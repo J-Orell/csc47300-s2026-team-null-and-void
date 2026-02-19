@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        nav {
+            width: 240px;
+            background-color: #2e7d32;
+            color: white;
+            padding: 30px 20px;
+            flex-shrink: 0;
+        }
+        nav h2 {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav li {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        nav a.active {
+            opacity: 1;
+            font-weight: bold;
+            border-left: 4px solid white;
+            padding-left: 10px;
+        }
+        main {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        .settings-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        header {
+            border-bottom: 2px solid #2e7d32;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+        h1 {
+            color: #2e7d32;
+            margin: 0;
+        }
+        h2 {
+            font-size: 1.2rem;
+            color: #444;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        section {
+            margin-bottom: 40px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .flex-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .card-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+        }
+        .btn-save {
+            background-color: #2e7d32;
+            color: white;
+            flex: 2;
+        }
+        .btn-cancel {
+            background-color: #e0e0e0;
+            color: #333;
+            flex: 1;
+        }
+        .danger-box {
+            border: 1px solid #ffcdd2;
+            background: #fff5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .btn-outline-danger {
+            background: transparent;
+            border: 2px solid #d32f2f;
+            color: #d32f2f;
+            width: 48%;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-outline-danger:hover {
+            background: #d32f2f;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <h2>BudgetBuddy</h2>
+    <ul>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Transactions</a></li>
+        <li><a href="#" class="active">Settings</a></li>
+    </ul>
+</nav>
+<main>
+    <div class="settings-container">
+        <header>
+            <h1>Settings</h1>
+        </header>
+        <form>
+            <section>
+                <h2>User Profile</h2>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" value="Raeesah Iram">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" value="riram000@citymail.cuny.edu">
+                </div>
+                <div class="flex-row">
+                    <div style="flex: 1;">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" placeholder="(212) 555-0199">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="dob">Birthday</label>
+                        <input type="date" id="dob">
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h2>App Preferences</h2>
+                <div class="form-group">
+                    <label for="currency">Primary Currency</label>
+                    <select id="currency">
+                        <option value="USD">USD - US Dollar ($)</option>
+                        <option value="EUR">EUR - Euro (€)</option>
+                        <option value="GBP">GBP - British Pound (£)</option>
+                        <option value="JPY">JPY - Japanese Yen (¥)</option>
+                        <option value="CAD">CAD - Canadian Dollar (C$)</option>
+                        <option value="AUD">AUD - Australian Dollar (A$)</option>
+                        <option value="INR">INR - Indian Rupee (₹)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="threshold">Alert me when I reach:</label>
+                    <div class="flex-row">
+                        <input type="number" id="threshold" value="90" style="width: 80px;">
+                        <span>% of my monthly budget</span>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h2>Cards & Payments</h2>
+                <div class="card-item">
+                    <span>Visa ending in 4242</span>
+                    <button type="button" style="color: #d32f2f; border: none; background: none; cursor: pointer; text-decoration: underline;">Delete Card</button>
+                </div>
+                <div class="card-item">
+                    <span>Mastercard ending in 8899</span>
+                    <button type="button" style="color: #d32f2f; border: none; background: none; cursor: pointer; text-decoration: underline;">Delete Card</button>
+                </div>
+                <button type="button" class="btn" style="background: #eee; width: 100%; margin-top: 10px;">+ Add New Card</button>
+            </section>
+            <section>
+                <h2>Account Management</h2>
+                <div class="danger-box">
+                    <p style="margin-top: 0; color: #555; font-size: 0.9rem;">Temporary or permanent changes to your account status.</p>
+                    <div style="display: flex; justify-content: space-between;">
+                        <button type="button" class="btn btn-outline-danger">Pause Account</button>
+                        <button type="button" class="btn btn-outline-danger">Delete Account</button>
+                    </div>
+                </div>
+            </section>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-save">Save Changes</button>
+                <button type="reset" class="btn btn-cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
