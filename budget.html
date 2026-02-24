@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget - BudgetBuddy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar (matches existing pages exactly) ── */
+        nav {
+            width: 240px;
+            background-color: #2e7d32;
+            color: white;
+            padding: 30px 20px;
+            flex-shrink: 0;
+        }
+        nav h2 { font-size: 1.4rem; margin-bottom: 40px; font-weight: 600; }
+        nav ul { list-style: none; padding: 0; }
+        nav li { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        nav a { color: white; text-decoration: none; font-weight: 500; opacity: 0.8; transition: opacity 0.3s ease; }
+        nav a:hover { opacity: 1; }
+        nav a.active { opacity: 1; font-weight: bold; border-left: 4px solid white; padding-left: 10px; }
+
+        /* ── Main layout ── */
+        main { flex-grow: 1; padding: 40px; overflow-y: auto; }
+
+        .budget-container { max-width: 1000px; margin: 0 auto; }
+
+        header { margin-bottom: 30px; border-bottom: 2px solid #2e7d32; padding-bottom: 15px; }
+        header h1 { color: #2e7d32; font-size: 2rem; margin-bottom: 4px; }
+        header p { color: #666; font-size: 0.95rem; }
+
+        /* ── Month selector ── */
+        .month-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .month-bar button {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 34px;
+            height: 34px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .month-bar button:hover { background: #256628; }
+        .month-bar span { font-size: 1.1rem; font-weight: 600; color: #333; min-width: 140px; text-align: center; }
+
+        /* ── Summary strip ── */
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 6px solid #2e7d32;
+        }
+        .summary-card.over { border-left-color: #d32f2f; }
+        .summary-card.warn { border-left-color: #f9a825; }
+        .summary-card .label { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; font-weight: 600; margin-bottom: 8px; }
+        .summary-card .value { font-size: 1.7rem; font-weight: bold; color: #2e7d32; }
+        .summary-card.over .value { color: #d32f2f; }
+        .summary-card.warn .value { color: #f9a825; }
+
+        /* ── Add budget form ── */
+        .add-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 24px 28px;
+            margin-bottom: 28px;
+        }
+        .add-section h2 { font-size: 1.1rem; color: #444; margin-bottom: 18px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .add-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .add-form .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+        .add-form label { font-size: 0.85rem; font-weight: 600; color: #555; }
+        .add-form input, .add-form select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        .add-form input:focus, .add-form select:focus { outline: none; border-color: #2e7d32; }
+        .btn-add {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            height: 40px;
+            white-space: nowrap;
+        }
+        .btn-add:hover { background: #256628; }
+
+        /* ── Budget cards grid ── */
+        .budgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 20px;
+        }
+
+        .budget-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 22px;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .budget-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+        .card-title { display: flex; align-items: center; gap: 9px; }
+        .card-icon { font-size: 1.4rem; }
+        .card-name { font-weight: 700; font-size: 1rem; color: #333; }
+        .card-actions { display: flex; gap: 6px; }
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #aaa;
+            padding: 2px 5px;
+            border-radius: 4px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .icon-btn:hover { color: #2e7d32; background: #f0f7f0; }
+        .icon-btn.del:hover { color: #d32f2f; background: #fff5f5; }
+
+        .amounts { display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 8px; }
+        .spent-label { color: #555; }
+        .spent-label span { font-weight: 700; color: #333; }
+        .budget-label { color: #888; }
+        .budget-label span { font-weight: 600; color: #2e7d32; }
+
+        .progress-wrap { width: 100%; height: 10px; background: #e9ecef; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+        .progress-bar.safe { background: linear-gradient(90deg, #2e7d32, #4caf50); }
+        .progress-bar.warning { background: linear-gradient(90deg, #f9a825, #ffcc02); }
+        .progress-bar.danger { background: linear-gradient(90deg, #d32f2f, #ef5350); }
+
+        .card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; }
+        .remaining { font-weight: 600; }
+        .remaining.safe { color: #2e7d32; }
+        .remaining.warning { color: #f9a825; }
+        .remaining.danger { color: #d32f2f; }
+        .pct-label { color: #aaa; }
+
+        .alert-badge {
+            display: inline-block;
+            background: #fff3e0;
+            color: #e65100;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-top: 8px;
+        }
+        .alert-badge.over { background: #ffebee; color: #c62828; }
+
+        /* ── Empty state ── */
+        .empty-state { text-align: center; padding: 60px 20px; color: #bbb; }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+        .empty-state p { font-size: 1rem; }
+
+        /* ── Edit modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 14px;
+            padding: 30px;
+            width: 360px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+        }
+        .modal h3 { color: #2e7d32; margin-bottom: 20px; font-size: 1.2rem; }
+        .modal .field { margin-bottom: 16px; }
+        .modal label { display: block; font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+        .modal input, .modal select {
+            width: 100%; padding: 10px 12px;
+            border: 1px solid #ddd; border-radius: 6px;
+            font-family: inherit; font-size: 0.95rem;
+        }
+        .modal input:focus, .modal select:focus { outline: none; border-color: #2e7d32; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btns button { flex: 1; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; }
+        .btn-save { background: #2e7d32; color: white; }
+        .btn-save:hover { background: #256628; }
+        .btn-cancel-modal { background: #e0e0e0; color: #333; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; padding: 20px; }
+            main { padding: 20px; }
+            .summary-strip { grid-template-columns: 1fr; }
+            .budgets-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>BudgetBuddy</h2>
+    <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="transactions.html">Transactions</a></li>
+        <li><a href="budget.html" class="active">Budget</a></li>
+        <li><a href="settings.html">Settings</a></li>
+    </ul>
+</nav>
+
+<main>
+    <div class="budget-container">
+        <header>
+            <h1>Budget Manager</h1>
+            <p>Set monthly limits per category and track your spending.</p>
+        </header>
+
+        <!-- Month Navigator -->
+        <div class="month-bar">
+            <button onclick="changeMonth(-1)">&#8249;</button>
+            <span id="monthLabel"></span>
+            <button onclick="changeMonth(1)">&#8250;</button>
+        </div>
+
+        <!-- Summary Strip -->
+        <div class="summary-strip">
+            <div class="summary-card">
+                <div class="label">Total Budget</div>
+                <div class="value" id="totalBudget">$0</div>
+            </div>
+            <div class="summary-card warn" id="spentCard">
+                <div class="label">Total Spent</div>
+                <div class="value" id="totalSpent">$0</div>
+            </div>
+            <div class="summary-card" id="remainCard">
+                <div class="label">Remaining</div>
+                <div class="value" id="totalRemain">$0</div>
+            </div>
+        </div>
+
+        <!-- Add Budget Form -->
+        <div class="add-section">
+            <h2>Add New Budget Category</h2>
+            <div class="add-form">
+                <div class="field">
+                    <label for="catIcon">Icon</label>
+                    <select id="catIcon">
+                        <option value="🛒">🛒 Groceries</option>
+                        <option value="🚗">🚗 Transport</option>
+                        <option value="🎬">🎬 Entertainment</option>
+                        <option value="💡">💡 Utilities</option>
+                        <option value="🛍️">🛍️ Shopping</option>
+                        <option value="🍽️">🍽️ Dining</option>
+                        <option value="💊">💊 Health</option>
+                        <option value="📚">📚 Education</option>
+                        <option value="✈️">✈️ Travel</option>
+                        <option value="🏠">🏠 Housing</option>
+                        <option value="💰">💰 Other</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="catName">Category Name</label>
+                    <input type="text" id="catName" placeholder="e.g. Groceries">
+                </div>
+                <div class="field" style="max-width:130px">
+                    <label for="catLimit">Monthly Limit ($)</label>
+                    <input type="number" id="catLimit" placeholder="500" min="1">
+                </div>
+                <div class="field" style="max-width:130px">
+                    <label for="catSpent">Spent So Far ($)</label>
+                    <input type="number" id="catSpent" placeholder="0" min="0">
+                </div>
+                <button class="btn-add" onclick="addBudget()">+ Add</button>
+            </div>
+        </div>
+
+        <!-- Budget Cards -->
+        <div class="budgets-grid" id="budgetsGrid"></div>
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="icon">📋</div>
+            <p>No budgets set yet. Add a category above to get started!</p>
+        </div>
+    </div>
+</main>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <h3>Edit Budget</h3>
+        <div class="field">
+            <label>Category Name</label>
+            <input type="text" id="editName">
+        </div>
+        <div class="field">
+            <label>Monthly Limit ($)</label>
+            <input type="number" id="editLimit" min="1">
+        </div>
+        <div class="field">
+            <label>Spent So Far ($)</label>
+            <input type="number" id="editSpent" min="0">
+        </div>
+        <div class="modal-btns">
+            <button class="btn-save" onclick="saveEdit()">Save</button>
+            <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── State ──
+    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    let currentDate = new Date(2026, 1); // Feb 2026
+    let editingIdx = null;
+
+    let budgets = [
+        { icon: "🛒", name: "Groceries",     limit: 700,  spent: 450  },
+        { icon: "🚗", name: "Transport",      limit: 300,  spent: 210  },
+        { icon: "🎬", name: "Entertainment",  limit: 200,  spent: 180  },
+        { icon: "💡", name: "Utilities",      limit: 150,  spent: 98   },
+        { icon: "🛍️", name: "Shopping",      limit: 400,  spent: 380  },
+        { icon: "🍽️", name: "Dining",        limit: 250,  spent: 62   },
+    ];
+
+    // ── Month nav ──
+    function changeMonth(dir) {
+        currentDate.setMonth(currentDate.getMonth() + dir);
+        document.getElementById("monthLabel").textContent =
+            MONTHS[currentDate.getMonth()] + " " + currentDate.getFullYear();
+    }
+    changeMonth(0); // init label
+
+    // ── Render ──
+    function render() {
+        const grid = document.getElementById("budgetsGrid");
+        const empty = document.getElementById("emptyState");
+
+        if (budgets.length === 0) {
+            grid.innerHTML = "";
+            empty.style.display = "block";
+            updateSummary();
+            return;
+        }
+        empty.style.display = "none";
+
+        grid.innerHTML = budgets.map((b, i) => {
+            const pct = Math.min((b.spent / b.limit) * 100, 100);
+            const over = b.spent > b.limit;
+            const warn = !over && pct >= 90;
+            const state = over ? "danger" : warn ? "warning" : "safe";
+            const remain = b.limit - b.spent;
+
+            return `
+            <div class="budget-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">${b.icon}</span>
+                        <span class="card-name">${b.name}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="icon-btn" onclick="openEdit(${i})" title="Edit">✏️</button>
+                        <button class="icon-btn del" onclick="deleteBudget(${i})" title="Delete">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="amounts">
+                    <span class="spent-label">Spent: <span>$${b.spent.toFixed(2)}</span></span>
+                    <span class="budget-label">Limit: <span>$${b.limit.toFixed(2)}</span></span>
+                </div>
+
+                <div class="progress-wrap">
+                    <div class="progress-bar ${state}" style="width:${pct.toFixed(1)}%"></div>
+                </div>
+
+                <div class="card-footer">
+                    <span class="remaining ${state}">
+                        ${over ? "Over by $" + Math.abs(remain).toFixed(2) : "$" + remain.toFixed(2) + " left"}
+                    </span>
+                    <span class="pct-label">${pct.toFixed(0)}% used</span>
+                </div>
+
+                ${over ? '<span class="alert-badge over">⚠️ Over Budget</span>' :
+                  warn ? '<span class="alert-badge">⚠️ Near Limit</span>' : ''}
+            </div>`;
+        }).join("");
+
+        updateSummary();
+    }
+
+    function updateSummary() {
+        const totalBudget = budgets.reduce((s, b) => s + b.limit, 0);
+        const totalSpent  = budgets.reduce((s, b) => s + b.spent, 0);
+        const remain      = totalBudget - totalSpent;
+
+        document.getElementById("totalBudget").textContent = "$" + totalBudget.toFixed(2);
+        document.getElementById("totalSpent").textContent  = "$" + totalSpent.toFixed(2);
+        document.getElementById("totalRemain").textContent = (remain < 0 ? "-$" : "$") + Math.abs(remain).toFixed(2);
+
+        const spentCard  = document.getElementById("spentCard");
+        const remainCard = document.getElementById("remainCard");
+        spentCard.className  = "summary-card " + (totalSpent / totalBudget > 0.9 ? "over" : "warn");
+        remainCard.className = "summary-card " + (remain < 0 ? "over" : "");
+    }
+
+    // ── Add ──
+    function addBudget() {
+        const iconSel = document.getElementById("catIcon");
+        const icon    = iconSel.value;
+        const name    = document.getElementById("catName").value.trim();
+        const limit   = parseFloat(document.getElementById("catLimit").value);
+        const spent   = parseFloat(document.getElementById("catSpent").value) || 0;
+
+        if (!name) { alert("Please enter a category name."); return; }
+        if (!limit || limit <= 0) { alert("Please enter a valid budget limit."); return; }
+
+        budgets.push({ icon, name, limit, spent });
+        document.getElementById("catName").value  = "";
+        document.getElementById("catLimit").value = "";
+        document.getElementById("catSpent").value = "";
+        render();
+    }
+
+    // ── Delete ──
+    function deleteBudget(i) {
+        if (confirm(`Delete "${budgets[i].name}" budget?`)) {
+            budgets.splice(i, 1);
+            render();
+        }
+    }
+
+    // ── Edit modal ──
+    function openEdit(i) {
+        editingIdx = i;
+        document.getElementById("editName").value  = budgets[i].name;
+        document.getElementById("editLimit").value = budgets[i].limit;
+        document.getElementById("editSpent").value = budgets[i].spent;
+        document.getElementById("editModal").classList.add("open");
+    }
+
+    function closeModal() {
+        document.getElementById("editModal").classList.remove("open");
+        editingIdx = null;
+    }
+
+    function saveEdit() {
+        const name  = document.getElementById("editName").value.trim();
+        const limit = parseFloat(document.getElementById("editLimit").value);
+        const spent = parseFloat(document.getElementById("editSpent").value) || 0;
+
+        if (!name || !limit || limit <= 0) { alert("Please fill in all fields correctly."); return; }
+        budgets[editingIdx] = { ...budgets[editingIdx], name, limit, spent };
+        closeModal();
+        render();
+    }
+
+    // Close modal on overlay click
+    document.getElementById("editModal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // ── Init ──
+    render();
+</script>
+
+</body>
+</html>
