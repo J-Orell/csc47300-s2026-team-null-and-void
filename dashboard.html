@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BudgetBuddy</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <h2>BudgetBuddy</h2>
+        <ul>
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="transactions.html">Transactions</a></li>
+            <li><a href="settings.html">Settings</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="dashboard-container">
+            <header>
+                <h1>Welcome Back!</h1>
+                <p class="subtitle">Here's your financial overview for this month</p>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Income</div>
+                    <div class="stat-value">$4,250.00</div>
+                    <div class="stat-change positive">↑ 12% from last month</div>
+                </div>
+
+                <div class="stat-card expense">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value">$2,180.50</div>
+                    <div class="stat-change positive">↓ 5% from last month</div>
+                </div>
+
+                <div class="stat-card savings">
+                    <div class="stat-label">Savings</div>
+                    <div class="stat-value">$2,069.50</div>
+                    <div class="stat-change positive">↑ 18% from last month</div>
+                </div>
+
+                <div class="stat-card budget">
+                    <div class="stat-label">Budget Health</div>
+                    <div class="stat-value">85%</div>
+                    <div class="stat-change">On track with budget</div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn">Add Transaction</button>
+                <button class="action-btn secondary">View Reports</button>
+                <button class="action-btn">Set Budget</button>
+                <button class="action-btn secondary">Export Data</button>
+            </div>
+
+            <div class="main-content">
+                <div class="card">
+                    <h2>Spending by Category</h2>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Groceries</span>
+                            <span class="category-amount">$450.00</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Transportation</span>
+                            <span class="category-amount">$280.00</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 40%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Entertainment</span>
+                            <span class="category-amount">$320.50</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 46%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Utilities</span>
+                            <span class="category-amount">$520.00</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Shopping</span>
+                            <span class="category-amount">$610.00</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 88%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Quick Stats</h2>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Avg Daily Spend</span>
+                            <span class="category-amount">$72.68</span>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Transactions</span>
+                            <span class="category-amount">42</span>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Largest Expense</span>
+                            <span class="category-amount">$180.00</span>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Budget Remaining</span>
+                            <span class="category-amount" style="color: #28a745;">$1,500.00</span>
+                        </div>
+                    </div>
+
+                    <div class="spending-category">
+                        <div class="category-header">
+                            <span class="category-name">Savings Rate</span>
+                            <span class="category-amount">48.7%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-transactions">
+                <h2>Recent Transactions</h2>
+
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">Salary Deposit</div>
+                        <div class="transaction-date">Feb 20, 2026</div>
+                    </div>
+                    <div class="transaction-amount income">+$3,500.00</div>
+                </div>
+
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">Whole Foods</div>
+                        <div class="transaction-date">Feb 19, 2026</div>
+                    </div>
+                    <div class="transaction-amount expense">-$87.50</div>
+                </div>
+
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">Gas Station</div>
+                        <div class="transaction-date">Feb 19, 2026</div>
+                    </div>
+                    <div class="transaction-amount expense">-$45.00</div>
+                </div>
+
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">Netflix Subscription</div>
+                        <div class="transaction-date">Feb 18, 2026</div>
+                    </div>
+                    <div class="transaction-amount expense">-$15.99</div>
+                </div>
+
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">Restaurant</div>
+                        <div class="transaction-date">Feb 17, 2026</div>
+                    </div>
+                    <div class="transaction-amount expense">-$52.75</div>
+                </div>
+
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">Amazon Purchase</div>
+                        <div class="transaction-date">Feb 16, 2026</div>
+                    </div>
+                    <div class="transaction-amount expense">-$125.30</div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

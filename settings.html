@@ -4,150 +4,165 @@
     <meta charset="UTF-8">
     <title>Settings</title>
     <style>
+        :root {
+            --brand-blue: #1e293b;
+            --accent-blue: #3b82f6;
+            --text-main: #334155;
+            --bg-soft: #f8fafc;
+            --white: #ffffff;
+            --error: #ef4444;
+            --transition: 0.3s ease;
+        }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f7f6;
+            font-family: Georgia, serif;
+            background-color: var(--bg-soft);
             margin: 0;
-            display: flex;
-            min-height: 100vh;
+            color: var(--text-main);
         }
         nav {
-            width: 240px;
-            background-color: #2e7d32;
-            color: white;
-            padding: 30px 20px;
-            flex-shrink: 0;
+            background-color: var(--brand-blue);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
         }
         nav h2 {
-            font-size: 1.4rem;
-            margin-bottom: 40px;
+            color: var(--white);
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: normal;
         }
         nav ul {
+            display: flex;
             list-style: none;
+            margin: 0;
             padding: 0;
-        }
-        nav li {
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            gap: 25px;
         }
         nav a {
-            color: white;
+            color: var(--white);
             text-decoration: none;
-            font-weight: 500;
             opacity: 0.8;
+            transition: var(--transition);
+            font-size: 0.95rem;
         }
-        nav a.active {
+        nav a:hover, nav a.active {
             opacity: 1;
-            font-weight: bold;
-            border-left: 4px solid white;
-            padding-left: 10px;
+            color: var(--accent-blue);
         }
         main {
-            flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
         }
         .settings-container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        header {
-            border-bottom: 2px solid #2e7d32;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
+            width: 100%;
+            max-width: 850px;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         h1 {
-            color: #2e7d32;
-            margin: 0;
+            margin: 0 0 40px 0;
+            font-size: 2.2rem;
+            color: var(--brand-blue);
+            font-weight: normal;
         }
         h2 {
             font-size: 1.2rem;
-            color: #444;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            color: var(--brand-blue);
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: normal;
         }
-        section {
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
             margin-bottom: 40px;
         }
+        .full-row {
+            grid-column: span 2;
+        }
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #555;
+            font-size: 0.95rem;
         }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
+        input, select {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-family: Georgia, serif;
+            font-size: 1rem;
+            transition: var(--transition);
         }
-        .flex-row {
-            display: flex;
+        input:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+        }
+        .card-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
-            align-items: center;
         }
         .card-item {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f9f9f9;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #eee;
-            margin-bottom: 10px;
         }
-        .btn-group {
+        .account-actions {
+            background: #fef2f2;
+            padding: 25px;
+            border-radius: 4px;
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            gap: 20px;
         }
         .btn {
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 14px 24px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
             border: none;
+            font-family: Georgia, serif;
+            font-size: 1rem;
+            transition: var(--transition);
         }
         .btn-save {
-            background-color: #2e7d32;
-            color: white;
-            flex: 2;
+            background: var(--accent-blue);
+            color: var(--white);
+        }
+        .btn-save:hover {
+            filter: brightness(1.1);
         }
         .btn-cancel {
-            background-color: #e0e0e0;
-            color: #333;
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .btn-danger {
             flex: 1;
+            background: var(--white);
+            border: 1px solid var(--error);
+            color: var(--error);
         }
-        .danger-box {
-            border: 1px solid #ffcdd2;
-            background: #fff5f5;
-            padding: 20px;
-            border-radius: 8px;
+        .btn-danger:hover {
+            background: var(--error);
+            color: var(--white);
         }
-        .btn-outline-danger {
-            background: transparent;
-            border: 2px solid #d32f2f;
-            color: #d32f2f;
-            width: 48%;
-            padding: 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-outline-danger:hover {
-            background: #d32f2f;
-            color: white;
+        .action-bar {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            gap: 15px;
         }
     </style>
 </head>
@@ -157,83 +172,71 @@
     <ul>
         <li><a href="#">Dashboard</a></li>
         <li><a href="#">Transactions</a></li>
+        <li><a href="#">Budget</a></li>
         <li><a href="#" class="active">Settings</a></li>
     </ul>
 </nav>
 <main>
     <div class="settings-container">
-        <header>
-            <h1>Settings</h1>
-        </header>
+        <h1>Settings</h1>
         <form>
             <section>
-                <h2>User Profile</h2>
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" value="Raeesah Iram">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" value="riram000@citymail.cuny.edu">
-                </div>
-                <div class="flex-row">
-                    <div style="flex: 1;">
+                <h2>Personal Information</h2>
+                <div class="grid-layout">
+                    <div class="form-group full-row">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" value="Raeesah Iram">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" value="riram000@citymail.cuny.edu">
+                    </div>
+                    <div class="form-group">
                         <label for="phone">Phone Number</label>
                         <input type="tel" id="phone" placeholder="(212) 555-0199">
                     </div>
-                    <div style="flex: 1;">
-                        <label for="dob">Birthday</label>
-                        <input type="date" id="dob">
+                </div>
+            </section>
+            <section>
+                <h2>Preferences</h2>
+                <div class="grid-layout">
+                    <div class="form-group">
+                        <label for="currency">Local Currency</label>
+                        <select id="currency">
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="threshold">Spending Alert (%)</label>
+                        <input type="number" id="threshold" value="90">
                     </div>
                 </div>
             </section>
             <section>
-                <h2>App Preferences</h2>
-                <div class="form-group">
-                    <label for="currency">Primary Currency</label>
-                    <select id="currency">
-                        <option value="USD">USD - US Dollar ($)</option>
-                        <option value="EUR">EUR - Euro (€)</option>
-                        <option value="GBP">GBP - British Pound (£)</option>
-                        <option value="JPY">JPY - Japanese Yen (¥)</option>
-                        <option value="CAD">CAD - Canadian Dollar (C$)</option>
-                        <option value="AUD">AUD - Australian Dollar (A$)</option>
-                        <option value="INR">INR - Indian Rupee (₹)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="threshold">Alert me when I reach:</label>
-                    <div class="flex-row">
-                        <input type="number" id="threshold" value="90" style="width: 80px;">
-                        <span>% of my monthly budget</span>
+                <h2>Payment Methods</h2>
+                <div class="card-list">
+                    <div class="card-item">
+                        <span>Visa **** 4242</span>
+                        <button type="button" style="color:var(--error); border:none; background:none; cursor:pointer; font-family: Georgia;">Delete</button>
+                    </div>
+                    <div class="card-item">
+                        <span>MC **** 8899</span>
+                        <button type="button" style="color:var(--error); border:none; background:none; cursor:pointer; font-family: Georgia;">Delete</button>
                     </div>
                 </div>
             </section>
-            <section>
-                <h2>Cards & Payments</h2>
-                <div class="card-item">
-                    <span>Visa ending in 4242</span>
-                    <button type="button" style="color: #d32f2f; border: none; background: none; cursor: pointer; text-decoration: underline;">Delete Card</button>
-                </div>
-                <div class="card-item">
-                    <span>Mastercard ending in 8899</span>
-                    <button type="button" style="color: #d32f2f; border: none; background: none; cursor: pointer; text-decoration: underline;">Delete Card</button>
-                </div>
-                <button type="button" class="btn" style="background: #eee; width: 100%; margin-top: 10px;">+ Add New Card</button>
-            </section>
-            <section>
+            <section style="margin-top: 40px;">
                 <h2>Account Management</h2>
-                <div class="danger-box">
-                    <p style="margin-top: 0; color: #555; font-size: 0.9rem;">Temporary or permanent changes to your account status.</p>
-                    <div style="display: flex; justify-content: space-between;">
-                        <button type="button" class="btn btn-outline-danger">Pause Account</button>
-                        <button type="button" class="btn btn-outline-danger">Delete Account</button>
-                    </div>
+                <div class="account-actions">
+                    <button type="button" class="btn btn-danger">Pause Account</button>
+                    <button type="button" class="btn btn-danger">Delete Account</button>
                 </div>
             </section>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-save">Save Changes</button>
-                <button type="reset" class="btn btn-cancel">Cancel</button>
+            <div class="action-bar">
+                <button type="submit" class="btn btn-save" style="flex: 2;">Confirm Changes</button>
+                <button type="reset" class="btn btn-cancel" style="flex: 1;">Discard</button>
             </div>
         </form>
     </div>
