@@ -1,0 +1,660 @@
+/*
+============================================================
+BUDGET PAGE - Advanced CSS Features Documentation
+============================================================
+
+FEATURE 1: CSS GRID LAYOUT
+- Used for .summary-strip (3-column responsive summary cards)
+- Used for .budgets-grid (auto-fill responsive card grid)
+- Used for .add-form (flexible form layout)
+- Satisfies the Flexbox/Grid requirement
+
+FEATURE 2: CSS TRANSITIONS & HOVER ANIMATIONS
+- Budget cards lift up with green glow on hover
+- Summary cards scale up subtly on hover
+- Buttons have smooth background-color transitions
+- Form inputs glow green on focus
+- Icon buttons change color on hover (edit = green, delete = red)
+
+FEATURE 3: CSS KEYFRAME ANIMATIONS
+- Progress bars animate from 0% to their target width on load
+- The edit modal fades in and scales up when opened
+- Budget cards fade in with staggered delays
+
+FEATURE 4: CSS GRADIENTS
+- Progress bars use directional gradients based on status
+  (green = safe, yellow = warning, red = danger)
+- Added a decorative gradient line under the main page header.
+
+FEATURE 5: RESPONSIVE DESIGN (MEDIA QUERIES)
+- At 768px: summary strip and budget grid become single column
+- Form wraps naturally using flex-wrap
+- Modal adjusts width for smaller screens
+
+FEATURE 6: PSEUDO-ELEMENTS
+- Used ::after for the gradient bar under the header.
+- Used ::before for a subtle glow effect on the summary cards.
+*/
+
+
+/* ── Budget Container ── */
+.budget-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+
+/* ── Page Header with gradient accent (FEATURE 4 & 6) ── */
+.budget-container header {
+    border-bottom: none;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.budget-container header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #2e7d32, #4caf50, #81c784, transparent);
+    border-radius: 2px;
+}
+
+.budget-container header p {
+    color: #666;
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+
+/* ── Month Selector ── */
+.month-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.month-bar button {
+    background: linear-gradient(135deg, #2e7d32, #4caf50);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2);
+}
+
+.month-bar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.35);
+}
+
+.month-bar button:active {
+    transform: translateY(0);
+}
+
+.month-bar span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    min-width: 140px;
+    text-align: center;
+}
+
+
+/* ── FEATURE 1: CSS GRID - Summary Strip ── */
+.summary-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-left: 6px solid #2e7d32;
+    position: relative;
+    overflow: hidden;
+    /* FEATURE 2: Hover animation */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* FEATURE 6: Decorative radial glow */
+.summary-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at top right, rgba(46, 125, 50, 0.08), transparent 70%);
+    border-radius: 0 0 0 80px;
+}
+
+.summary-card.over {
+    border-left-color: #d32f2f;
+}
+
+.summary-card.over::before {
+    background: radial-gradient(circle at top right, rgba(211, 47, 47, 0.08), transparent 70%);
+}
+
+.summary-card.warn {
+    border-left-color: #f9a825;
+}
+
+.summary-card.warn::before {
+    background: radial-gradient(circle at top right, rgba(249, 168, 37, 0.08), transparent 70%);
+}
+
+.summary-card .label {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.summary-card .value {
+    font-size: 1.7rem;
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.summary-card.over .value {
+    color: #d32f2f;
+}
+
+.summary-card.warn .value {
+    color: #f9a825;
+}
+
+
+/* ── Add Budget Form ── */
+.add-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    border: 1px solid rgba(46, 125, 50, 0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.add-section:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.add-section h2 {
+    font-size: 1.1rem;
+    color: #1b5e20;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #e8f5e9;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+.add-form {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.add-form .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.add-form label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.add-form input,
+.add-form select {
+    padding: 10px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    width: 100%;
+    background: #fafafa;
+    /* FEATURE 2: Focus glow */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.add-form input:focus,
+.add-form select:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+    background: white;
+}
+
+.btn-add {
+    background: linear-gradient(135deg, #2e7d32, #4caf50);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    height: 42px;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.35);
+}
+
+.btn-add:active {
+    transform: translateY(0);
+}
+
+
+/* ── FEATURE 1: CSS GRID - Budget Cards Grid ── */
+.budgets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 20px;
+}
+
+/* FEATURE 3: Staggered fade-in animation */
+@keyframes budgetCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.budget-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 22px;
+    position: relative;
+    border: 1px solid rgba(46, 125, 50, 0.05);
+    animation: budgetCardIn 0.5s ease forwards;
+    /* FEATURE 2: Green glow hover */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.budget-card:nth-child(1) { animation-delay: 0s; }
+.budget-card:nth-child(2) { animation-delay: 0.05s; }
+.budget-card:nth-child(3) { animation-delay: 0.1s; }
+.budget-card:nth-child(4) { animation-delay: 0.15s; }
+.budget-card:nth-child(5) { animation-delay: 0.2s; }
+.budget-card:nth-child(6) { animation-delay: 0.25s; }
+
+.budget-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.card-icon {
+    font-size: 1.4rem;
+}
+
+.card-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #333;
+}
+
+.card-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #aaa;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.icon-btn:hover {
+    color: #2e7d32;
+    background: #f0f7f0;
+    transform: scale(1.1);
+}
+
+.icon-btn.del:hover {
+    color: #d32f2f;
+    background: #fff5f5;
+}
+
+.amounts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    margin-bottom: 8px;
+}
+
+.spent-label {
+    color: #555;
+}
+
+.spent-label span {
+    font-weight: 700;
+    color: #333;
+}
+
+.budget-label {
+    color: #888;
+}
+
+.budget-label span {
+    font-weight: 600;
+    color: #2e7d32;
+}
+
+
+/* ── Progress Bar ── */
+.progress-wrap {
+    width: 100%;
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/*
+   FEATURE 3: FIXED progress bar animation
+   The old animation used "from { width: 0% }" which caused bars
+   to fill to 100% first then snap to their actual width.
+   Now the inline style sets the target width, and the animation
+   only animates FROM 0% — the "to" keyframe uses the inline width.
+*/
+@keyframes fillBudgetBar {
+    from {
+        width: 0%;
+        /* opacity: 0; */
+        /* ^  maybe keep it? */
+    }
+}
+
+/* Renamed to avoid conflict with dashboard's .progress-bar */
+.budget-progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    animation: fillBudgetBar 1s ease;
+    box-shadow: 0 0 8px rgba(46, 125, 50, 0.2);
+}
+
+/* FEATURE 4: Status-based gradients */
+.budget-progress-bar.safe {
+    background: linear-gradient(90deg, #2e7d32, #4caf50);
+    box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+}
+
+.budget-progress-bar.warning {
+    background: linear-gradient(90deg, #f9a825, #ffcc02);
+    box-shadow: 0 0 8px rgba(249, 168, 37, 0.3);
+}
+
+.budget-progress-bar.danger {
+    background: linear-gradient(90deg, #d32f2f, #ef5350);
+    box-shadow: 0 0 8px rgba(211, 47, 47, 0.3);
+}
+
+
+/* ── Card Footer ── */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+}
+
+.remaining {
+    font-weight: 600;
+}
+
+.remaining.safe {
+    color: #2e7d32;
+}
+
+.remaining.warning {
+    color: #f9a825;
+}
+
+.remaining.danger {
+    color: #d32f2f;
+}
+
+.pct-label {
+    color: #aaa;
+}
+
+.alert-badge {
+    display: inline-block;
+    background: #fff3e0;
+    color: #e65100;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 10px;
+    transition: transform 0.2s ease;
+}
+
+.alert-badge:hover {
+    transform: scale(1.05);
+}
+
+.alert-badge.over {
+    background: #ffebee;
+    color: #c62828;
+}
+
+
+/* ── Empty State ── */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #bbb;
+}
+
+.empty-state .icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 1rem;
+}
+
+
+/* ── Edit Modal ── */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+/* FEATURE 3: Modal fade-in animation */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    width: 360px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    animation: modalFadeIn 0.3s ease forwards;
+}
+
+.modal h3 {
+    color: #1b5e20;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.modal .field {
+    margin-bottom: 16px;
+}
+
+.modal label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.modal input,
+.modal select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal input:focus,
+.modal select:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+}
+
+.modal-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-btns button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #2e7d32, #4caf50);
+    color: white;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.35);
+}
+
+.btn-cancel-modal {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-cancel-modal:hover {
+    background: #d0d0d0;
+    transform: translateY(-2px);
+}
+
+
+/* ── FEATURE 5: MEDIA QUERIES (RESPONSIVE DESIGN) ── */
+@media (max-width: 768px) {
+    .summary-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .budgets-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .add-form {
+        flex-direction: column;
+    }
+
+    .add-form .field {
+        min-width: 100%;
+    }
+
+    .modal {
+        width: 90%;
+        margin: 0 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-card .value {
+        font-size: 1.4rem;
+    }
+
+    .month-bar span {
+        font-size: 0.95rem;
+        min-width: 120px;
+    }
+}
