@@ -2,187 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Settings</title>
-    <style>
-        :root {
-            --brand-blue: #1e293b;
-            --accent-blue: #3b82f6;
-            --text-main: #334155;
-            --bg-soft: #f8fafc;
-            --white: #ffffff;
-            --error: #ef4444;
-            --transition: 0.3s ease;
-        }
-        body {
-            font-family: Georgia, serif;
-            background-color: var(--bg-soft);
-            margin: 0;
-            color: var(--text-main);
-        }
-        nav {
-            background-color: var(--brand-blue);
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 70px;
-        }
-        nav h2 {
-            color: var(--white);
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: normal;
-        }
-        nav ul {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            gap: 25px;
-        }
-        nav a {
-            color: var(--white);
-            text-decoration: none;
-            opacity: 0.8;
-            transition: var(--transition);
-            font-size: 0.95rem;
-        }
-        nav a:hover, nav a.active {
-            opacity: 1;
-            color: var(--accent-blue);
-        }
-        main {
-            padding: 60px 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .settings-container {
-            width: 100%;
-            max-width: 850px;
-            background: var(--white);
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        h1 {
-            margin: 0 0 40px 0;
-            font-size: 2.2rem;
-            color: var(--brand-blue);
-            font-weight: normal;
-        }
-        h2 {
-            font-size: 1.2rem;
-            color: var(--brand-blue);
-            margin: 0 0 20px 0;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e2e8f0;
-            font-weight: normal;
-        }
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        .full-row {
-            grid-column: span 2;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        label {
-            font-size: 0.95rem;
-        }
-        input, select {
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            font-family: Georgia, serif;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        input:focus {
-            border-color: var(--accent-blue);
-            outline: none;
-        }
-        .card-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .card-item {
-            background: #f1f5f9;
-            padding: 15px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .account-actions {
-            background: #fef2f2;
-            padding: 25px;
-            border-radius: 4px;
-            display: flex;
-            gap: 20px;
-        }
-        .btn {
-            padding: 14px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-            font-family: Georgia, serif;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        .btn-save {
-            background: var(--accent-blue);
-            color: var(--white);
-        }
-        .btn-save:hover {
-            filter: brightness(1.1);
-        }
-        .btn-cancel {
-            background: #e2e8f0;
-            color: #475569;
-        }
-        .btn-danger {
-            flex: 1;
-            background: var(--white);
-            border: 1px solid var(--error);
-            color: var(--error);
-        }
-        .btn-danger:hover {
-            background: var(--error);
-            color: var(--white);
-        }
-        .action-bar {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #f1f5f9;
-            display: flex;
-            gap: 15px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - BudgetBuddy</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="settings.css">
 </head>
 <body>
+
 <nav>
     <h2>BudgetBuddy</h2>
     <ul>
-        <li><a href="#">Dashboard</a></li>
-        <li><a href="#">Transactions</a></li>
-        <li><a href="#">Budget</a></li>
-        <li><a href="#" class="active">Settings</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="transactions.html">Transactions</a></li>
+        <li><a href="budget.html">Budget</a></li>
+        <li><a href="settings.html" class="active">Settings</a></li>
     </ul>
 </nav>
+
 <main>
     <div class="settings-container">
-        <h1>Settings</h1>
+
+        <header>
+            <h1>Settings</h1>
+            <p>Manage your account preferences and personal information</p>
+        </header>
+
         <form>
-            <section>
+            <!-- Personal Information -->
+            <section class="settings-section">
                 <h2>Personal Information</h2>
-                <div class="grid-layout">
+                <div class="settings-grid">
                     <div class="form-group full-row">
                         <label for="name">Full Name</label>
                         <input type="text" id="name" value="Raeesah Iram">
@@ -197,49 +46,155 @@
                     </div>
                 </div>
             </section>
-            <section>
+
+            <!-- Preferences -->
+            <section class="settings-section">
                 <h2>Preferences</h2>
-                <div class="grid-layout">
+                <div class="settings-grid">
                     <div class="form-group">
                         <label for="currency">Local Currency</label>
                         <select id="currency">
                             <option value="USD">USD ($)</option>
                             <option value="EUR">EUR (€)</option>
                             <option value="GBP">GBP (£)</option>
+                            <option value="JPY">JPY (¥)</option>
+                            <option value="CAD">CAD (C$)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="threshold">Spending Alert (%)</label>
-                        <input type="number" id="threshold" value="90">
+                        <label for="threshold">Spending Alert Threshold (%)</label>
+                        <input type="number" id="threshold" value="90" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="dateformat">Date Format</label>
+                        <select id="dateformat">
+                            <option value="mdy">MM/DD/YYYY</option>
+                            <option value="dmy">DD/MM/YYYY</option>
+                            <option value="ymd">YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="startday">Budget Cycle Start</label>
+                        <select id="startday">
+                            <option value="1">1st of month</option>
+                            <option value="15">15th of month</option>
+                            <option value="last">Last day of month</option>
+                        </select>
                     </div>
                 </div>
             </section>
-            <section>
+
+            <!-- Notifications -->
+            <section class="settings-section">
+                <h2>Notifications</h2>
+                <div class="notification-options">
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Budget Alerts</span>
+                            <span class="toggle-desc">Get notified when spending nears your limit</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Weekly Summary</span>
+                            <span class="toggle-desc">Receive a weekly spending report via email</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Transaction Alerts</span>
+                            <span class="toggle-desc">Get notified for every new transaction</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Monthly Report</span>
+                            <span class="toggle-desc">Detailed monthly breakdown sent to your email</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment Methods -->
+            <section class="settings-section">
                 <h2>Payment Methods</h2>
                 <div class="card-list">
                     <div class="card-item">
-                        <span>Visa **** 4242</span>
-                        <button type="button" style="color:var(--error); border:none; background:none; cursor:pointer; font-family: Georgia;">Delete</button>
+                        <div class="card-info">
+                            <span class="card-type visa">VISA</span>
+                            <span class="card-number">**** **** **** 4242</span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="card-expiry">Exp: 08/27</span>
+                            <button type="button" class="card-delete-btn">Remove</button>
+                        </div>
                     </div>
                     <div class="card-item">
-                        <span>MC **** 8899</span>
-                        <button type="button" style="color:var(--error); border:none; background:none; cursor:pointer; font-family: Georgia;">Delete</button>
+                        <div class="card-info">
+                            <span class="card-type mc">MC</span>
+                            <span class="card-number">**** **** **** 8899</span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="card-expiry">Exp: 03/28</span>
+                            <button type="button" class="card-delete-btn">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-card">+ Add Payment Method</button>
+            </section>
+
+            <!-- Account Management -->
+            <section class="settings-section">
+                <h2>Account Management</h2>
+                <div class="account-actions">
+                    <div class="account-action-card">
+                        <div class="action-info">
+                            <span class="action-title">Export Data</span>
+                            <span class="action-desc">Download all your transaction data as CSV</span>
+                        </div>
+                        <button type="button" class="btn-action export">Export</button>
+                    </div>
+                    <div class="account-action-card">
+                        <div class="action-info">
+                            <span class="action-title">Pause Account</span>
+                            <span class="action-desc">Temporarily disable tracking and notifications</span>
+                        </div>
+                        <button type="button" class="btn-action pause">Pause</button>
+                    </div>
+                    <div class="account-action-card danger">
+                        <div class="action-info">
+                            <span class="action-title">Delete Account</span>
+                            <span class="action-desc">Permanently remove your account and all data</span>
+                        </div>
+                        <button type="button" class="btn-action delete">Delete</button>
                     </div>
                 </div>
             </section>
-            <section style="margin-top: 40px;">
-                <h2>Account Management</h2>
-                <div class="account-actions">
-                    <button type="button" class="btn btn-danger">Pause Account</button>
-                    <button type="button" class="btn btn-danger">Delete Account</button>
-                </div>
-            </section>
-            <div class="action-bar">
-                <button type="submit" class="btn btn-save" style="flex: 2;">Confirm Changes</button>
-                <button type="reset" class="btn btn-cancel" style="flex: 1;">Discard</button>
+
+            <!-- Save / Discard Bar -->
+            <div class="save-bar">
+                <button type="submit" class="btn-save-settings">Save Changes</button>
+                <button type="reset" class="btn-discard">Discard</button>
             </div>
         </form>
     </div>
 </main>
+
 </body>
 </html>
