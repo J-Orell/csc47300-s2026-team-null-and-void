@@ -1,0 +1,22 @@
+{
+  "monthlyData": {
+    "months": ["January", "February", "March", "April", "May", "June"],
+    "income": [4500, 4250, 4800, 4600, 4900, 5000],
+    "expenses": [2100, 2180, 2300, 1900, 2400, 2200]
+  },
+  "categoryBreakdown": {
+    "Rent": 1200,
+    "Food": 450,
+    "Transport": 280,
+    "Entertainment": 320,
+    "Utilities": 520,
+    "Shopping": 610,
+    "Other": 200
+  },
+  "currentMonth": {
+    "totalIncome": 5000,
+    "totalExpenses": 2200,
+    "savings": 2800,
+    "savingsRate": "56%"
+  }
+}

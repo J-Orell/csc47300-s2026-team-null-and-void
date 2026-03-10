@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - BudgetBuddy</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav>
@@ -19,137 +20,73 @@
 
     <main>
         <div class="dashboard-container">
-            <header>
-                <h1>Welcome Back!</h1>
-                <p class="subtitle">Here's your financial overview for this month</p>
-            </header>
+            <div class="page-header">
+                <div class="header-content">
+                    <h1 class="page-title">Financial Overview</h1>
+                    <p class="page-subtitle">Monitor your income, expenses, and savings at a glance</p>
+                </div>
+                <div class="header-date" id="currentDate"></div>
+            </div>
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Total Income</div>
-                    <div class="stat-value">$4,250.00</div>
-                    <div class="stat-change positive">↑ 12% from last month</div>
+                    <div class="stat-icon income">📈</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Income</div>
+                        <div class="stat-value" id="totalIncome">$5,000.00</div>
+                    </div>
                 </div>
 
                 <div class="stat-card expense">
-                    <div class="stat-label">Total Expenses</div>
-                    <div class="stat-value">$2,180.50</div>
-                    <div class="stat-change positive">↓ 5% from last month</div>
+                    <div class="stat-icon expense-icon">💸</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Expenses</div>
+                        <div class="stat-value" id="totalExpenses">$2,200.00</div>
+                    </div>
                 </div>
 
                 <div class="stat-card savings">
-                    <div class="stat-label">Savings</div>
-                    <div class="stat-value">$2,069.50</div>
-                    <div class="stat-change positive">↑ 18% from last month</div>
+                    <div class="stat-icon savings-icon">🎯</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Savings</div>
+                        <div class="stat-value" id="totalSavings">$2,800.00</div>
+                    </div>
                 </div>
 
                 <div class="stat-card budget">
-                    <div class="stat-label">Budget Health</div>
-                    <div class="stat-value">85%</div>
-                    <div class="stat-change">On track with budget</div>
+                    <div class="stat-icon rate-icon">📊</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Savings Rate</div>
+                        <div class="stat-value" id="savingsRate">56%</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="quick-actions">
-                <button class="action-btn">Add Transaction</button>
-                <button class="action-btn secondary">View Reports</button>
-                <button class="action-btn">Set Budget</button>
-                <button class="action-btn secondary">Export Data</button>
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Monthly Income vs Expenses</h2>
+                        <p class="chart-subtitle">6-month comparison</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Expense Breakdown by Category</h2>
+                        <p class="chart-subtitle">Current month distribution</p>
+                    </div>
+                    <div class="chart-container pie-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
             </div>
 
-            <div class="main-content">
-                <div class="card">
-                    <h2>Spending by Category</h2>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Groceries</span>
-                            <span class="category-amount">$450.00</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 65%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Transportation</span>
-                            <span class="category-amount">$280.00</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 40%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Entertainment</span>
-                            <span class="category-amount">$320.50</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 46%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Utilities</span>
-                            <span class="category-amount">$520.00</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 75%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Shopping</span>
-                            <span class="category-amount">$610.00</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 88%;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>Quick Stats</h2>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Avg Daily Spend</span>
-                            <span class="category-amount">$72.68</span>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Transactions</span>
-                            <span class="category-amount">42</span>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Largest Expense</span>
-                            <span class="category-amount">$180.00</span>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Budget Remaining</span>
-                            <span class="category-amount" style="color: #28a745;">$1,500.00</span>
-                        </div>
-                    </div>
-
-                    <div class="spending-category">
-                        <div class="category-header">
-                            <span class="category-name">Savings Rate</span>
-                            <span class="category-amount">48.7%</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="category-details">
+                <h3>Expense Categories</h3>
+                <div class="category-list" id="categoryList"></div>
             </div>
 
             <div class="recent-transactions">
@@ -205,5 +142,7 @@
             </div>
         </div>
     </main>
+
+    <script src="dashboard.js"></script>
 </body>
 </html>
