@@ -9,248 +9,110 @@
 </head>
 <body>
 
-<nav>
-    <h2>BudgetBuddy</h2>
-    <ul>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="transactions.html">Transactions</a></li>
-        <li><a href="budget.html" class="active">Budget</a></li>
-        <li><a href="settings.html">Settings</a></li>
-    </ul>
-</nav>
+    <nav>
+        <h2>BudgetBuddy</h2>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="transactions.html">Transactions</a></li>
+            <li><a href="budget.html" class="active">Budget</a></li>
+            <li><a href="settings.html">Settings</a></li>
+        </ul>
+    </nav>
 
-<main>
-    <div class="budget-container">
-        <header>
-            <h1>Budget Manager</h1>
-            <p>Set monthly limits per category and track your spending.</p>
-        </header>
+    <main>
+        <div class="budget-container">
+            <header>
+                <h1>Budget Manager</h1>
+                <p>Set monthly limits per category and track your spending.</p>
+            </header>
 
-        <div class="month-bar">
-            <button onclick="changeMonth(-1)">&#8249;</button>
-            <span id="monthLabel"></span>
-            <button onclick="changeMonth(1)">&#8250;</button>
+            <div class="month-bar">
+                <button onclick="changeMonth(-1)">&#8249;</button>
+                <span id="monthLabel"></span>
+                <button onclick="changeMonth(1)">&#8250;</button>
+            </div>
+
+            <div class="summary-strip">
+                <div class="summary-card">
+                    <div class="label">Total Budget</div>
+                    <div class="value" id="totalBudget">$0</div>
+                </div>
+                <div class="summary-card warn" id="spentCard">
+                    <div class="label">Total Spent</div>
+                    <div class="value" id="totalSpent">$0</div>
+                </div>
+                <div class="summary-card" id="remainCard">
+                    <div class="label">Remaining</div>
+                    <div class="value" id="totalRemain">$0</div>
+                </div>
+            </div>
+
+            <div class="add-section">
+                <h2>Add New Budget Category</h2>
+                <div class="add-form">
+                    <div class="field">
+                        <label for="catIcon">Icon</label>
+                        <select id="catIcon">
+                            <option value="🛒">🛒 Groceries</option>
+                            <option value="🚗">🚗 Transport</option>
+                            <option value="🎬">🎬 Entertainment</option>
+                            <option value="💡">💡 Utilities</option>
+                            <option value="🛍️">🛍️ Shopping</option>
+                            <option value="🍽️">🍽️ Dining</option>
+                            <option value="💊">💊 Health</option>
+                            <option value="📚">📚 Education</option>
+                            <option value="✈️">✈️ Travel</option>
+                            <option value="🏠">🏠 Housing</option>
+                            <option value="💰">💰 Other</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="catName">Category Name</label>
+                        <input type="text" id="catName" placeholder="e.g. Groceries">
+                    </div>
+                    <div class="field" style="max-width:130px">
+                        <label for="catLimit">Monthly Limit ($)</label>
+                        <input type="number" id="catLimit" placeholder="500" min="1">
+                    </div>
+                    <div class="field" style="max-width:130px">
+                        <label for="catSpent">Spent So Far ($)</label>
+                        <input type="number" id="catSpent" placeholder="0" min="0">
+                    </div>
+                    <button class="btn-add" onclick="addBudget()">+ Add</button>
+                </div>
+            </div>
+
+            <div class="budgets-grid" id="budgetsGrid"></div>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="icon">📋</div>
+                <p>No budgets set yet. Add a category above to get started!</p>
+            </div>
         </div>
+    </main>
 
-        <div class="summary-strip">
-            <div class="summary-card">
-                <div class="label">Total Budget</div>
-                <div class="value" id="totalBudget">$0</div>
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <h3>Edit Budget</h3>
+            <div class="field">
+                <label>Category Name</label>
+                <input type="text" id="editName">
             </div>
-            <div class="summary-card warn" id="spentCard">
-                <div class="label">Total Spent</div>
-                <div class="value" id="totalSpent">$0</div>
+            <div class="field">
+                <label>Monthly Limit ($)</label>
+                <input type="number" id="editLimit" min="1">
             </div>
-            <div class="summary-card" id="remainCard">
-                <div class="label">Remaining</div>
-                <div class="value" id="totalRemain">$0</div>
+            <div class="field">
+                <label>Spent So Far ($)</label>
+                <input type="number" id="editSpent" min="0">
             </div>
-        </div>
-
-        <div class="add-section">
-            <h2>Add New Budget Category</h2>
-            <div class="add-form">
-                <div class="field">
-                    <label for="catIcon">Icon</label>
-                    <select id="catIcon">
-                        <option value="🛒">🛒 Groceries</option>
-                        <option value="🚗">🚗 Transport</option>
-                        <option value="🎬">🎬 Entertainment</option>
-                        <option value="💡">💡 Utilities</option>
-                        <option value="🛍️">🛍️ Shopping</option>
-                        <option value="🍽️">🍽️ Dining</option>
-                        <option value="💊">💊 Health</option>
-                        <option value="📚">📚 Education</option>
-                        <option value="✈️">✈️ Travel</option>
-                        <option value="🏠">🏠 Housing</option>
-                        <option value="💰">💰 Other</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label for="catName">Category Name</label>
-                    <input type="text" id="catName" placeholder="e.g. Groceries">
-                </div>
-                <div class="field" style="max-width:130px">
-                    <label for="catLimit">Monthly Limit ($)</label>
-                    <input type="number" id="catLimit" placeholder="500" min="1">
-                </div>
-                <div class="field" style="max-width:130px">
-                    <label for="catSpent">Spent So Far ($)</label>
-                    <input type="number" id="catSpent" placeholder="0" min="0">
-                </div>
-                <button class="btn-add" onclick="addBudget()">+ Add</button>
+            <div class="modal-btns">
+                <button class="btn-save" onclick="saveEdit()">Save</button>
+                <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
             </div>
-        </div>
-
-        <div class="budgets-grid" id="budgetsGrid"></div>
-        <div class="empty-state" id="emptyState" style="display:none;">
-            <div class="icon">📋</div>
-            <p>No budgets set yet. Add a category above to get started!</p>
         </div>
     </div>
-</main>
 
-<div class="modal-overlay" id="editModal">
-    <div class="modal">
-        <h3>Edit Budget</h3>
-        <div class="field">
-            <label>Category Name</label>
-            <input type="text" id="editName">
-        </div>
-        <div class="field">
-            <label>Monthly Limit ($)</label>
-            <input type="number" id="editLimit" min="1">
-        </div>
-        <div class="field">
-            <label>Spent So Far ($)</label>
-            <input type="number" id="editSpent" min="0">
-        </div>
-        <div class="modal-btns">
-            <button class="btn-save" onclick="saveEdit()">Save</button>
-            <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    let currentDate = new Date(2026, 1);
-    let editingIdx = null;
-
-    let budgets = [
-        { icon: "🛒", name: "Groceries",    limit: 700, spent: 450 },
-        { icon: "🚗", name: "Transport",     limit: 300, spent: 210 },
-        { icon: "🎬", name: "Entertainment", limit: 200, spent: 180 },
-        { icon: "💡", name: "Utilities",     limit: 150, spent: 98  },
-        { icon: "🛍️", name: "Shopping",     limit: 400, spent: 380 },
-        { icon: "🍽️", name: "Dining",       limit: 250, spent: 62  },
-    ];
-
-    function changeMonth(dir) {
-        currentDate.setMonth(currentDate.getMonth() + dir);
-        document.getElementById("monthLabel").textContent =
-            MONTHS[currentDate.getMonth()] + " " + currentDate.getFullYear();
-    }
-    changeMonth(0);
-
-    function render() {
-        const grid  = document.getElementById("budgetsGrid");
-        const empty = document.getElementById("emptyState");
-
-        if (budgets.length === 0) {
-            grid.innerHTML = "";
-            empty.style.display = "block";
-            updateSummary();
-            return;
-        }
-        empty.style.display = "none";
-
-        grid.innerHTML = budgets.map((b, i) => {
-            const pct    = Math.min((b.spent / b.limit) * 100, 100);
-            const over   = b.spent > b.limit;
-            const warn   = !over && pct >= 90;
-            const state  = over ? "danger" : warn ? "warning" : "safe";
-            const remain = b.limit - b.spent;
-
-            return `
-            <div class="budget-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <span class="card-icon">${b.icon}</span>
-                        <span class="card-name">${b.name}</span>
-                    </div>
-                    <div class="card-actions">
-                        <button class="icon-btn" onclick="openEdit(${i})" title="Edit">✏️</button>
-                        <button class="icon-btn del" onclick="deleteBudget(${i})" title="Delete">🗑️</button>
-                    </div>
-                </div>
-                <div class="amounts">
-                    <span class="spent-label">Spent: <span>$${b.spent.toFixed(2)}</span></span>
-                    <span class="budget-label">Limit: <span>$${b.limit.toFixed(2)}</span></span>
-                </div>
-                <div class="progress-wrap">
-                    <div class="budget-progress-bar ${state}" style="width:${pct.toFixed(1)}%"></div>
-                </div>
-                <div class="card-footer">
-                    <span class="remaining ${state}">
-                        ${over ? "Over by $" + Math.abs(remain).toFixed(2) : "$" + remain.toFixed(2) + " left"}
-                    </span>
-                    <span class="pct-label">${pct.toFixed(0)}% used</span>
-                </div>
-                ${over ? '<span class="alert-badge over">⚠️ Over Budget</span>' :
-                  warn ? '<span class="alert-badge">⚠️ Near Limit</span>' : ''}
-            </div>`;
-        }).join("");
-
-        updateSummary();
-    }
-
-    function updateSummary() {
-        const totalBudget = budgets.reduce((s, b) => s + b.limit, 0);
-        const totalSpent  = budgets.reduce((s, b) => s + b.spent, 0);
-        const remain      = totalBudget - totalSpent;
-
-        document.getElementById("totalBudget").textContent = "$" + totalBudget.toFixed(2);
-        document.getElementById("totalSpent").textContent  = "$" + totalSpent.toFixed(2);
-        document.getElementById("totalRemain").textContent = (remain < 0 ? "-$" : "$") + Math.abs(remain).toFixed(2);
-
-        document.getElementById("spentCard").className  = "summary-card " + (totalSpent / totalBudget > 0.9 ? "over" : "warn");
-        document.getElementById("remainCard").className = "summary-card " + (remain < 0 ? "over" : "");
-    }
-
-    function addBudget() {
-        const icon  = document.getElementById("catIcon").value;
-        const name  = document.getElementById("catName").value.trim();
-        const limit = parseFloat(document.getElementById("catLimit").value);
-        const spent = parseFloat(document.getElementById("catSpent").value) || 0;
-
-        if (!name)                { alert("Please enter a category name."); return; }
-        if (!limit || limit <= 0) { alert("Please enter a valid budget limit."); return; }
-
-        budgets.push({ icon, name, limit, spent });
-        document.getElementById("catName").value  = "";
-        document.getElementById("catLimit").value = "";
-        document.getElementById("catSpent").value = "";
-        render();
-    }
-
-    function deleteBudget(i) {
-        if (confirm(`Delete "${budgets[i].name}" budget?`)) {
-            budgets.splice(i, 1);
-            render();
-        }
-    }
-
-    function openEdit(i) {
-        editingIdx = i;
-        document.getElementById("editName").value  = budgets[i].name;
-        document.getElementById("editLimit").value = budgets[i].limit;
-        document.getElementById("editSpent").value = budgets[i].spent;
-        document.getElementById("editModal").classList.add("open");
-    }
-
-    function closeModal() {
-        document.getElementById("editModal").classList.remove("open");
-        editingIdx = null;
-    }
-
-    function saveEdit() {
-        const name  = document.getElementById("editName").value.trim();
-        const limit = parseFloat(document.getElementById("editLimit").value);
-        const spent = parseFloat(document.getElementById("editSpent").value) || 0;
-
-        if (!name || !limit || limit <= 0) { alert("Please fill in all fields correctly."); return; }
-        budgets[editingIdx] = { ...budgets[editingIdx], name, limit, spent };
-        closeModal();
-        render();
-    }
-
-    document.getElementById("editModal").addEventListener("click", function(e) {
-        if (e.target === this) closeModal();
-    });
-
-    render();
-</script>
-
+    <script src="budget.js"></script>
 </body>
 </html>
