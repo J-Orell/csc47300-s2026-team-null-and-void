@@ -3,7 +3,7 @@
     "target": "ES6",
     "module": "commonjs",
     "strict": true,
-    "outDir": "./",
+    "outDir": "./dist",
     "rootDir": "./",
     "sourceMap": false,
     "lib": ["ES2017", "DOM"],
