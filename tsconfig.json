@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "strict": true,
+    "outDir": "./",
+    "rootDir": "./",
+    "sourceMap": false,
+    "lib": ["ES2017", "DOM"],
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "include": ["*.ts"],
+  "exclude": ["node_modules"]
+}
