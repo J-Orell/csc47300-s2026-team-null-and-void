@@ -7,159 +7,111 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="transactions.css">
 </head>
-
 <body>
+    <nav>
+        <h2>BudgetBuddy</h2>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="transactions.html" class="active">Transactions</a></li>
+            <li><a href="budget.html">Budget</a></li>
+            <li><a href="settings.html">Settings</a></li>
+        </ul>
+    </nav>
 
-<nav>
-    <h2>BudgetBuddy</h2>
-    <ul>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="transactions.html" class="active">Transactions</a></li>
-        <li><a href="budget.html">Budget</a></li>
-        <li><a href="settings.html">Settings</a></li>
-    </ul>
-</nav>
+    <main>
+        <div class="transactions-container">
 
-<main>
-    <div class="transactions-container">
+            <header>
+                <h1>Transactions</h1>
+                <p>View and manage all your income and expenses</p>
+            </header>
 
-        <header>
-            <h1>Transactions</h1>
-            <p>View and manage all your income and expenses</p>
-        </header>
-
-        <!-- Summary Cards -->
-        <div class="summary-cards">
-            <div class="summary-card">
-                <h3>Total Income</h3>
-                <div class="amount">$4,250.00</div>
-                <div class="trend">↑ 12% from last month</div>
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total Income</h3>
+                    <div class="amount">$4,250.00</div>
+                    <div class="trend">↑ 12% from last month</div>
+                </div>
+                <div class="summary-card expense-card">
+                    <h3>Total Expenses</h3>
+                    <div class="amount">$2,180.45</div>
+                    <div class="trend down">↑ 3% from last month</div>
+                </div>
+                <div class="summary-card balance-card">
+                    <h3>Remaining Balance</h3>
+                    <div class="amount">$2,069.55</div>
+                    <div class="trend">Looking good!</div>
+                </div>
             </div>
-            <div class="summary-card expense-card">
-                <h3>Total Expenses</h3>
-                <div class="amount">$2,180.45</div>
-                <div class="trend down">↑ 3% from last month</div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="filter-date">Date Range</label>
+                    <input type="date" id="filter-date" value="2026-02-01">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-category">Category</label>
+                    <select id="filter-category">
+                        <option value="all">All Categories</option>
+                        <option value="income">Income</option>
+                        <option value="food">Food</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="transport">Transport</option>
+                        <option value="shopping">Shopping</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-type">Type</label>
+                    <select id="filter-type">
+                        <option value="all">All</option>
+                        <option value="income">Income Only</option>
+                        <option value="expense">Expenses Only</option>
+                    </select>
+                </div>
+                <button class="btn-filter">Apply</button>
             </div>
-            <div class="summary-card balance-card">
-                <h3>Remaining Balance</h3>
-                <div class="amount">$2,069.55</div>
-                <div class="trend">Looking good!</div>
+
+            <!-- Transactions Table -->
+            <div class="table-wrapper">
+                <div class="table-header">
+                    <h2>Transaction History</h2>
+                    <span class="transaction-count">Showing 8 transactions</span>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn arrow">‹</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn arrow">›</button>
+            </div>
+
+            <!-- Add Transaction Button -->
+            <button class="add-transaction-btn" style="margin-top: 25px;">+ Add New Transaction</button>
+
         </div>
+    </main>
 
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <div class="filter-group">
-                <label for="filter-date">Date Range</label>
-                <input type="date" id="filter-date" value="2026-02-01">
-            </div>
-            <div class="filter-group">
-                <label for="filter-category">Category</label>
-                <select id="filter-category">
-                    <option value="all">All Categories</option>
-                    <option value="income">Income</option>
-                    <option value="food">Food</option>
-                    <option value="utilities">Utilities</option>
-                    <option value="entertainment">Entertainment</option>
-                    <option value="transport">Transport</option>
-                    <option value="shopping">Shopping</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="filter-type">Type</label>
-                <select id="filter-type">
-                    <option value="all">All</option>
-                    <option value="income">Income Only</option>
-                    <option value="expense">Expenses Only</option>
-                </select>
-            </div>
-            <button class="btn-filter">Apply</button>
-        </div>
-
-        <!-- Transactions Table -->
-        <div class="table-wrapper">
-            <div class="table-header">
-                <h2>Transaction History</h2>
-                <span class="transaction-count">Showing 8 transactions</span>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Category</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="tx-date">Feb 20, 2026</td>
-                        <td class="tx-description">Paycheck - Direct Deposit</td>
-                        <td><span class="tx-category income-cat">Income</span></td>
-                        <td class="tx-amount income">+$2,500.00</td>
-                    </tr>
-                    <tr>
-                        <td class="tx-date">Feb 19, 2026</td>
-                        <td class="tx-description">Whole Foods Market</td>
-                        <td><span class="tx-category food">Food</span></td>
-                        <td class="tx-amount expense">-$145.30</td>
-                    </tr>
-                    <tr>
-                        <td class="tx-date">Feb 18, 2026</td>
-                        <td class="tx-description">Electric Bill - ConEd</td>
-                        <td><span class="tx-category utilities">Utilities</span></td>
-                        <td class="tx-amount expense">-$98.75</td>
-                    </tr>
-                    <tr>
-                        <td class="tx-date">Feb 15, 2026</td>
-                        <td class="tx-description">Freelance Web Project</td>
-                        <td><span class="tx-category income-cat">Income</span></td>
-                        <td class="tx-amount income">+$1,750.00</td>
-                    </tr>
-                    <tr>
-                        <td class="tx-date">Feb 13, 2026</td>
-                        <td class="tx-description">Uber Ride</td>
-                        <td><span class="tx-category transport">Transport</span></td>
-                        <td class="tx-amount expense">-$24.50</td>
-                    </tr>
-                    <tr>
-                        <td class="tx-date">Feb 10, 2026</td>
-                        <td class="tx-description">Movie Theater</td>
-                        <td><span class="tx-category entertainment">Entertainment</span></td>
-                        <td class="tx-amount expense">-$32.00</td>
-                    </tr>
-                    <tr>
-                        <td class="tx-date">Feb 08, 2026</td>
-                        <td class="tx-description">Restaurant - Olive Garden</td>
-                        <td><span class="tx-category food">Food</span></td>
-                        <td class="tx-amount expense">-$62.40</td>
-                    </tr>
-                    <tr>
-                        <td class="tx-date">Feb 05, 2026</td>
-                        <td class="tx-description">Amazon Purchase</td>
-                        <td><span class="tx-category shopping">Shopping</span></td>
-                        <td class="tx-amount expense">-$89.99</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="pagination">
-            <button class="page-btn arrow">‹</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <button class="page-btn">4</button>
-            <button class="page-btn arrow">›</button>
-        </div>
-
-        <!-- Add Transaction Button -->
-        <button class="add-transaction-btn" style="margin-top: 25px;">+ Add New Transaction</button>
-
-    </div>
-</main>
-
+    <script src="transactions.js"></script>
 </body>
 </html>
