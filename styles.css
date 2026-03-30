@@ -1,3 +1,95 @@
+/* ═══════════════════════════════════════════════════════════════ */
+/*                     CSS CUSTOM PROPERTIES                       */
+/* ═══════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Primary Greens */
+    --green-dark: #1b5e20;
+    --green-main: #2e7d32;
+    --green-mid: #4caf50;
+    --green-light: #7cb342;
+    --green-pale: #81c784;
+    --green-bg: #e8f5e9;
+    --green-border: #e8f5e9;
+    --green-accent: #28a745;
+
+    /* Status Colors */
+    --red-main: #dc3545;
+    --red-dark: #d32f2f;
+    --red-darker: #c62828;
+    --yellow-main: #ffc107;
+    --yellow-dark: #f9a825;
+    --yellow-light: #ffcc02;
+    --blue-info: #17a2b8;
+    --blue-accent: #20c997;
+    --orange-main: #e65100;
+
+    /* Text Grays */
+    --text-primary: #1a1a1a;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-muted: #666;
+    --text-light: #777;
+    --text-lighter: #888;
+    --text-faint: #999;
+    --text-disabled: #aaa;
+    --text-placeholder: #bbb;
+
+    /* Backgrounds */
+    --bg-body-start: #f4f7f6;
+    --bg-body-end: #e8f5e9;
+    --bg-white: #ffffff;
+    --bg-off-white: #f9f9f9;
+    --bg-light: #f5f5f5;
+    --bg-input: #fafafa;
+    --bg-section: #f8fafc;
+    --bg-hover: #f0f4f8;
+
+    /* Borders */
+    --border-light: #e9ecef;
+    --border-card: #e2e8f0;
+    --border-divider: #f0f0f0;
+    --border-section: #f0f4f8;
+    --border-green-subtle: rgba(46, 125, 50, 0.05);
+
+    /* Shadows */
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-green: 0 4px 12px rgba(46, 125, 50, 0.25);
+    --shadow-green-hover: 0 6px 18px rgba(46, 125, 50, 0.35);
+    --shadow-green-glow: 0 0 8px rgba(46, 125, 50, 0.3);
+
+    /* Gradients */
+    --gradient-green: linear-gradient(135deg, #2e7d32, #4caf50);
+    --gradient-green-vertical: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
+    --gradient-body: linear-gradient(135deg, #f4f7f6 0%, #e8f5e9 100%);
+    --gradient-card: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    --gradient-header-accent: linear-gradient(90deg, #2e7d32, #4caf50, #81c784, transparent);
+    --gradient-progress: linear-gradient(90deg, #2e7d32 0%, #4caf50 50%, #7cb342 100%);
+    --gradient-blue: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+
+    /* Typography */
+    --font-main: 'Segoe UI', sans-serif;
+
+    /* Spacing */
+    --section-gap: 30px;
+    --card-radius: 12px;
+    --card-radius-lg: 16px;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                        GLOBAL RESET                             */
+/* ═══════════════════════════════════════════════════════════════ */
+
 * {
     margin: 0;
     padding: 0;
@@ -5,15 +97,31 @@
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #f4f7f6 0%, #e8f5e9 100%);
+    font-family: var(--font-main);
+    background: var(--gradient-body);
     display: flex;
     min-height: 100vh;
 }
 
+/*
+   Buttons and selects don't inherit font-family by default.
+   This ensures consistent typography across all interactive elements.
+*/
+button,
+select,
+input,
+textarea {
+    font-family: var(--font-main);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                      SIDEBAR NAVIGATION                         */
+/* ═══════════════════════════════════════════════════════════════ */
+
 nav {
     width: 240px;
-    background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
+    background: var(--gradient-green-vertical);
     color: white;
     padding: 30px 20px;
     flex-shrink: 0;
@@ -45,7 +153,7 @@ nav a {
     text-decoration: none;
     font-weight: 500;
     opacity: 0.8;
-    transition: all 0.3s ease;
+    transition: all var(--transition-normal);
     display: block;
     padding: 15px;
     border-radius: 8px;
@@ -67,420 +175,56 @@ nav a.active {
     border-radius: 8px;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                        MAIN CONTENT AREA                        */
+/* ═══════════════════════════════════════════════════════════════ */
+
 main {
     flex-grow: 1;
     padding: 40px;
     overflow-y: auto;
-    background: linear-gradient(180deg, rgba(244, 247, 246, 0.8) 0%, rgba(232, 245, 233, 0.8) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(244, 247, 246, 0.8) 0%,
+        rgba(232, 245, 233, 0.8) 100%
+    );
 }
 
-.dashboard-container {
-    max-width: 1400px;
-    margin: 0 auto;
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                        SCROLLBAR STYLING                        */
+/* ═══════════════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-header {
-    margin-bottom: 40px;
-    animation: slideInDown 0.6s ease;
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
 }
 
-h1 {
-    color: #1b5e20;
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-.subtitle {
-    color: #666;
-    font-size: 1rem;
-    font-weight: 400;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-}
-
-.stat-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    border-left: 6px solid #2e7d32;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    animation: slideInUp 0.6s ease forwards;
-}
-
-.stat-card:nth-child(1) { animation-delay: 0s; }
-.stat-card:nth-child(2) { animation-delay: 0.1s; }
-.stat-card:nth-child(3) { animation-delay: 0.2s; }
-.stat-card:nth-child(4) { animation-delay: 0.3s; }
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, rgba(46, 125, 50, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-}
-
-.stat-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-}
-
-.stat-card.income {
-    border-left-color: #28a745;
-}
-
-.stat-card.income::before {
-    background: radial-gradient(circle, rgba(40, 167, 69, 0.1) 0%, transparent 70%);
-}
-
-.stat-card.expense {
-    border-left-color: #dc3545;
-}
-
-.stat-card.expense::before {
-    background: radial-gradient(circle, rgba(220, 53, 69, 0.1) 0%, transparent 70%);
-}
-
-.stat-card.savings {
-    border-left-color: #ffc107;
-}
-
-.stat-card.savings::before {
-    background: radial-gradient(circle, rgba(255, 193, 7, 0.1) 0%, transparent 70%);
-}
-
-.stat-card.budget {
-    border-left-color: #17a2b8;
-}
-
-.stat-card.budget::before {
-    background: radial-gradient(circle, rgba(23, 162, 184, 0.1) 0%, transparent 70%);
-}
-
-.stat-label {
-    color: #666;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    position: relative;
-    z-index: 1;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #2e7d32;
-    margin-bottom: 8px;
-    position: relative;
-    z-index: 1;
-}
-
-.stat-card.income .stat-value {
-    color: #28a745;
-}
-
-.stat-card.expense .stat-value {
-    color: #dc3545;
-}
-
-.stat-card.savings .stat-value {
-    color: #ffc107;
-}
-
-.stat-card.budget .stat-value {
-    color: #17a2b8;
-}
-
-.stat-change {
-    font-size: 0.85rem;
-    color: #999;
-}
-
-.stat-change.positive {
-    color: #28a745;
-}
-
-.stat-change.negative {
-    color: #dc3545;
-}
-
-.main-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 30px;
-    margin-bottom: 40px;
-}
-
-.card {
-    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    animation: slideInUp 0.6s ease 0.2s forwards;
-    opacity: 0;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(46, 125, 50, 0.05);
-}
-
-.card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px);
-}
-
-.card h2 {
-    color: #1b5e20;
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e8f5e9;
-    font-weight: 700;
-}
-
-.spending-category {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #f0f0f0;
-    transition: all 0.3s ease;
-}
-
-.spending-category:hover {
-    padding-left: 10px;
-}
-
-.spending-category:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.category-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.category-name {
-    font-weight: 600;
-    color: #333;
-    font-size: 0.95rem;
-}
-
-.category-amount {
-    font-weight: bold;
-    color: #2e7d32;
-    font-size: 1.1rem;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background-color: #e9ecef;
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-green-vertical);
     border-radius: 10px;
-    overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #2e7d32 0%, #4caf50 50%, #7cb342 100%);
-    border-radius: 10px;
-    animation: fillProgress 1.5s ease-out;
-    box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--green-dark), var(--green-main));
 }
 
-.recent-transactions {
-    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    animation: slideInUp 0.6s ease 0.4s forwards;
-    opacity: 0;
-    border: 1px solid rgba(46, 125, 50, 0.05);
-    transition: all 0.3s ease;
-}
 
-.recent-transactions:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px);
-}
+/* ═══════════════════════════════════════════════════════════════ */
+/*                     SHARED ANIMATIONS                           */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   slideInDown — Used for page headers. Fades in from above.
+   slideInUp   — Used for content sections. Fades in from below.
+   fillProgress — Used for progress/loading bars.
+   pulse        — Subtle opacity pulse for attention-drawing elements.
+   modalFadeIn  — Used for modal dialogs. Fades in with slight scale.
+*/
 
-.recent-transactions h2 {
-    color: #1b5e20;
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e8f5e9;
-    font-weight: 700;
-}
-
-.transaction-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #f0f0f0;
-    transition: all 0.3s ease;
-    gap: 20px;
-}
-
-.transaction-item:hover {
-    padding-left: 10px;
-    background: rgba(46, 125, 50, 0.02);
-    border-radius: 8px;
-}
-
-.transaction-item:last-child {
-    border-bottom: none;
-}
-
-.transaction-info {
-    flex-grow: 1;
-}
-
-.transaction-title {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
-    font-size: 0.95rem;
-}
-
-.transaction-date {
-    font-size: 0.85rem;
-    color: #999;
-}
-
-.transaction-amount {
-    font-weight: bold;
-    font-size: 1.1rem;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
-    min-width: 120px;
-    text-align: right;
-}
-
-.transaction-amount.income {
-    color: #28a745;
-    background: rgba(40, 167, 69, 0.08);
-}
-
-.transaction-amount.expense {
-    color: #dc3545;
-    background: rgba(220, 53, 69, 0.08);
-}
-
-.quick-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-bottom: 40px;
-    animation: slideInUp 0.6s ease 0.1s forwards;
-    opacity: 0;
-}
-
-.action-btn {
-    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-    font-size: 1rem;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-}
-
-.action-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.action-btn:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-.action-btn:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.38);
-}
-
-.action-btn:active {
-    transform: translateY(-2px);
-}
-
-.action-btn.secondary {
-    background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
-    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.25);
-}
-
-.action-btn.secondary:hover {
-    box-shadow: 0 8px 20px rgba(23, 162, 184, 0.38);
-}
-
-@media (max-width: 768px) {
-    body {
-        flex-direction: column;
-    }
-
-    nav {
-        width: 100%;
-        padding: 20px;
-    }
-
-    main {
-        padding: 20px;
-    }
-
-    .main-content {
-        grid-template-columns: 1fr;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-
-    h1 {
-        font-size: 1.8rem;
-    }
-
-    .quick-actions {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Animations */
 @keyframes slideInDown {
     from {
         opacity: 0;
@@ -495,7 +239,7 @@ h1 {
 @keyframes slideInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -523,27 +267,46 @@ h1 {
     }
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px;
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #2e7d32, #4caf50);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #1b5e20, #2e7d32);
-}
 
 /* ═══════════════════════════════════════════════════════════════ */
 /*                    PAGE HEADER SECTION                          */
 /* ═══════════════════════════════════════════════════════════════ */
+/*
+   The generic <header> element gets slideInDown.
+   .page-header is the flex layout used on dashboard.
+   Container-scoped headers (budget, transactions, settings)
+   get a gradient underline via ::after.
+*/
+
+header {
+    margin-bottom: 40px;
+    animation: slideInDown 0.6s ease;
+}
+
+h1 {
+    color: var(--green-dark);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 400;
+}
 
 .page-header {
     display: flex;
@@ -556,27 +319,82 @@ h1 {
 .page-title {
     font-size: 2.8rem;
     font-weight: 700;
-    color: #1b5e20;
+    color: var(--green-dark);
     margin-bottom: 0.5rem;
     letter-spacing: -1px;
 }
 
 .page-subtitle {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-muted);
     font-weight: 400;
 }
 
 .header-date {
-    color: #999;
+    color: var(--text-faint);
     font-size: 0.95rem;
     font-weight: 500;
     white-space: nowrap;
 }
 
+
 /* ═══════════════════════════════════════════════════════════════ */
-/*                  STATS GRID UPDATE                              */
+/*              SHARED HEADER GRADIENT UNDERLINE                   */
 /* ═══════════════════════════════════════════════════════════════ */
+/*
+   Used by budget, transactions, and settings pages.
+   Adds a decorative gradient bar beneath the <header> element
+   inside each page's container.
+*/
+
+.budget-container header,
+.transactions-container header,
+.settings-container header {
+    border-bottom: none;
+    margin-bottom: var(--section-gap);
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.budget-container header::after,
+.transactions-container header::after,
+.settings-container header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-header-accent);
+    border-radius: 2px;
+}
+
+.budget-container header p,
+.transactions-container header p,
+.settings-container header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                    DASHBOARD CONTAINER                          */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                       STATS GRID                                */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Used on dashboard for the income/expense/savings/rate cards.
+   Each stat-card slides in with a staggered delay.
+*/
 
 .stats-grid {
     display: grid;
@@ -586,15 +404,15 @@ h1 {
 }
 
 .stat-card {
-    background: white;
-    border-radius: 16px;
+    background: var(--bg-white);
+    border-radius: var(--card-radius-lg);
     padding: 1.5rem;
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-card);
+    transition: all var(--transition-smooth);
     animation: slideInUp 0.5s ease backwards;
 }
 
@@ -605,8 +423,8 @@ h1 {
 
 .stat-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    border-color: #4caf50;
+    box-shadow: var(--shadow-heavy);
+    border-color: var(--green-mid);
 }
 
 .stat-icon {
@@ -643,7 +461,7 @@ h1 {
 .stat-label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #999;
+    color: var(--text-faint);
     text-transform: uppercase;
     letter-spacing: 0.8px;
     margin-bottom: 0.5rem;
@@ -652,7 +470,7 @@ h1 {
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
-    color: #2e7d32;
+    color: var(--green-main);
     line-height: 1;
 }
 
@@ -661,16 +479,34 @@ h1 {
 }
 
 .stat-card.savings .stat-value {
-    color: #ffc107;
+    color: var(--yellow-main);
 }
 
 .stat-card.budget .stat-value {
-    color: #17a2b8;
+    color: var(--blue-info);
 }
 
+.stat-change {
+    font-size: 0.85rem;
+    color: var(--text-faint);
+}
+
+.stat-change.positive {
+    color: var(--green-accent);
+}
+
+.stat-change.negative {
+    color: var(--red-main);
+}
+
+
 /* ═══════════════════════════════════════════════════════════════ */
-/*                    CHARTS SECTION                               */
+/*                      CHARTS SECTION                             */
 /* ═══════════════════════════════════════════════════════════════ */
+/*
+   Grid layout for chart cards on the dashboard.
+   Each chart card slides in with a staggered delay.
+*/
 
 .charts-section {
     display: grid;
@@ -680,12 +516,12 @@ h1 {
 }
 
 .chart-card {
-    background: white;
-    border-radius: 16px;
+    background: var(--bg-white);
+    border-radius: var(--card-radius-lg);
     padding: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-card);
+    transition: all var(--transition-smooth);
     animation: slideInUp 0.6s ease backwards;
 }
 
@@ -694,8 +530,8 @@ h1 {
 
 .chart-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    border-color: #4caf50;
+    box-shadow: var(--shadow-heavy);
+    border-color: var(--green-mid);
 }
 
 .chart-header {
@@ -705,13 +541,13 @@ h1 {
 .chart-header h2 {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--text-primary);
     margin-bottom: 0.25rem;
 }
 
 .chart-subtitle {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-faint);
     font-weight: 400;
 }
 
@@ -732,16 +568,21 @@ h1 {
     max-width: 100%;
 }
 
+
 /* ═══════════════════════════════════════════════════════════════ */
-/*            CATEGORY DETAILS SECTION                             */
+/*                  CATEGORY DETAILS SECTION                       */
 /* ═══════════════════════════════════════════════════════════════ */
+/*
+   Displays expense categories on the dashboard.
+   Uses a grid of category items with left-border accent.
+*/
 
 .category-details {
-    background: white;
-    border-radius: 16px;
+    background: var(--bg-white);
+    border-radius: var(--card-radius-lg);
     padding: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-card);
     animation: slideInUp 0.7s ease backwards 0.4s;
     margin-bottom: 2rem;
 }
@@ -749,10 +590,10 @@ h1 {
 .category-details h3 {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--text-primary);
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #f0f4f8;
+    border-bottom: 2px solid var(--border-section);
 }
 
 .category-list {
@@ -763,20 +604,20 @@ h1 {
 
 .category-item {
     padding: 1.5rem;
-    background: #f8fafc;
-    border-radius: 12px;
-    border-left: 4px solid #4caf50;
-    transition: all 0.3s ease;
+    background: var(--bg-section);
+    border-radius: var(--card-radius);
+    border-left: 4px solid var(--green-mid);
+    transition: all var(--transition-normal);
 }
 
 .category-item:hover {
     transform: translateX(8px);
-    background: #f0f4f8;
+    background: var(--bg-hover);
 }
 
 .category-name {
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--text-primary);
     font-size: 1rem;
     margin-bottom: 0.5rem;
 }
@@ -784,11 +625,583 @@ h1 {
 .category-amount {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #2e7d32;
+    color: var(--green-main);
 }
 
+
 /* ═══════════════════════════════════════════════════════════════ */
-/*              RESPONSIVE ADJUSTMENTS                             */
+/*                    SPENDING CATEGORIES                          */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Used in the main content grid for spending breakdown.
+   Includes progress bars for visual budget representation.
+*/
+
+.spending-category {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-divider);
+    transition: all var(--transition-normal);
+}
+
+.spending-category:hover {
+    padding-left: 10px;
+}
+
+.spending-category:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border-light);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-progress);
+    border-radius: 10px;
+    animation: fillProgress 1.5s ease-out;
+    box-shadow: var(--shadow-green-glow);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                     MAIN CONTENT GRID                           */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Two-column grid used on dashboard for spending chart + sidebar.
+   .card is a generic content card with slideInUp animation.
+*/
+
+.main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background: var(--gradient-card);
+    padding: 30px;
+    border-radius: var(--card-radius-lg);
+    box-shadow: var(--shadow-md);
+    animation: slideInUp 0.6s ease 0.2s forwards;
+    opacity: 0;
+    transition: all var(--transition-normal);
+    border: 1px solid var(--border-green-subtle);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+}
+
+.card h2 {
+    color: var(--green-dark);
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--green-border);
+    font-weight: 700;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                   RECENT TRANSACTIONS                           */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Transaction list used on dashboard. Slides in with delay.
+   Each item is a grid row with hover indent effect.
+*/
+
+.recent-transactions {
+    background: var(--gradient-card);
+    padding: 30px;
+    border-radius: var(--card-radius-lg);
+    box-shadow: var(--shadow-md);
+    animation: slideInUp 0.6s ease 0.4s forwards;
+    opacity: 0;
+    border: 1px solid var(--border-green-subtle);
+    transition: all var(--transition-normal);
+}
+
+.recent-transactions:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+}
+
+.recent-transactions h2 {
+    color: var(--green-dark);
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--green-border);
+    font-weight: 700;
+}
+
+.transaction-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-divider);
+    transition: all var(--transition-normal);
+    gap: 20px;
+}
+
+.transaction-item:hover {
+    padding-left: 10px;
+    background: rgba(46, 125, 50, 0.02);
+    border-radius: 8px;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-info {
+    flex-grow: 1;
+}
+
+.transaction-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+}
+
+.transaction-date {
+    font-size: 0.85rem;
+    color: var(--text-faint);
+}
+
+.transaction-amount {
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.02);
+    min-width: 120px;
+    text-align: right;
+}
+
+.transaction-amount.income {
+    color: var(--green-accent);
+    background: rgba(40, 167, 69, 0.08);
+}
+
+.transaction-amount.expense {
+    color: var(--red-main);
+    background: rgba(220, 53, 69, 0.08);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                      QUICK ACTIONS                              */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Action button grid used on dashboard.
+   .action-btn has a ripple effect via ::before pseudo-element.
+*/
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 40px;
+    animation: slideInUp 0.6s ease 0.1s forwards;
+    opacity: 0;
+}
+
+.action-btn {
+    background: var(--gradient-green);
+    color: white;
+    padding: 20px;
+    border-radius: var(--card-radius);
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-green);
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.action-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.action-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.38);
+}
+
+.action-btn:active {
+    transform: translateY(-2px);
+}
+
+.action-btn.secondary {
+    background: var(--gradient-blue);
+    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.25);
+}
+
+.action-btn.secondary:hover {
+    box-shadow: 0 8px 20px rgba(23, 162, 184, 0.38);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                  SHARED CARD BASE PATTERN                       */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Reusable base class for content sections/cards across pages.
+   Provides consistent background, radius, shadow, and border.
+   Apply alongside page-specific classes for padding/size overrides.
+*/
+
+.card-base {
+    background: var(--gradient-card);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-green-subtle);
+    transition: box-shadow var(--transition-normal);
+}
+
+.card-base:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                  SHARED SUMMARY CARD BASE                       */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Used by budget (.summary-card in summary-strip) and
+   transactions (.summary-card in summary-cards).
+   Provides the common card appearance, border-left accent,
+   hover lift, and decorative ::before radial glow.
+*/
+
+.summary-card {
+    background: var(--bg-white);
+    padding: 22px 24px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-md);
+    border-left: 6px solid var(--green-main);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.summary-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at top right, rgba(46, 125, 50, 0.08), transparent 70%);
+    border-radius: 0 0 0 80px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                   SHARED BUTTON: PRIMARY                        */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Reusable green gradient button used across all pages.
+   Apply .btn-primary for consistent appearance, then add
+   page-specific sizing (padding, width, font-size) as needed.
+*/
+
+.btn-primary {
+    background: var(--gradient-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-green);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-green-hover);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                   SHARED ICON BUTTON                            */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Small icon-style buttons used for edit/delete actions
+   on budget cards and transaction rows.
+*/
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-disabled);
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color var(--transition-fast),
+                background var(--transition-fast),
+                transform var(--transition-fast);
+}
+
+.icon-btn:hover {
+    color: var(--green-main);
+    background: #f0f7f0;
+    transform: scale(1.1);
+}
+
+.icon-btn.del:hover {
+    color: var(--red-dark);
+    background: #fff5f5;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                SHARED FORM INPUT FOCUS STYLES                   */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Consistent input/select styling with green focus glow.
+   Used by budget (add-form), transactions (filter-group),
+   and settings (settings-container) pages.
+   The .form-input class can be applied directly for standalone usage.
+*/
+
+.form-input,
+.add-form input,
+.add-form select,
+.filter-group input,
+.filter-group select,
+.settings-container input,
+.settings-container select {
+    padding: 10px 12px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--bg-input);
+    transition: border-color var(--transition-normal),
+                box-shadow var(--transition-normal),
+                background var(--transition-normal);
+}
+
+.form-input:focus,
+.add-form input:focus,
+.add-form select:focus,
+.filter-group input:focus,
+.filter-group select:focus,
+.settings-container input:focus,
+.settings-container select:focus {
+    outline: none;
+    border-color: var(--green-main);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+    background: var(--bg-white);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                      SHARED MODAL STYLES                        */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Modal overlay + dialog used by budget (edit budget) and
+   transactions (edit transaction) pages.
+   Opens via adding .open class to .modal-overlay.
+   Includes save/cancel button styles.
+*/
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: var(--bg-white);
+    border-radius: var(--card-radius-lg);
+    padding: 30px;
+    width: 400px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    animation: modalFadeIn 0.3s ease forwards;
+}
+
+.modal h3 {
+    color: var(--green-dark);
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.modal .field {
+    margin-bottom: 16px;
+}
+
+.modal label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-medium);
+    margin-bottom: 6px;
+}
+
+.modal input,
+.modal select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color var(--transition-normal),
+                box-shadow var(--transition-normal);
+}
+
+.modal input:focus,
+.modal select:focus {
+    outline: none;
+    border-color: var(--green-main);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+}
+
+.modal-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-btns button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: transform var(--transition-fast),
+                box-shadow var(--transition-fast);
+}
+
+.btn-save {
+    background: var(--gradient-green);
+    color: white;
+    box-shadow: var(--shadow-green);
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-green-hover);
+}
+
+.btn-cancel-modal {
+    background: #e0e0e0;
+    color: var(--text-dark);
+}
+
+.btn-cancel-modal:hover {
+    background: #d0d0d0;
+    transform: translateY(-2px);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                    SHARED SECTION HEADING                       */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Standardized h2 used inside content sections across pages.
+   Apply .section-title for consistent appearance.
+   Also serves as default for h2 inside card-base containers.
+*/
+
+.section-title {
+    color: var(--green-dark);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--green-border);
+    margin-top: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                     SHARED EMPTY STATE                          */
+/* ═══════════════════════════════════════════════════════════════ */
+/*
+   Placeholder shown when a list/grid has no items.
+   Used by budget (no budgets) and transactions (no transactions).
+   Contains a large icon and descriptive text.
+*/
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-placeholder);
+}
+
+.empty-state .icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 1rem;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════ */
+/*                   RESPONSIVE: GLOBAL RULES                      */
 /* ═══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 1024px) {
@@ -798,6 +1211,35 @@ h1 {
 }
 
 @media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    nav {
+        width: 100%;
+        padding: 20px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .page-header {
         flex-direction: column;
         gap: 1rem;
@@ -805,10 +1247,6 @@ h1 {
 
     .page-title {
         font-size: 2rem;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
     }
 
     .chart-card {
@@ -825,6 +1263,11 @@ h1 {
 
     .category-details {
         padding: 1.5rem;
+    }
+
+    .modal {
+        width: 90%;
+        margin: 0 20px;
     }
 }
 

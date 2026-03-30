@@ -1,85 +1,50 @@
 /*
 ============================================================
-BUDGET PAGE - Advanced CSS Features Documentation
+  BUDGET PAGE - Page-Specific Styles
 ============================================================
-
-FEATURE 1: CSS GRID LAYOUT
-- Used for .summary-strip (3-column responsive summary cards)
-- Used for .budgets-grid (auto-fill responsive card grid)
-- Used for .add-form (flexible form layout)
-- Satisfies the Flexbox/Grid requirement
-
-FEATURE 2: CSS TRANSITIONS & HOVER ANIMATIONS
-- Budget cards lift up with green glow on hover
-- Summary cards scale up subtly on hover
-- Buttons have smooth background-color transitions
-- Form inputs glow green on focus
-- Icon buttons change color on hover (edit = green, delete = red)
-
-FEATURE 3: CSS KEYFRAME ANIMATIONS
-- Progress bars animate from 0% to their target width on load
-- The edit modal fades in and scales up when opened
-- Budget cards fade in with staggered delays
-
-FEATURE 4: CSS GRADIENTS
-- Progress bars use directional gradients based on status
-  (green = safe, yellow = warning, red = danger)
-- Added a decorative gradient line under the main page header.
-
-FEATURE 5: RESPONSIVE DESIGN (MEDIA QUERIES)
-- At 768px: summary strip and budget grid become single column
-- Form wraps naturally using flex-wrap
-- Modal adjusts width for smaller screens
-
-FEATURE 6: PSEUDO-ELEMENTS
-- Used ::after for the gradient bar under the header.
-- Used ::before for a subtle glow effect on the summary cards.
+  Shared styles come from styles.css:
+    - slideInDown animation on <header>
+    - slideInUp animation
+    - Header gradient underline
+    - .form-input / .add-form input focus glow
+    - .card-base
+    - .section-title
+    - .btn-primary (green gradient button base)
+    - .btn-save / .btn-cancel-modal (modal button styles)
+    - .modal-overlay / .modal (edit budget modal)
+    - .icon-btn (edit/delete action buttons)
+    - .summary-card (base card with border-left, hover, ::before)
+    - .empty-state (no budgets placeholder)
+    - .progress-bar / .progress-fill (base progress bar)
+    - CSS custom properties (colors, shadows, transitions)
+============================================================
 */
 
 
-/* ── Budget Container ── */
+/* Budget Container */
+
 .budget-container {
     max-width: 1000px;
     margin: 0 auto;
 }
 
 
-/* ── Page Header with gradient accent (FEATURE 4 & 6) ── */
-.budget-container header {
-    border-bottom: none;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    position: relative;
-}
+/* ── Month Selector ──
+   Navigation arrows to switch between budget months.
+   Buttons use green gradient with hover lift effect.
+*/
 
-.budget-container header::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, #2e7d32, #4caf50, #81c784, transparent);
-    border-radius: 2px;
-}
-
-.budget-container header p {
-    color: #666;
-    font-size: 0.95rem;
-    margin-top: 5px;
-}
-
-
-/* ── Month Selector ── */
 .month-bar {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 28px;
+    animation: slideInUp 0.6s ease 0.4s backwards;
+    animation-delay: 0.1s;
 }
 
 .month-bar button {
-    background: linear-gradient(135deg, #2e7d32, #4caf50);
+    background: var(--gradient-green);
     color: white;
     border: none;
     border-radius: 8px;
@@ -87,7 +52,9 @@ FEATURE 6: PSEUDO-ELEMENTS
     height: 36px;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: transform var(--transition-fast),
+                box-shadow var(--transition-fast),
+                background var(--transition-fast);
     box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2);
 }
 
@@ -103,51 +70,40 @@ FEATURE 6: PSEUDO-ELEMENTS
 .month-bar span {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-dark);
     min-width: 140px;
     text-align: center;
 }
 
 
-/* ── FEATURE 1: CSS GRID - Summary Strip ── */
+/* ── Summary Strip ──
+   Three-column grid of budget totals (Total / Spent / Remaining).
+   Uses shared .summary-card base from styles.css for card appearance,
+   hover lift, and ::before decorative glow.
+   Adds status variants (.warn, .over) for color-coded borders.
+*/
+
 .summary-strip {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
-    margin-bottom: 30px;
+    margin-bottom: var(--section-gap);
+    animation: slideInUp 0.6s ease 0.4s backwards;
+    animation-delay: 0.15s;
 }
 
-.summary-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
-    border-radius: 12px;
-    padding: 22px 24px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    border-left: 6px solid #2e7d32;
-    position: relative;
-    overflow: hidden;
-    /* FEATURE 2: Hover animation */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Override shared .summary-card with budget-specific gradient bg */
+.summary-strip .summary-card {
+    background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-off-white) 100%);
 }
 
-.summary-card:hover {
-    transform: translateY(-5px) scale(1.01);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-}
-
-/* FEATURE 6: Decorative radial glow */
-.summary-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 80px;
-    height: 80px;
-    background: radial-gradient(circle at top right, rgba(46, 125, 50, 0.08), transparent 70%);
+/* Decorative radial glow — enhances shared ::before */
+.summary-strip .summary-card::before {
     border-radius: 0 0 0 80px;
 }
 
 .summary-card.over {
-    border-left-color: #d32f2f;
+    border-left-color: var(--red-dark);
 }
 
 .summary-card.over::before {
@@ -155,7 +111,7 @@ FEATURE 6: PSEUDO-ELEMENTS
 }
 
 .summary-card.warn {
-    border-left-color: #f9a825;
+    border-left-color: var(--yellow-dark);
 }
 
 .summary-card.warn::before {
@@ -166,7 +122,7 @@ FEATURE 6: PSEUDO-ELEMENTS
     font-size: 0.82rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #888;
+    color: var(--text-lighter);
     font-weight: 600;
     margin-bottom: 8px;
 }
@@ -174,38 +130,45 @@ FEATURE 6: PSEUDO-ELEMENTS
 .summary-card .value {
     font-size: 1.7rem;
     font-weight: bold;
-    color: #2e7d32;
+    color: var(--green-main);
 }
 
 .summary-card.over .value {
-    color: #d32f2f;
+    color: var(--red-dark);
 }
 
 .summary-card.warn .value {
-    color: #f9a825;
+    color: var(--yellow-dark);
 }
 
 
-/* ── Add Budget Form ── */
+/* ── Add Budget Form ──
+   Form section for adding new budget categories.
+   Uses shared form input focus styles from styles.css.
+   .add-form uses flexbox for responsive wrapping.
+*/
+
 .add-section {
-    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-off-white) 100%);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-md);
     padding: 24px 28px;
     margin-bottom: 28px;
-    border: 1px solid rgba(46, 125, 50, 0.05);
-    transition: box-shadow 0.3s ease;
+    border: 1px solid var(--border-green-subtle);
+    transition: box-shadow var(--transition-normal);
+    animation: slideInUp 0.6s ease 0.4s backwards;
+    animation-delay: 0.2s;
 }
 
 .add-section:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-hover);
 }
 
 .add-section h2 {
-    font-size: 1.1rem;
-    color: #1b5e20;
+    font-size: 1.2rem;
+    color: var(--green-dark);
     margin-bottom: 18px;
-    border-bottom: 2px solid #e8f5e9;
+    border-bottom: 2px solid var(--green-border);
     padding-bottom: 10px;
     font-weight: 700;
 }
@@ -228,32 +191,17 @@ FEATURE 6: PSEUDO-ELEMENTS
 .add-form label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #555;
+    color: var(--text-medium);
 }
 
+/* Budget-specific: inputs need full width within flex fields */
 .add-form input,
 .add-form select {
-    padding: 10px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 0.95rem;
     width: 100%;
-    background: #fafafa;
-    /* FEATURE 2: Focus glow */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-}
-
-.add-form input:focus,
-.add-form select:focus {
-    outline: none;
-    border-color: #2e7d32;
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
-    background: white;
 }
 
 .btn-add {
-    background: linear-gradient(135deg, #2e7d32, #4caf50);
+    background: var(--gradient-green);
     color: white;
     border: none;
     padding: 10px 24px;
@@ -263,13 +211,14 @@ FEATURE 6: PSEUDO-ELEMENTS
     cursor: pointer;
     height: 42px;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--shadow-green);
+    transition: transform var(--transition-fast),
+                box-shadow var(--transition-fast);
 }
 
 .btn-add:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.35);
+    box-shadow: var(--shadow-green-hover);
 }
 
 .btn-add:active {
@@ -277,35 +226,30 @@ FEATURE 6: PSEUDO-ELEMENTS
 }
 
 
-/* ── FEATURE 1: CSS GRID - Budget Cards Grid ── */
+/* ── Budget Cards Grid ──
+   Auto-fill responsive grid of individual budget category cards.
+   Each card slides in with staggered delay using shared slideInUp.
+   Cards lift with green glow shadow on hover.
+*/
+
 .budgets-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 20px;
-}
-
-/* FEATURE 3: Staggered fade-in animation */
-@keyframes budgetCardIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    animation: slideInUp 0.6s ease 0.4s backwards;
+    animation-delay: 0.25s;
 }
 
 .budget-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-off-white) 100%);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-md);
     padding: 22px;
     position: relative;
-    border: 1px solid rgba(46, 125, 50, 0.05);
-    animation: budgetCardIn 0.5s ease forwards;
-    /* FEATURE 2: Green glow hover */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-green-subtle);
+    animation: slideInUp 0.5s ease forwards;
+    transition: transform var(--transition-normal),
+                box-shadow var(--transition-normal);
 }
 
 .budget-card:nth-child(1) { animation-delay: 0s; }
@@ -319,6 +263,12 @@ FEATURE 6: PSEUDO-ELEMENTS
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3);
 }
+
+
+/* ── Budget Card Header ──
+   Top row with category icon/name and edit/delete action buttons.
+   .icon-btn styles come from shared styles.css.
+*/
 
 .card-header {
     display: flex;
@@ -340,7 +290,7 @@ FEATURE 6: PSEUDO-ELEMENTS
 .card-name {
     font-weight: 700;
     font-size: 1rem;
-    color: #333;
+    color: var(--text-dark);
 }
 
 .card-actions {
@@ -348,27 +298,10 @@ FEATURE 6: PSEUDO-ELEMENTS
     gap: 6px;
 }
 
-.icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: #aaa;
-    padding: 4px 6px;
-    border-radius: 6px;
-    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-}
 
-.icon-btn:hover {
-    color: #2e7d32;
-    background: #f0f7f0;
-    transform: scale(1.1);
-}
-
-.icon-btn.del:hover {
-    color: #d32f2f;
-    background: #fff5f5;
-}
+/* ── Budget Card Amounts ──
+   Spent vs limit display row above the progress bar.
+*/
 
 .amounts {
     display: flex;
@@ -378,51 +311,46 @@ FEATURE 6: PSEUDO-ELEMENTS
 }
 
 .spent-label {
-    color: #555;
+    color: var(--text-medium);
 }
 
 .spent-label span {
     font-weight: 700;
-    color: #333;
+    color: var(--text-dark);
 }
 
 .budget-label {
-    color: #888;
+    color: var(--text-lighter);
 }
 
 .budget-label span {
     font-weight: 600;
-    color: #2e7d32;
+    color: var(--green-main);
 }
 
 
-/* ── Progress Bar ── */
+/* ── Budget Progress Bar ──
+   Custom progress bar with status-based gradient colors.
+   Animates from 0% width on load via fillBudgetBar.
+   Renamed from .progress-bar to avoid conflict with shared styles.
+*/
+
 .progress-wrap {
     width: 100%;
     height: 10px;
-    background: #e9ecef;
+    background: var(--border-light);
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 10px;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-/*
-   FEATURE 3: FIXED progress bar animation
-   The old animation used "from { width: 0% }" which caused bars
-   to fill to 100% first then snap to their actual width.
-   Now the inline style sets the target width, and the animation
-   only animates FROM 0% — the "to" keyframe uses the inline width.
-*/
 @keyframes fillBudgetBar {
     from {
         width: 0%;
-        /* opacity: 0; */
-        /* ^  maybe keep it? */
     }
 }
 
-/* Renamed to avoid conflict with dashboard's .progress-bar */
 .budget-progress-bar {
     height: 100%;
     border-radius: 10px;
@@ -430,24 +358,28 @@ FEATURE 6: PSEUDO-ELEMENTS
     box-shadow: 0 0 8px rgba(46, 125, 50, 0.2);
 }
 
-/* FEATURE 4: Status-based gradients */
+/* Status-based gradient colors */
 .budget-progress-bar.safe {
-    background: linear-gradient(90deg, #2e7d32, #4caf50);
-    box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+    background: linear-gradient(90deg, var(--green-main), var(--green-mid));
+    box-shadow: var(--shadow-green-glow);
 }
 
 .budget-progress-bar.warning {
-    background: linear-gradient(90deg, #f9a825, #ffcc02);
+    background: linear-gradient(90deg, var(--yellow-dark), var(--yellow-light));
     box-shadow: 0 0 8px rgba(249, 168, 37, 0.3);
 }
 
 .budget-progress-bar.danger {
-    background: linear-gradient(90deg, #d32f2f, #ef5350);
+    background: linear-gradient(90deg, var(--red-dark), #ef5350);
     box-shadow: 0 0 8px rgba(211, 47, 47, 0.3);
 }
 
 
-/* ── Card Footer ── */
+/* ── Budget Card Footer ──
+   Bottom row with remaining amount and percentage label.
+   Color changes based on budget status (safe/warning/danger).
+*/
+
 .card-footer {
     display: flex;
     justify-content: space-between;
@@ -460,31 +392,37 @@ FEATURE 6: PSEUDO-ELEMENTS
 }
 
 .remaining.safe {
-    color: #2e7d32;
+    color: var(--green-main);
 }
 
 .remaining.warning {
-    color: #f9a825;
+    color: var(--yellow-dark);
 }
 
 .remaining.danger {
-    color: #d32f2f;
+    color: var(--red-dark);
 }
 
 .pct-label {
-    color: #aaa;
+    color: var(--text-disabled);
 }
+
+
+/* ── Alert Badge ──
+   Warning/over-budget indicator that appears on cards
+   when spending approaches or exceeds the limit.
+*/
 
 .alert-badge {
     display: inline-block;
     background: #fff3e0;
-    color: #e65100;
+    color: var(--orange-main);
     font-size: 0.75rem;
     font-weight: 700;
     padding: 3px 10px;
     border-radius: 20px;
     margin-top: 10px;
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast);
 }
 
 .alert-badge:hover {
@@ -493,138 +431,33 @@ FEATURE 6: PSEUDO-ELEMENTS
 
 .alert-badge.over {
     background: #ffebee;
-    color: #c62828;
+    color: var(--red-darker);
 }
 
 
-/* ── Empty State ── */
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #bbb;
-}
+/* ── Empty State Animation ──
+   Applies slideInUp to the shared .empty-state when
+   shown inside the budget container.
+*/
 
-.empty-state .icon {
-    font-size: 3rem;
-    margin-bottom: 12px;
-}
-
-.empty-state p {
-    font-size: 1rem;
+.budget-container .empty-state {
+    animation: slideInUp 0.6s ease 0.4s backwards;
+    animation-delay: 0.25s;
 }
 
 
-/* ── Edit Modal ── */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 100;
-    justify-content: center;
-    align-items: center;
-}
+/* ── Budget Modal Override ──
+   The edit budget modal uses shared .modal styles from styles.css.
+   Budget modal is slightly narrower (360px vs shared 400px).
+*/
 
-/* FEATURE 3: Modal fade-in animation */
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.modal-overlay.open {
-    display: flex;
-}
-
-.modal {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
+.budget-container .modal {
     width: 360px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-    animation: modalFadeIn 0.3s ease forwards;
-}
-
-.modal h3 {
-    color: #1b5e20;
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-}
-
-.modal .field {
-    margin-bottom: 16px;
-}
-
-.modal label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 6px;
-}
-
-.modal input,
-.modal select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 0.95rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.modal input:focus,
-.modal select:focus {
-    outline: none;
-    border-color: #2e7d32;
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
-}
-
-.modal-btns {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.modal-btns button {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn-save {
-    background: linear-gradient(135deg, #2e7d32, #4caf50);
-    color: white;
-    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-}
-
-.btn-save:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.35);
-}
-
-.btn-cancel-modal {
-    background: #e0e0e0;
-    color: #333;
-}
-
-.btn-cancel-modal:hover {
-    background: #d0d0d0;
-    transform: translateY(-2px);
 }
 
 
-/* ── FEATURE 5: MEDIA QUERIES (RESPONSIVE DESIGN) ── */
+/* Responsive: Budget-Specific */
+
 @media (max-width: 768px) {
     .summary-strip {
         grid-template-columns: 1fr;
@@ -640,11 +473,6 @@ FEATURE 6: PSEUDO-ELEMENTS
 
     .add-form .field {
         min-width: 100%;
-    }
-
-    .modal {
-        width: 90%;
-        margin: 0 20px;
     }
 }
 
