@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function (): void {
 
 // Load Data from JSON File
 function loadData(): void {
-    fetch('data.json')
+    fetch('/data/dashboard-data.json')
         .then((response: Response) => response.json())
         .then((data: DashboardData) => {
             chartData = data;

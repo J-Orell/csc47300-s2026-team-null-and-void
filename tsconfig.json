@@ -4,12 +4,12 @@
     "module": "commonjs",
     "strict": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./ts",
     "sourceMap": false,
     "lib": ["ES2017", "DOM"],
     "noImplicitAny": true,
     "strictNullChecks": true
   },
-  "include": ["*.ts"],
+  "include": ["ts/*.ts"],
   "exclude": ["node_modules"]
 }

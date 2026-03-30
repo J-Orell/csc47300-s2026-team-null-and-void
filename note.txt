@@ -2,4 +2,4 @@ For ts to spawn in the js files:
 tsc
 
 For using the cloc.exe thing:
-.\cloc-2.08.exe --exclude-dir=node_modules .
+.\cloc-2.08.exe --exclude-dir=node_modules,dist .

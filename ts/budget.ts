@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function (): void {
 
 // Load Budget Data from JSON
 function loadBudgetData(): void {
-    fetch('budget-data.json')
+    fetch('/data/budget-data.json')
         .then((response: Response) => response.json())
         .then((data: BudgetItem[]) => {
             budgets = data;
