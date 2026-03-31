@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
 import Budget from './pages/Budget'
 import Settings from './pages/Settings'
+import SavingsGoals from './pages/SavingsGoals'
 import './App.css'
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/budget" element={<Budget />} />
+          <Route path="/savings-goals" element={<SavingsGoals />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>

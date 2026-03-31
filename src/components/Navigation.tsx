@@ -36,6 +36,14 @@ const Navigation: FC = () => {
         </li>
         <li>
           <Link 
+            to="/savings-goals" 
+            className={isActive('/savings-goals') ? 'active' : ''}
+          >
+            Savings Goals
+          </Link>
+        </li>
+        <li>
+          <Link 
             to="/settings" 
             className={isActive('/settings') ? 'active' : ''}
           >
