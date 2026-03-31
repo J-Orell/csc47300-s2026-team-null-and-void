@@ -24,7 +24,7 @@ const Budget: FC = () => {
     limit: '',
     spent: ''
   })
-
+  // Function to add a new budget category
   const handleAddBudget = () => {
     if (newCategory.name && newCategory.limit) {
       const newBudget: BudgetCategory = {
@@ -38,7 +38,7 @@ const Budget: FC = () => {
       setNewCategory({ icon: '🛒', name: '', limit: '', spent: '' })
     }
   }
-
+  // Function to remove a budget category by ID
   const removeBudget = (id: string) => {
     setBudgets(budgets.filter(b => b.id !== id))
   }

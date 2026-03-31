@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { Chart as ChartJS, ArcElement, DoughnutController, Tooltip, Legend } from 'chart.js'
 import { ChartOptions } from 'chart.js'
 import { CategoryBreakdown } from '../types'
@@ -12,6 +12,21 @@ interface CategoryChartProps {
 const CategoryChart: FC<CategoryChartProps> = ({ data }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const chartRef = useRef<ChartJS | null>(null)
+  const [hiddenCategories, setHiddenCategories] = useState<Set<string>>(new Set())
+
+  const categoryLabels = Object.keys(data)
+
+  const toggleCategory = (category: string) => {
+    setHiddenCategories(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(category)) {
+        newSet.delete(category)
+      } else {
+        newSet.add(category)
+      }
+      return newSet
+    })
+  }
 
   useEffect(() => {
     if (!canvasRef.current || !data) return
@@ -23,8 +38,9 @@ const CategoryChart: FC<CategoryChartProps> = ({ data }) => {
       chartRef.current.destroy()
     }
 
-    const categoryLabels = Object.keys(data)
-    const categoryValues = Object.values(data)
+    // Filter data based on hidden categories
+    const filteredLabels = categoryLabels.filter(label => !hiddenCategories.has(label))
+    const filteredValues = filteredLabels.map(label => data[label as keyof CategoryBreakdown])
 
     const colors = [
       'rgba(76, 175, 80, 0.85)',
@@ -55,6 +71,7 @@ const CategoryChart: FC<CategoryChartProps> = ({ data }) => {
             boxWidth: 10,
             boxHeight: 10,
           },
+          onClick: () => false, // Disable default click behavior
         },
         tooltip: {
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
@@ -72,11 +89,11 @@ const CategoryChart: FC<CategoryChartProps> = ({ data }) => {
     chartRef.current = new ChartJS(ctx, {
       type: 'doughnut',
       data: {
-        labels: categoryLabels,
+        labels: filteredLabels,
         datasets: [
           {
-            data: categoryValues,
-            backgroundColor: colors.slice(0, categoryLabels.length),
+            data: filteredValues,
+            backgroundColor: colors.slice(0, filteredLabels.length),
             borderColor: 'white',
             borderWidth: 3,
           },
@@ -90,9 +107,65 @@ const CategoryChart: FC<CategoryChartProps> = ({ data }) => {
         chartRef.current.destroy()
       }
     }
-  }, [data])
+  }, [data, hiddenCategories])
 
-  return <canvas ref={canvasRef} />
+  return (
+    <div>
+      <div style={{
+        position: 'relative',
+        height: '300px',
+        marginBottom: '0.5rem'
+      }}>
+        <canvas ref={canvasRef} />
+      </div>
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '0.75rem',
+        marginTop: '1rem',
+        justifyContent: 'center',
+        padding: '0 1rem'
+      }}>
+        {categoryLabels.map((category) => (
+          <button
+            key={category}
+            onClick={() => toggleCategory(category)}
+            style={{
+              padding: '0.6rem 1.2rem',
+              border: hiddenCategories.has(category) ? '1px solid #c8e6c9' : '2px solid #2e7d32',
+              borderRadius: '8px',
+              background: hiddenCategories.has(category) ? '#f0f0f0' : '#ffffff',
+              color: hiddenCategories.has(category) ? '#999999' : '#2e7d32',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '0.9rem',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              opacity: hiddenCategories.has(category) ? 0.5 : 1,
+              textDecoration: hiddenCategories.has(category) ? 'line-through' : 'none',
+              boxShadow: hiddenCategories.has(category) ? 'none' : '0 2px 8px rgba(46, 125, 50, 0.1)',
+              transform: hiddenCategories.has(category) ? 'scale(0.95)' : 'scale(1)'
+            }}
+            onMouseEnter={(e) => {
+              if (!hiddenCategories.has(category)) {
+                e.currentTarget.style.background = '#e8f5e9'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(46, 125, 50, 0.2)'
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!hiddenCategories.has(category)) {
+                e.currentTarget.style.background = '#ffffff'
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(46, 125, 50, 0.1)'
+                e.currentTarget.style.transform = 'scale(1)'
+              }
+            }}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export default CategoryChart
