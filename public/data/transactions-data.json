@@ -1,0 +1,10 @@
+[
+    { "id": 1, "date": "2026-02-20", "description": "Paycheck - Direct Deposit", "category": "income", "amount": 2500.00, "type": "income" },
+    { "id": 2, "date": "2026-02-19", "description": "Whole Foods Market", "category": "food", "amount": 145.30, "type": "expense" },
+    { "id": 3, "date": "2026-02-18", "description": "Electric Bill - ConEd", "category": "utilities", "amount": 98.75, "type": "expense" },
+    { "id": 4, "date": "2026-02-15", "description": "Freelance Web Project", "category": "income", "amount": 1750.00, "type": "income" },
+    { "id": 5, "date": "2026-02-13", "description": "Uber Ride", "category": "transport", "amount": 24.50, "type": "expense" },
+    { "id": 6, "date": "2026-02-10", "description": "Movie Theater", "category": "entertainment", "amount": 32.00, "type": "expense" },
+    { "id": 7, "date": "2026-02-08", "description": "Restaurant - Olive Garden", "category": "food", "amount": 62.40, "type": "expense" },
+    { "id": 8, "date": "2026-02-05", "description": "Amazon Purchase", "category": "shopping", "amount": 89.99, "type": "expense" }
+]

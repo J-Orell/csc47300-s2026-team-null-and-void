@@ -1,0 +1,70 @@
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  font-size: 32px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-label {
+  color: #999;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.stat-card-income .stat-value {
+  color: #4CAF50;
+}
+
+.stat-card-expense .stat-value {
+  color: #FF6B6B;
+}
+
+.stat-card-savings .stat-value {
+  color: #2196F3;
+}
+
+.stat-card-rate .stat-value {
+  color: #FF9800;
+}
+
+@media (max-width: 768px) {
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stat-icon {
+    font-size: 24px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+}

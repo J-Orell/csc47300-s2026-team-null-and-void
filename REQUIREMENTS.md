@@ -1,0 +1,50 @@
+# BudgetBuddy - Requirements
+
+## System Requirements
+
+- **Node.js**: v18+
+- **npm**: v9+
+- Modern browser (Chrome, Firefox, Safari, Edge)
+
+## Dependencies
+
+### Production
+
+- react@^18.2.0
+- react-dom@^18.2.0
+- react-router-dom@^6.20.1
+- chart.js@^4.4.1
+
+### Development
+
+- typescript@^5.3.3
+- vite@^5.0.10
+- @vitejs/plugin-react@^4.2.1
+- @types/react@^18.2.43
+- @types/react-dom@^18.2.17
+
+## Installation
+
+```bash
+npm install
+```
+
+## Commands
+
+```bash
+npm run dev       # Start development server (http://localhost:5173)
+npm run build     # Build for production
+npm run preview   # Preview production build
+```
+
+## Project Stack
+
+- **Frontend**: React 18 + TypeScript
+- **Routing**: React Router v6
+- **Charts**: Chart.js
+- **Build Tool**: Vite
+- **Styling**: CSS
+
+## Required Data
+
+Place `/data/dashboard-data.json` with dashboard data (monthlyData, categoryBreakdown, currentMonth)

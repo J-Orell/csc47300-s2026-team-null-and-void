@@ -1,4 +1,5 @@
 
+# Build outputs
 dist/
 build/
 
@@ -6,20 +7,12 @@ build/
 node_modules/
 package-lock.json
 
-# Compiled TypeScript (generated from build)
-dashboard.js
-budget.js
-*.js
-!cloc-2.08.exe
-
-# OS Files
+# Development
 .DS_Store
 Thumbs.db
-
-# Build outputs (if using source maps)
 *.map
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -30,8 +23,22 @@ Thumbs.db
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+pnpm-debug.log
 
-# Environment files
+# Environment
 .env
 .env.local
 .env.*.local
+
+# Legacy files (no longer needed after React migration)
+# Old HTML/CSS/JS files
+*.old.js
+*.old.css
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
