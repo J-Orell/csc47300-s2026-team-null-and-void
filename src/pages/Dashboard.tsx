@@ -9,12 +9,13 @@ import '../styles/Dashboard.css'
 const Dashboard: FC = () => {
   const { data, loading, error } = useDashboardData()
 
-  if (loading) return <div className="loading">Loading dashboard...</div>
-  if (error) return <div className="error">Error loading dashboard: {error.message}</div>
-  if (!data) return <div className="error">No data available</div>
+  if (loading) return <main><div className="loading">Loading dashboard...</div></main>
+  if (error)   return <main><div className="error">Error loading dashboard: {error.message}</div></main>
+  if (!data)   return <main><div className="error">No data available</div></main>
 
   return (
     <main className="dashboard-container">
+      {/* Page Header */}
       <div className="page-header">
         <div className="header-content">
           <h1 className="page-title">Financial Overview</h1>
@@ -22,34 +23,20 @@ const Dashboard: FC = () => {
         </div>
         <div className="header-date">{getCurrentDate()}</div>
       </div>
-
+      
+      {/* Stats Grid */}
       <div className="stats-grid">
-        <StatCard
-          icon="📈"
-          label="Total Income"
-          value={`$${formatNumber(data.currentMonth.totalIncome)}`}
-          type="income"
-        />
-        <StatCard
-          icon="💸"
-          label="Total Expenses"
-          value={`$${formatNumber(data.currentMonth.totalExpenses)}`}
-          type="expense"
-        />
-        <StatCard
-          icon="🎯"
-          label="Total Savings"
-          value={`$${formatNumber(data.currentMonth.savings)}`}
-          type="savings"
-        />
-        <StatCard
-          icon="📊"
-          label="Savings Rate"
-          value={data.currentMonth.savingsRate}
-          type="rate"
-        />
+        <StatCard icon="📈" label="Total Income"
+          value={`$${formatNumber(data.currentMonth.totalIncome)}`} type="income" />
+        <StatCard icon="💸" label="Total Expenses"
+          value={`$${formatNumber(data.currentMonth.totalExpenses)}`} type="expense" />
+        <StatCard icon="🎯" label="Total Savings"
+          value={`$${formatNumber(data.currentMonth.savings)}`} type="savings" />
+        <StatCard icon="📊" label="Savings Rate"
+          value={data.currentMonth.savingsRate} type="rate" />
       </div>
 
+      {/* Charts */}
       <div className="charts-section">
         <div className="chart-card">
           <div className="chart-header">
@@ -60,7 +47,6 @@ const Dashboard: FC = () => {
             <MonthlyChart data={data.monthlyData} />
           </div>
         </div>
-
         <div className="chart-card">
           <div className="chart-header">
             <h2>Expense Breakdown by Category</h2>
@@ -72,6 +58,7 @@ const Dashboard: FC = () => {
         </div>
       </div>
 
+      {/* Expense Categories */}
       <div className="category-details">
         <h3 className="section-title">Expense Categories</h3>
         <div className="category-list">

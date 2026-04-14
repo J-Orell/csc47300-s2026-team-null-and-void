@@ -1,26 +1,58 @@
 import { FC, useState } from 'react'
+import '../styles/Settings.css'
 
 const Settings: FC = () => {
   const [settings, setSettings] = useState({
-    fullName: 'Raeesah Iram',
-    email: 'riram000@citymail.cuny.edu',
-    phone: '(212) 555-0199',
-    currency: 'USD',
-    threshold: 90,
-    dateFormat: 'mdy',
-    budgetCycleStart: 1
+    fullName:         'Raeesah Iram',
+    email:            'riram000@citymail.cuny.edu',
+    phone:            '(212) 555-0199',
+    currency:         'USD',
+    threshold:        90,
+    dateFormat:       'mdy',
+    budgetCycleStart: '1',
+  })
+
+  const [notifications, setNotifications] = useState({
+    budgetAlerts:       true,
+    weeklySummary:      true,
+    transactionAlerts:  false,
+    monthlyReport:      true,
   })
 
   const [saved, setSaved] = useState(false)
 
   const handleChange = (field: string, value: string | number) => {
-    setSettings({ ...settings, [field]: value })
+    setSettings(prev => ({ ...prev, [field]: value }))
+    setSaved(false)
+  }
+
+  const handleToggle = (field: keyof typeof notifications) => {
+    setNotifications(prev => ({ ...prev, [field]: !prev[field] }))
     setSaved(false)
   }
 
   const handleSave = () => {
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
+  }
+
+  const handleDiscard = () => {
+    setSettings({
+      fullName:         'Raeesah Iram',
+      email:            'riram000@citymail.cuny.edu',
+      phone:            '(212) 555-0199',
+      currency:         'USD',
+      threshold:        90,
+      dateFormat:       'mdy',
+      budgetCycleStart: '1',
+    })
+    setNotifications({
+      budgetAlerts:      true,
+      weeklySummary:     true,
+      transactionAlerts: false,
+      monthlyReport:     true,
+    })
+    setSaved(false)
   }
 
   return (
@@ -31,149 +63,49 @@ const Settings: FC = () => {
           <p>Manage your account preferences and personal information</p>
         </header>
 
-        <form style={{ maxWidth: '800px' }}>
-          {/* Personal Information */}
-          <section style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '2rem',
-            marginBottom: '2rem',
-            boxShadow: 'var(--shadow-lg)',
-            border: '1px solid var(--border-card)'
-          }}>
-            <h2 style={{
-              fontSize: '1.2rem',
-              fontWeight: '700',
-              color: '#333',
-              marginBottom: '1.5rem',
-              paddingBottom: '1rem',
-              borderBottom: '2px solid #f0f4f8'
-            }}>
-              Personal Information
-            </h2>
+        <form onSubmit={e => e.preventDefault()}>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.9rem',
-                  fontWeight: '600',
-                  marginBottom: '0.5rem',
-                  color: '#666'
-                }}>
-                  Full Name
-                </label>
+          {/* ── Personal Information ── */}
+          <section className="settings-section">
+            <h2>Personal Information</h2>
+            <div className="settings-grid">
+              <div className="settings-field settings-full-row">
+                <label>Full Name</label>
                 <input
                   type="text"
                   value={settings.fullName}
-                  onChange={(e) => handleChange('fullName', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #e9ecef',
-                    borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'inherit'
-                  }}
+                  onChange={e => handleChange('fullName', e.target.value)}
                 />
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    marginBottom: '0.5rem',
-                    color: '#666'
-                  }}>
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={settings.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #e9ecef',
-                      borderRadius: '8px',
-                      fontSize: '0.95rem',
-                      fontFamily: 'inherit'
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    marginBottom: '0.5rem',
-                    color: '#666'
-                  }}>
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    value={settings.phone}
-                    onChange={(e) => handleChange('phone', e.target.value)}
-                    placeholder="(212) 555-0199"
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #e9ecef',
-                      borderRadius: '8px',
-                      fontSize: '0.95rem',
-                      fontFamily: 'inherit'
-                    }}
-                  />
-                </div>
+              <div className="settings-field">
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  value={settings.email}
+                  onChange={e => handleChange('email', e.target.value)}
+                />
+              </div>
+              <div className="settings-field">
+                <label>Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="(212) 555-0199"
+                  value={settings.phone}
+                  onChange={e => handleChange('phone', e.target.value)}
+                />
               </div>
             </div>
           </section>
 
-          {/* Preferences */}
-          <section style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '2rem',
-            marginBottom: '2rem',
-            boxShadow: 'var(--shadow-lg)',
-            border: '1px solid var(--border-card)'
-          }}>
-            <h2 style={{
-              fontSize: '1.2rem',
-              fontWeight: '700',
-              color: '#333',
-              marginBottom: '1.5rem',
-              paddingBottom: '1rem',
-              borderBottom: '2px solid #f0f4f8'
-            }}>
-              Preferences
-            </h2>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.9rem',
-                  fontWeight: '600',
-                  marginBottom: '0.5rem',
-                  color: '#666'
-                }}>
-                  Local Currency
-                </label>
+          {/* ── Preferences ── */}
+          <section className="settings-section">
+            <h2>Preferences</h2>
+            <div className="settings-grid">
+              <div className="settings-field">
+                <label>Local Currency</label>
                 <select
                   value={settings.currency}
-                  onChange={(e) => handleChange('currency', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #e9ecef',
-                    borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'inherit'
-                  }}
+                  onChange={e => handleChange('currency', e.target.value)}
                 >
                   <option value="USD">USD ($)</option>
                   <option value="EUR">EUR (€)</option>
@@ -182,125 +114,135 @@ const Settings: FC = () => {
                   <option value="CAD">CAD (C$)</option>
                 </select>
               </div>
-
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.9rem',
-                  fontWeight: '600',
-                  marginBottom: '0.5rem',
-                  color: '#666'
-                }}>
-                  Spending Alert Threshold (%)
-                </label>
+              <div className="settings-field">
+                <label>Spending Alert Threshold (%)</label>
                 <input
-                  type="number"
-                  min="1"
-                  max="100"
+                  type="number" min="1" max="100"
                   value={settings.threshold}
-                  onChange={(e) => handleChange('threshold', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #e9ecef',
-                    borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'inherit'
-                  }}
+                  onChange={e => handleChange('threshold', Number(e.target.value))}
                 />
               </div>
-
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.9rem',
-                  fontWeight: '600',
-                  marginBottom: '0.5rem',
-                  color: '#666'
-                }}>
-                  Date Format
-                </label>
+              <div className="settings-field">
+                <label>Date Format</label>
                 <select
                   value={settings.dateFormat}
-                  onChange={(e) => handleChange('dateFormat', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #e9ecef',
-                    borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'inherit'
-                  }}
+                  onChange={e => handleChange('dateFormat', e.target.value)}
                 >
                   <option value="mdy">MM/DD/YYYY</option>
                   <option value="dmy">DD/MM/YYYY</option>
                   <option value="ymd">YYYY-MM-DD</option>
                 </select>
               </div>
-
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.9rem',
-                  fontWeight: '600',
-                  marginBottom: '0.5rem',
-                  color: '#666'
-                }}>
-                  Budget Cycle Start
-                </label>
+              <div className="settings-field">
+                <label>Budget Cycle Start</label>
                 <select
                   value={settings.budgetCycleStart}
-                  onChange={(e) => handleChange('budgetCycleStart', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #e9ecef',
-                    borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'inherit'
-                  }}
+                  onChange={e => handleChange('budgetCycleStart', e.target.value)}
                 >
-                  <option value={1}>1st of month</option>
-                  <option value={15}>15th of month</option>
+                  <option value="1">1st of month</option>
+                  <option value="15">15th of month</option>
                   <option value="last">Last day of month</option>
                 </select>
               </div>
             </div>
           </section>
 
-          {/* Save Button */}
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-            <button
-              type="button"
-              onClick={handleSave}
-              style={{
-                padding: '0.75rem 2rem',
-                background: 'linear-gradient(135deg, #2e7d32, #4caf50)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontSize: '0.95rem',
-                transition: 'transform 0.2s'
-              }}
-            >
+          {/* ── Notifications ── */}
+          <section className="settings-section">
+            <h2>Notifications</h2>
+            <div className="notification-options">
+              {([
+                { key: 'budgetAlerts',      label: 'Budget Alerts',       desc: 'Get notified when spending nears your limit' },
+                { key: 'weeklySummary',     label: 'Weekly Summary',      desc: 'Receive a weekly spending report via email' },
+                { key: 'transactionAlerts', label: 'Transaction Alerts',  desc: 'Get notified for every new transaction' },
+                { key: 'monthlyReport',     label: 'Monthly Report',      desc: 'Detailed monthly breakdown sent to your email' },
+              ] as const).map(({ key, label, desc }) => (
+                <div key={key} className="toggle-row">
+                  <div className="toggle-info">
+                    <span className="toggle-label">{label}</span>
+                    <span className="toggle-desc">{desc}</span>
+                  </div>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={notifications[key]}
+                      onChange={() => handleToggle(key)}
+                    />
+                    <span className="toggle-slider" />
+                  </label>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ── Payment Methods ── */}
+          <section className="settings-section">
+            <h2>Payment Methods</h2>
+            <div className="card-list">
+              <div className="payment-card-item">
+                <div className="payment-card-info">
+                  <span className="card-type-badge visa">VISA</span>
+                  <span className="payment-card-number">**** **** **** 4242</span>
+                </div>
+                <div className="payment-card-meta">
+                  <span className="payment-card-expiry">Exp: 08/27</span>
+                  <button type="button" className="btn-remove-card">Remove</button>
+                </div>
+              </div>
+              <div className="payment-card-item">
+                <div className="payment-card-info">
+                  <span className="card-type-badge mc">MC</span>
+                  <span className="payment-card-number">**** **** **** 8899</span>
+                </div>
+                <div className="payment-card-meta">
+                  <span className="payment-card-expiry">Exp: 03/28</span>
+                  <button type="button" className="btn-remove-card">Remove</button>
+                </div>
+              </div>
+            </div>
+            <button type="button" className="btn-add-card">+ Add Payment Method</button>
+          </section>
+
+          {/* ── Account Management ── */}
+          <section className="settings-section">
+            <h2>Account Management</h2>
+            <div className="account-actions">
+              <div className="account-action-card">
+                <div className="action-info">
+                  <span className="action-title">Export Data</span>
+                  <span className="action-desc">Download all your transaction data as CSV</span>
+                </div>
+                <button type="button" className="btn-action-export">Export</button>
+              </div>
+              <div className="account-action-card">
+                <div className="action-info">
+                  <span className="action-title">Pause Account</span>
+                  <span className="action-desc">Temporarily disable tracking and notifications</span>
+                </div>
+                <button type="button" className="btn-action-pause">Pause</button>
+              </div>
+              <div className="account-action-card danger-card">
+                <div className="action-info">
+                  <span className="action-title">Delete Account</span>
+                  <span className="action-desc">Permanently remove your account and all data</span>
+                </div>
+                <button type="button" className="btn-action-delete">Delete</button>
+              </div>
+            </div>
+          </section>
+
+          {/* ── Save / Discard Bar ── */}
+          <div className="save-bar">
+            <button type="button" className="btn-save-settings" onClick={handleSave}>
               Save Changes
+            </button>
+            <button type="button" className="btn-discard" onClick={handleDiscard}>
+              Discard
             </button>
           </div>
 
           {saved && (
-            <div style={{
-              marginTop: '1rem',
-              padding: '1rem',
-              background: 'rgba(76, 175, 80, 0.1)',
-              border: '1px solid #4caf50',
-              borderRadius: '8px',
-              color: '#2e7d32',
-              fontWeight: '500'
-            }}>
-              ✓ Settings saved successfully!
-            </div>
+            <div className="save-success">✓ Settings saved successfully!</div>
           )}
         </form>
       </div>

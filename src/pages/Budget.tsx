@@ -1,58 +1,143 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
+import StatCard from '../components/StatCard'
+import { Budget as BudgetType } from '../types'
+import '../styles/Budget.css'
 
-interface BudgetCategory {
+type BudgetState = 'safe' | 'warning' | 'danger'
+
+interface BudgetCategory extends BudgetType {
   id: string
   icon: string
-  name: string
-  limit: number
-  spent: number
+}
+
+interface EditModalProps {
+  budget: BudgetCategory
+  onClose: () => void
+  onSave: (name: string, limit: number, spent: number) => void
+}
+
+const EditModal: FC<EditModalProps> = ({ budget, onClose, onSave }) => {
+  const [name,  setName]  = useState(budget.name)
+  const [limit, setLimit] = useState(String(budget.limit))
+  const [spent, setSpent] = useState(String(budget.spent))
+
+  const handleSave = () => {
+    if (!name.trim()) { alert('Please enter a category name.'); return }
+    const l = parseFloat(limit)
+    if (!l || l <= 0) { alert('Please enter a valid limit.'); return }
+    onSave(name.trim(), l, parseFloat(spent) || 0)
+  }
+
+  return (
+    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="modal" style={{ maxWidth: '360px' }}>
+        <div className="modal-header">
+          <h2>Edit Budget</h2>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="budget-modal-field">
+          <label>Category Name</label>
+          <input type="text" value={name} onChange={e => setName(e.target.value)} />
+        </div>
+        <div className="budget-modal-field">
+          <label>Monthly Limit ($)</label>
+          <input type="number" min="1" value={limit} onChange={e => setLimit(e.target.value)} />
+        </div>
+        <div className="budget-modal-field">
+          <label>Spent So Far ($)</label>
+          <input type="number" min="0" value={spent} onChange={e => setSpent(e.target.value)} />
+        </div>
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+          <button
+            onClick={handleSave}
+            style={{
+              flex: 2, padding: '0.75rem',
+              background: 'var(--gradient-green)', color: 'white',
+              border: 'none', borderRadius: '8px', fontWeight: 700,
+              cursor: 'pointer', fontSize: '0.95rem',
+            }}
+          >Save</button>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1, padding: '0.75rem',
+              background: '#e0e0e0', color: 'var(--text-dark)',
+              border: 'none', borderRadius: '8px', fontWeight: 600,
+              cursor: 'pointer', fontSize: '0.95rem',
+            }}
+          >Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 const Budget: FC = () => {
-  const [budgets, setBudgets] = useState<BudgetCategory[]>([
-    { id: '1', icon: '🛒', name: 'Groceries', limit: 400, spent: 245 },
-    { id: '2', icon: '🚗', name: 'Transport', limit: 200, spent: 125 },
-    { id: '3', icon: '🎬', name: 'Entertainment', limit: 150, spent: 80 },
-    { id: '4', icon: '💡', name: 'Utilities', limit: 150, spent: 90 },
-    { id: '5', icon: '🛍️', name: 'Shopping', limit: 300, spent: 240 },
-    { id: '6', icon: '🍽️', name: 'Dining', limit: 250, spent: 165 },
-  ])
+  const [budgets, setBudgets]     = useState<BudgetCategory[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [editingBudget, setEditingBudget] = useState<BudgetCategory | null>(null)
 
-  const [newCategory, setNewCategory] = useState({
-    icon: '🛒',
-    name: '',
-    limit: '',
-    spent: ''
+  const [newCat, setNewCat] = useState({
+    icon: '🛒', name: '', limit: '', spent: ''
   })
-  // Function to add a new budget category
-  const handleAddBudget = () => {
-    if (newCategory.name && newCategory.limit) {
-      const newBudget: BudgetCategory = {
-        id: String(budgets.length + 1),
-        icon: newCategory.icon,
-        name: newCategory.name,
-        limit: parseFloat(newCategory.limit),
-        spent: parseFloat(newCategory.spent) || 0
-      }
-      setBudgets([...budgets, newBudget])
-      setNewCategory({ icon: '🛒', name: '', limit: '', spent: '' })
-    }
-  }
-  // Function to remove a budget category by ID
-  const removeBudget = (id: string) => {
-    setBudgets(budgets.filter(b => b.id !== id))
+
+  /* Load from JSON */
+  useEffect(() => {
+    fetch('/data/budget-data.json')
+      .then(r => r.json())
+      .then((data: Array<{ icon: string; name: string; limit: number; spent: number }>) => {
+        setBudgets(data.map((b, i) => ({ ...b, id: String(i + 1), category: b.name })))
+        setLoading(false)
+      })
+      .catch(() => {
+        setBudgets([])
+        setLoading(false)
+      })
+  }, [])
+
+  /* Add */
+  const handleAdd = () => {
+    if (!newCat.name.trim()) { alert('Please enter a category name.'); return }
+    const limit = parseFloat(newCat.limit)
+    if (!limit || limit <= 0) { alert('Please enter a valid budget limit.'); return }
+    const spent = parseFloat(newCat.spent) || 0
+    const nextId = String(Date.now())
+    setBudgets(prev => [...prev, {
+      id: nextId, icon: newCat.icon, name: newCat.name.trim(),
+      category: newCat.name.trim(), limit, spent
+    }])
+    setNewCat({ icon: '🛒', name: '', limit: '', spent: '' })
   }
 
-  const totalBudget = budgets.reduce((sum, b) => sum + b.limit, 0)
-  const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0)
-  const totalRemaining = totalBudget - totalSpent
-
-  const getProgressColor = (spent: number, limit: number) => {
-    const percentage = (spent / limit) * 100
-    if (percentage >= 90) return '#ff6b6b'
-    if (percentage >= 70) return '#ffc107'
-    return '#4caf50'
+  /* Delete */
+  const handleDelete = (id: string) => {
+    const b = budgets.find(b => b.id === id)
+    if (!b) return
+    setBudgets(prev => prev.filter(b => b.id !== id))
   }
+
+  /* Edit save */
+  const handleEditSave = (name: string, limit: number, spent: number) => {
+    if (!editingBudget) return
+    setBudgets(prev => prev.map(b =>
+      b.id === editingBudget.id ? { ...b, name, category: name, limit, spent } : b
+    ))
+    setEditingBudget(null)
+  }
+
+  /* Totals */
+  const totalBudget = budgets.reduce((s, b) => s + b.limit, 0)
+  const totalSpent  = budgets.reduce((s, b) => s + b.spent, 0)
+  const totalRemain = totalBudget - totalSpent
+
+  const getState = (spent: number, limit: number): BudgetState => {
+    const pct = (spent / limit) * 100
+    if (pct > 100) return 'danger'
+    if (pct >= 90)  return 'warning'
+    return 'safe'
+  }
+
+  if (loading) return <main><div className="loading">Loading budgets...</div></main>
 
   return (
     <main>
@@ -62,209 +147,150 @@ const Budget: FC = () => {
           <p>Set monthly limits per category and track your spending.</p>
         </header>
 
-        <div className="summary-strip" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div className="stat-card">
-            <div className="stat-icon income">💰</div>
-            <div className="stat-info">
-              <div className="stat-label">Total Budget</div>
-              <div className="stat-value">${totalBudget.toFixed(2)}</div>
-            </div>
-          </div>
-          <div className="stat-card expense">
-            <div className="stat-icon expense-icon">💸</div>
-            <div className="stat-info">
-              <div className="stat-label">Total Spent</div>
-              <div className="stat-value">${totalSpent.toFixed(2)}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon rate-icon">🎯</div>
-            <div className="stat-info">
-              <div className="stat-label">Remaining</div>
-              <div className="stat-value" style={{ color: totalRemaining >= 0 ? '#4caf50' : '#ff6b6b' }}>
-                ${totalRemaining.toFixed(2)}
-              </div>
-            </div>
-          </div>
+        {/* Summary Strip using StatCard for uniform look */}
+        <div className="summary-cards">
+          <StatCard 
+            icon="📊" 
+            label="Total Budget" 
+            value={`$${totalBudget.toFixed(2)}`} 
+            type="income" 
+          />
+          <StatCard 
+            icon="💸" 
+            label="Total Spent" 
+            value={`$${totalSpent.toFixed(2)}`} 
+            type={totalSpent > totalBudget ? 'expense' : 'rate'} 
+          />
+          <StatCard 
+            icon="💰" 
+            label="Remaining" 
+            value={`${totalRemain < 0 ? '-$' : '$'}${Math.abs(totalRemain).toFixed(2)}`} 
+            type={totalRemain < 0 ? 'expense' : 'savings'} 
+          />
         </div>
 
-        <div style={{
-          background: 'white',
-          borderRadius: '12px',
-          padding: '2rem',
-          marginBottom: '2rem',
-          boxShadow: 'var(--shadow-lg)',
-          border: '1px solid var(--border-card)'
-        }}>
-          <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#333' }}>Add New Budget Category</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem', color: '#666' }}>Icon</label>
-              <select
-                value={newCategory.icon}
-                onChange={(e) => setNewCategory({ ...newCategory, icon: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #e9ecef',
-                  borderRadius: '8px',
-                  fontSize: '0.95rem'
-                }}
-              >
+        {/* Add Form */}
+        <div className="add-budget-section">
+          <h2>Add New Budget Category</h2>
+          <div className="add-budget-form">
+            <div className="add-budget-field">
+              <label>Icon</label>
+              <select value={newCat.icon} onChange={e => setNewCat({ ...newCat, icon: e.target.value })}>
                 <option value="🛒">🛒 Groceries</option>
                 <option value="🚗">🚗 Transport</option>
                 <option value="🎬">🎬 Entertainment</option>
                 <option value="💡">💡 Utilities</option>
-                <option value="🛍️">🛍️ Shopping</option>
-                <option value="🍽️">🍽️ Dining</option>
+                <option value="🛍">🛍 Shopping</option>
+                <option value="🍽">🍽 Dining</option>
                 <option value="💊">💊 Health</option>
                 <option value="📚">📚 Education</option>
+                <option value="✈️">✈️ Travel</option>
+                <option value="🏠">🏠 Housing</option>
+                <option value="💰">💰 Other</option>
               </select>
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem', color: '#666' }}>Category Name</label>
+            <div className="add-budget-field">
+              <label>Category Name</label>
               <input
-                type="text"
-                placeholder="e.g. Groceries"
-                value={newCategory.name}
-                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #e9ecef',
-                  borderRadius: '8px',
-                  fontSize: '0.95rem'
-                }}
+                type="text" placeholder="e.g. Groceries"
+                value={newCat.name} onChange={e => setNewCat({ ...newCat, name: e.target.value })}
               />
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem', color: '#666' }}>Monthly Limit ($)</label>
+            <div className="add-budget-field">
+              <label>Monthly Limit ($)</label>
               <input
-                type="number"
-                placeholder="500"
-                value={newCategory.limit}
-                onChange={(e) => setNewCategory({ ...newCategory, limit: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #e9ecef',
-                  borderRadius: '8px',
-                  fontSize: '0.95rem'
-                }}
+                type="number" placeholder="500" min="1"
+                value={newCat.limit} onChange={e => setNewCat({ ...newCat, limit: e.target.value })}
               />
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem', color: '#666' }}>Spent So Far ($)</label>
+            <div className="add-budget-field">
+              <label>Spent So Far ($)</label>
               <input
-                type="number"
-                placeholder="0"
-                value={newCategory.spent}
-                onChange={(e) => setNewCategory({ ...newCategory, spent: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #e9ecef',
-                  borderRadius: '8px',
-                  fontSize: '0.95rem'
-                }}
+                type="number" placeholder="0" min="0"
+                value={newCat.spent} onChange={e => setNewCat({ ...newCat, spent: e.target.value })}
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <button
-                onClick={handleAddBudget}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  background: 'linear-gradient(135deg, #2e7d32, #4caf50)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s'
-                }}
-              >
-                Add Category
-              </button>
+              <button className="btn-add-budget" onClick={handleAdd}>+ Add</button>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-          {budgets.map(budget => {
-            const percentage = (budget.spent / budget.limit) * 100
-            const barColor = getProgressColor(budget.spent, budget.limit)
-            return (
-              <div
-                key={budget.id}
-                style={{
-                  background: 'white',
-                  borderRadius: '12px',
-                  padding: '1.5rem',
-                  boxShadow: 'var(--shadow-lg)',
-                  border: '1px solid var(--border-card)',
-                  position: 'relative'
-                }}
-              >
-                <button
-                  onClick={() => removeBudget(budget.id)}
-                  style={{
-                    position: 'absolute',
-                    top: '1rem',
-                    right: '1rem',
-                    background: '#ff6b6b',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '28px',
-                    height: '28px',
-                    cursor: 'pointer',
-                    fontSize: '1rem'
-                  }}
-                >
-                  ✕
-                </button>
-                <div style={{ marginBottom: '1rem' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{budget.icon}</div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#333', margin: '0 0 0.5rem 0' }}>
-                    {budget.name}
-                  </h3>
-                </div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-                    <span style={{ color: '#666' }}>Spent</span>
-                    <span style={{ fontWeight: '600', color: '#333' }}>
-                      ${budget.spent.toFixed(2)} / ${budget.limit.toFixed(2)}
+        {/* Grid or Empty State */}
+        {budgets.length === 0 ? (
+          <div className="empty-state">
+            <p>📋 No budgets set yet. Add a category above to get started!</p>
+          </div>
+        ) : (
+          <div className="budgets-grid">
+            {budgets.map(b => {
+              const pct   = Math.min((b.spent / b.limit) * 100, 100)
+              const over  = b.spent > b.limit
+              const warn  = !over && pct >= 90
+              const state = getState(b.spent, b.limit)
+              const remain = b.limit - b.spent
+
+              return (
+                <div key={b.id} className="budget-card">
+                  <div className="budget-card-header">
+                    <div className="budget-card-title">
+                      <span className="budget-card-icon">{b.icon}</span>
+                      <span className="budget-card-name">{b.name}</span>
+                    </div>
+                    <div className="budget-card-actions">
+                      <button
+                        className="icon-btn"
+                        title="Edit"
+                        onClick={() => setEditingBudget(b)}
+                      >✏️</button>
+                      <button
+                        className="icon-btn danger"
+                        title="Delete"
+                        onClick={() => handleDelete(b.id)}
+                      >🗑</button>
+                    </div>
+                  </div>
+
+                  <div className="budget-amounts">
+                    <span className="budget-spent-label">
+                      Spent: <span>${b.spent.toFixed(2)}</span>
+                    </span>
+                    <span className="budget-limit-label">
+                      Limit: <span>${b.limit.toFixed(2)}</span>
                     </span>
                   </div>
-                  <div style={{
-                    width: '100%',
-                    height: '8px',
-                    backgroundColor: '#e9ecef',
-                    borderRadius: '4px',
-                    overflow: 'hidden'
-                  }}>
+
+                  <div className="progress-wrap">
                     <div
-                      style={{
-                        width: `${Math.min(percentage, 100)}%`,
-                        height: '100%',
-                        backgroundColor: barColor,
-                        transition: 'width 0.3s ease'
-                      }}
+                      className={`budget-progress-bar ${state}`}
+                      style={{ width: `${pct.toFixed(1)}%` }}
                     />
                   </div>
+
+                  <div className="budget-card-footer">
+                    <span className={`budget-remaining ${state}`}>
+                      {over
+                        ? `Over by $${Math.abs(remain).toFixed(2)}`
+                        : `$${remain.toFixed(2)} left`}
+                    </span>
+                    <span className="budget-pct-label">{pct.toFixed(0)}% used</span>
+                  </div>
+
+                  {over && <span className="alert-badge danger">⚠️ Over Budget</span>}
+                  {warn && !over && <span className="alert-badge warning">⚠️ Near Limit</span>}
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#666' }}>
-                  {percentage >= 90
-                    ? '🚨 Very close to limit!'
-                    : percentage >= 70
-                    ? '⚠️ Getting close to limit'
-                    : '✅ Great progress!'}
-                </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        )}
+
+        {editingBudget && (
+          <EditModal
+            budget={editingBudget}
+            onClose={() => setEditingBudget(null)}
+            onSave={handleEditSave}
+          />
+        )}
       </div>
     </main>
   )

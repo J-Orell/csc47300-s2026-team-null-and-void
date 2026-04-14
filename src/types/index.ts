@@ -23,14 +23,17 @@ export interface DashboardData {
 
 export interface Transaction {
   id: string;
-  title: string;
   date: string;
+  description: string;
+  category: string;
   amount: number;
   type: 'income' | 'expense';
 }
 
 export interface Budget {
-  category: string;
+  id: string;
+  icon: string;
+  name: string;
   limit: number;
   spent: number;
 }
