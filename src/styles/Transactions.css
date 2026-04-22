@@ -292,10 +292,6 @@
     grid-template-columns: 1fr;
   }
 
-  .transactions-container .summary-cards {
-    grid-template-columns: 1fr;
-  }
-
   .data-table-wrapper {
     overflow-x: auto;
   }

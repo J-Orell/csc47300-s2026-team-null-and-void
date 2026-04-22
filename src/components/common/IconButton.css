@@ -1,0 +1,33 @@
+/* ═══════════════════════════════════════════════════════════════ */
+/* ICON BUTTON STYLES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 6px;
+  color: var(--text-faint);
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.icon-button:hover:not(:disabled) {
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+
+.icon-button-danger:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--red-main);
+}
+
+.icon-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

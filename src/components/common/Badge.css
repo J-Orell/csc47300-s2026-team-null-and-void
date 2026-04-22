@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════════════════════ */
+/* BADGE STYLES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  transition: transform var(--transition-fast);
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* BADGE SIZES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.badge-small {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+}
+
+.badge-medium {
+  font-size: 0.82rem;
+  padding: 4px 12px;
+}
+
+.badge-large {
+  font-size: 0.9rem;
+  padding: 6px 16px;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* BADGE VARIANTS */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.badge-default {
+  background: var(--bg-light);
+  color: var(--text-medium);
+}
+
+.badge-success {
+  background: var(--green-bg);
+  color: var(--green-main);
+}
+
+.badge-warning {
+  background: #fff3e0;
+  color: var(--orange-main);
+}
+
+.badge-danger {
+  background: #ffebee;
+  color: var(--red-darker);
+}
+
+.badge-info {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge-category {
+  /* Will be styled with specific category classes */
+}
+
+/* Category-specific badge colors (for transactions) */
+.badge-income {
+  background: var(--green-bg);
+  color: var(--green-main);
+}
+
+.badge-food {
+  background: #fff3e0;
+  color: var(--orange-main);
+}
+
+.badge-utilities {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge-entertainment {
+  background: #fce4ec;
+  color: var(--red-darker);
+}
+
+.badge-transport {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.badge-shopping {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.badge-other {
+  background: #f5f5f5;
+  color: var(--text-medium);
+}

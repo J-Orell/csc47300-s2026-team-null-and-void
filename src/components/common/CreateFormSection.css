@@ -1,0 +1,45 @@
+/* ═══════════════════════════════════════════════════════════════ */
+/* CREATE FORM SECTION STYLES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.create-form-section {
+  margin-bottom: 2rem;
+  animation-delay: 0.2s;
+}
+
+.create-form-title {
+  font-size: 1.2rem;
+  color: var(--green-dark);
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  margin-top: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--green-border);
+}
+
+.create-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  align-items: flex-end;
+}
+
+.create-form-submit {
+  display: grid;
+  align-items: flex-end;
+}
+
+.create-form-submit button {
+  white-space: nowrap;
+  height: 44px;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* RESPONSIVE */
+/* ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .create-form {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════════════════════ */
+/* CARD BASE STYLES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.card {
+  background: var(--bg-white);
+  border-radius: var(--card-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-card);
+  transition: all var(--transition-smooth);
+  animation: slideInUp 0.5s ease backwards;
+}
+
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-heavy);
+  border-color: var(--green-mid);
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* CARD VARIANTS */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Stat Card - for dashboard stats and summary cards */
+.card-stat {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* Chart Card - for dashboard charts */
+.card-chart {
+  padding: 2rem;
+}
+
+/* Budget Card - for budget items */
+.card-budget {
+  background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-off-white) 100%);
+  position: relative;
+}
+
+/* Action Card - for settings actions */
+.card-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 1.25rem;
+  background: #f8fdf8;
+  border-color: rgba(46, 125, 50, 0.08);
+}
+
+.card-action:hover {
+  transform: translateX(5px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Form Section Card */
+.card-form {
+  padding: 1.75rem 2rem;
+}
+
+.card-form:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* RESPONSIVE */
+/* ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .card-stat {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}

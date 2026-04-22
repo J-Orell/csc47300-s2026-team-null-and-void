@@ -1,5 +1,14 @@
-import { FC, useState } from 'react'
-import StatCard from '../components/StatCard'
+import { FC, useState, FormEvent } from 'react'
+import { 
+  Card, 
+  PageHeader, 
+  Button, 
+  Modal, 
+  FormField, 
+  EmptyState,
+  ProgressBar,
+  CreateFormSection
+} from '../components/common'
 
 interface SavingsGoal {
   id: string
@@ -10,92 +19,20 @@ interface SavingsGoal {
   createdDate: string
 }
 
-interface AddMoneyModalProps {
-  goalName: string
-  onClose: () => void
-  onAdd: (amount: number) => void
-}
-
-const AddMoneyModal: FC<AddMoneyModalProps> = ({ goalName, onClose, onAdd }) => {
-  const [amount, setAmount] = useState('')
-
-  const handleAdd = () => {
-    const n = parseFloat(amount)
-    if (!n || n <= 0) { alert('Please enter a valid amount.'); return }
-    onAdd(n)
-  }
-
-  return (
-    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="modal">
-        <div className="modal-header">
-          <h2>Add Money</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
-        <p style={{ marginBottom: '1rem', color: 'var(--text-medium)', fontSize: '0.95rem' }}>
-          Adding to: <strong>{goalName}</strong>
-        </p>
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-medium)', textTransform: 'uppercase' }}>
-            Amount ($)
-          </label>
-          <input
-            type="number"
-            placeholder="0.00"
-            min="0.01"
-            step="0.01"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            style={{
-              width: '100%', padding: '0.75rem',
-              border: '2px solid var(--border-light)', borderRadius: '8px',
-              fontSize: '0.95rem', fontFamily: 'inherit',
-            }}
-            autoFocus
-          />
-        </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button
-            onClick={handleAdd}
-            style={{
-              flex: 2, padding: '0.75rem',
-              background: 'var(--gradient-green)', color: 'white',
-              border: 'none', borderRadius: '8px', fontWeight: 700,
-              cursor: 'pointer', fontSize: '0.95rem',
-            }}
-          >Add Money</button>
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1, padding: '0.75rem',
-              background: '#e0e0e0', color: 'var(--text-dark)',
-              border: 'none', borderRadius: '8px', fontWeight: 600,
-              cursor: 'pointer', fontSize: '0.95rem',
-            }}
-          >Cancel</button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 const SavingsGoals: FC = () => {
   const [goals, setGoals] = useState<SavingsGoal[]>([
-    { id: '1', name: 'Vacation to Hawaii', targetAmount: 10000, currentSavings: 2500,  deadline: '2026-12-31', createdDate: '2026-01-15' },
-    { id: '2', name: 'Emergency Fund',      targetAmount: 15000, currentSavings: 8500,  deadline: '2026-11-30', createdDate: '2026-02-01' },
-    { id: '3', name: 'New Laptop',          targetAmount: 2000,  currentSavings: 1800,  deadline: '2026-06-15', createdDate: '2026-03-01' },
+    { id: '1', name: 'Vacation to Hawaii', targetAmount: 10000, currentSavings: 2500, deadline: '2026-12-31', createdDate: '2026-01-15' },
+    { id: '2', name: 'Emergency Fund', targetAmount: 15000, currentSavings: 8500, deadline: '2026-11-30', createdDate: '2026-02-01' },
+    { id: '3', name: 'New Laptop', targetAmount: 2000, currentSavings: 1800, deadline: '2026-06-15', createdDate: '2026-03-01' },
   ])
-
   const [formData, setFormData] = useState({ goalName: '', targetAmount: '', deadline: '' })
   const [addMoneyGoalId, setAddMoneyGoalId] = useState<string | null>(null)
 
-  /* totalThisMonth: sum of current savings added this month */
   const totalThisMonth = 450
 
-  /* Helpers */
   const calculateMonthlyNeeded = (goal: SavingsGoal): number => {
-    const deadlineDate    = new Date(goal.deadline)
-    const today           = new Date()
+    const deadlineDate = new Date(goal.deadline)
+    const today = new Date()
     const monthsRemaining = Math.max(1, Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24 * 30)))
     const amountRemaining = Math.max(0, goal.targetAmount - goal.currentSavings)
     return Math.round((amountRemaining / monthsRemaining) * 100) / 100
@@ -109,13 +46,12 @@ const SavingsGoals: FC = () => {
 
   const getProjectedCompletion = (goal: SavingsGoal): string => {
     if (goal.currentSavings >= goal.targetAmount) return 'Completed!'
-    const monthsNeeded  = Math.ceil((goal.targetAmount - goal.currentSavings) / (totalThisMonth || 1))
-    const projected     = new Date()
+    const monthsNeeded = Math.ceil((goal.targetAmount - goal.currentSavings) / (totalThisMonth || 1))
+    const projected = new Date()
     projected.setMonth(projected.getMonth() + monthsNeeded)
     return projected.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
   }
 
-  /* Most urgent goal: soonest deadline with remaining amount */
   const topGoal = goals.length > 0
     ? goals
         .filter(g => g.currentSavings < g.targetAmount)
@@ -127,26 +63,25 @@ const SavingsGoals: FC = () => {
     ? `You need to save $${calculateMonthlyNeeded(topGoal).toFixed(2)}/month to reach "${topGoal.name}" by ${new Date(topGoal.deadline).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
     : 'Create a savings goal to get personalized recommendations'
 
-  /* CRUD */
-  const handleAddGoal = () => {
-    if (!formData.goalName.trim())  { alert('Please enter a goal name.'); return }
-    if (!formData.targetAmount)     { alert('Please enter a target amount.'); return }
-    if (!formData.deadline)         { alert('Please select a deadline.'); return }
+  const handleAddGoal = (e: FormEvent) => {
+    e.preventDefault()
+    if (!formData.goalName.trim()) { alert('Please enter a goal name.'); return }
+    if (!formData.targetAmount) { alert('Please enter a target amount.'); return }
+    if (!formData.deadline) { alert('Please select a deadline.'); return }
+
     const newGoal: SavingsGoal = {
-      id:             String(Date.now()),
-      name:           formData.goalName.trim(),
-      targetAmount:   parseFloat(formData.targetAmount),
+      id: String(Date.now()),
+      name: formData.goalName.trim(),
+      targetAmount: parseFloat(formData.targetAmount),
       currentSavings: 0,
-      deadline:       formData.deadline,
-      createdDate:    new Date().toISOString().split('T')[0],
+      deadline: formData.deadline,
+      createdDate: new Date().toISOString().split('T')[0],
     }
     setGoals(prev => [...prev, newGoal])
     setFormData({ goalName: '', targetAmount: '', deadline: '' })
   }
 
   const handleDeleteGoal = (id: string) => {
-    const g = goals.find(g => g.id === id)
-    if (!g) return
     setGoals(prev => prev.filter(g => g.id !== id))
   }
 
@@ -161,70 +96,57 @@ const SavingsGoals: FC = () => {
 
   const addMoneyGoal = goals.find(g => g.id === addMoneyGoalId) ?? null
 
-  /* Input style reuse */
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '0.75rem',
-    border: '1px solid var(--border-light)', borderRadius: '8px',
-    fontSize: '0.95rem', fontFamily: 'inherit',
-  }
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block', fontSize: '0.85rem', fontWeight: 600,
-    marginBottom: '0.5rem', color: 'var(--text-medium)',
-    textTransform: 'uppercase', letterSpacing: '0.3px',
-  }
-
   return (
     <main>
       <div className="savings-goals-container">
-        <header>
-          <h1>Smart Savings Goals</h1>
-          <p>Track and automate your savings targets</p>
-        </header>
+        <PageHeader
+          title="Smart Savings Goals"
+          subtitle="Track and automate your savings targets"
+        />
 
         {/* Create Goal */}
-        <div style={{
-          background: 'var(--bg-white)', borderRadius: 'var(--card-radius-lg)',
-          padding: '1.75rem 2rem', marginBottom: '2rem',
-          boxShadow: 'var(--shadow-md)', border: '1px solid var(--border-card)',
-          animation: 'slideInUp 0.6s ease backwards',
-        }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--green-dark)', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '2px solid var(--green-border)' }}>
-            Create New Goal
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', alignItems: 'flex-end' }}>
-            <div>
-              <label style={labelStyle}>Goal Name</label>
-              <input type="text" placeholder="e.g., Vacation" style={inputStyle}
-                value={formData.goalName} onChange={e => setFormData({ ...formData, goalName: e.target.value })} />
-            </div>
-            <div>
-              <label style={labelStyle}>Target Amount ($)</label>
-              <input type="number" placeholder="10000" style={inputStyle}
-                value={formData.targetAmount} onChange={e => setFormData({ ...formData, targetAmount: e.target.value })} />
-            </div>
-            <div>
-              <label style={labelStyle}>Deadline</label>
-              <input type="date" style={inputStyle}
-                value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
-            </div>
-            <button onClick={handleAddGoal} style={{
-              width: '100%', padding: '0.75rem',
-              background: 'var(--gradient-green)', color: 'white',
-              border: 'none', borderRadius: '8px', fontWeight: 700,
-              cursor: 'pointer', fontSize: '0.95rem',
-              boxShadow: 'var(--shadow-green)', transition: 'all 0.2s',
-            }}>Create Goal</button>
-          </div>
-        </div>
+        <CreateFormSection
+          title="Create New Goal"
+          onSubmit={handleAddGoal}
+          submitLabel="Create Goal"
+        >
+          <FormField
+            label="Goal Name"
+            type="text"
+            value={formData.goalName}
+            onChange={(val) => setFormData({ ...formData, goalName: val })}
+            placeholder="e.g., Vacation"
+            required
+          />
+
+          <FormField
+            label="Target Amount ($)"
+            type="number"
+            value={formData.targetAmount}
+            onChange={(val) => setFormData({ ...formData, targetAmount: val })}
+            placeholder="10000"
+            required
+          />
+
+          <FormField
+            label="Deadline"
+            type="date"
+            value={formData.deadline}
+            onChange={(val) => setFormData({ ...formData, deadline: val })}
+            required
+          />
+        </CreateFormSection>
 
         {/* Smart Suggestion */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(46,125,50,0.08), rgba(76,175,80,0.08))',
-          borderLeft: '4px solid var(--green-mid)', borderRadius: '8px',
-          padding: '1.25rem 1.5rem', marginBottom: '2rem',
+          borderLeft: '4px solid var(--green-mid)', 
+          borderRadius: '8px',
+          padding: '1.25rem 1.5rem', 
+          marginBottom: '2rem',
           border: '1px solid rgba(76,175,80,0.25)',
-          animation: 'slideInUp 0.6s ease backwards', animationDelay: '0.1s'
+          animation: 'slideInUp 0.6s ease backwards', 
+          animationDelay: '0.1s'
         }}>
           <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--green-dark)', marginBottom: '0.4rem' }}>
             💡 Smart Suggestion
@@ -232,26 +154,31 @@ const SavingsGoals: FC = () => {
           <p style={{ fontSize: '0.95rem', color: 'var(--green-main)', margin: 0 }}>{suggestion}</p>
         </div>
 
-        {/* Insights Strip now uses standard StatCard components */}
-        <div className="summary-cards" style={{ marginBottom: '2rem' }}>
-          <StatCard 
-            icon="💰" 
-            label="This Month Saved" 
-            value={`$${totalThisMonth}`} 
-            type="income" 
-          />
-          <StatCard 
-            icon="✅" 
-            label="On Track" 
-            value={goals.length > 0 && goals.every(g => isOnTrack(g)) ? 'Yes' : 'No'} 
-            type="rate" 
-          />
-          <StatCard 
-            icon="🎯" 
-            label={topGoal ? 'Projected Completion' : 'Status'} 
-            value={topGoal ? getProjectedCompletion(topGoal) : 'N/A'} 
-            type="savings" 
-          />
+        {/* Insights Strip */}
+        <div className="summary-cards">
+          <Card variant="stat" className="stat-card-income">
+            <div className="stat-icon">💰</div>
+            <div className="stat-info">
+              <div className="stat-label">This Month Saved</div>
+              <div className="stat-value">${totalThisMonth}</div>
+            </div>
+          </Card>
+
+          <Card variant="stat" className="stat-card-rate">
+            <div className="stat-icon">✅</div>
+            <div className="stat-info">
+              <div className="stat-label">On Track</div>
+              <div className="stat-value">{goals.length > 0 && goals.every(g => isOnTrack(g)) ? 'Yes' : 'No'}</div>
+            </div>
+          </Card>
+
+          <Card variant="stat" className="stat-card-savings">
+            <div className="stat-icon">🎯</div>
+            <div className="stat-info">
+              <div className="stat-label">{topGoal ? 'Projected Completion' : 'Status'}</div>
+              <div className="stat-value">{topGoal ? getProjectedCompletion(topGoal) : 'N/A'}</div>
+            </div>
+          </Card>
         </div>
 
         {/* Active Goals */}
@@ -261,25 +188,22 @@ const SavingsGoals: FC = () => {
           </h2>
 
           {goals.length === 0 ? (
-            <div className="empty-state">
-              <p>🎯 No savings goals yet. Create one to get started!</p>
-            </div>
+            <EmptyState
+              icon="🎯"
+              message="No savings goals yet. Create one to get started!"
+            />
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
               {goals.map(goal => {
-                const progress      = calculateProgress(goal)
+                const progress = calculateProgress(goal)
                 const monthlyNeeded = calculateMonthlyNeeded(goal)
-                const onTrack       = isOnTrack(goal)
+                const onTrack = isOnTrack(goal)
 
                 return (
-                  <div key={goal.id} style={{
-                    background: 'var(--bg-white)', borderRadius: 'var(--card-radius-lg)',
-                    padding: '1.5rem', boxShadow: 'var(--shadow-lg)',
-                    border: '1px solid var(--border-card)',
-                    transition: 'transform var(--transition-normal), box-shadow var(--transition-normal)',
-                  }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-5px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 30px rgba(46,125,50,0.2)' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-lg)' }}
+                  <Card 
+                    key={goal.id} 
+                    style={{ padding: '1.5rem' }}
+                    hover
                   >
                     {/* Goal header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -306,13 +230,7 @@ const SavingsGoals: FC = () => {
                           ${goal.currentSavings.toFixed(2)} / ${goal.targetAmount.toFixed(2)}
                         </span>
                       </div>
-                      <div style={{ width: '100%', height: '10px', background: 'var(--border-light)', borderRadius: '5px', overflow: 'hidden' }}>
-                        <div style={{
-                          width: `${progress}%`, height: '100%',
-                          background: progress === 100 ? 'var(--green-main)' : 'linear-gradient(90deg, var(--green-dark), var(--green-mid))',
-                          transition: 'width 0.3s ease',
-                        }} />
-                      </div>
+                      <ProgressBar percentage={progress} />
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-faint)', marginTop: '0.4rem' }}>
                         {progress}% complete
                       </div>
@@ -326,13 +244,17 @@ const SavingsGoals: FC = () => {
                       borderLeft: `4px solid ${onTrack ? 'var(--green-main)' : 'var(--red-main)'}`,
                     }}>
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-faint)', fontWeight: 600, textTransform: 'uppercase' }}>Monthly Target</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-faint)', fontWeight: 600, textTransform: 'uppercase' }}>
+                          Monthly Target
+                        </div>
                         <div style={{ fontSize: '1.1rem', fontWeight: 700, color: onTrack ? 'var(--green-main)' : 'var(--red-main)' }}>
                           ${monthlyNeeded.toFixed(2)}
                         </div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-faint)', fontWeight: 600, textTransform: 'uppercase' }}>Status</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-faint)', fontWeight: 600, textTransform: 'uppercase' }}>
+                          Status
+                        </div>
                         <div style={{ fontSize: '0.95rem', fontWeight: 700, color: onTrack ? 'var(--green-main)' : 'var(--red-main)' }}>
                           {onTrack ? '✓ On Track' : '⚠ Behind'}
                         </div>
@@ -341,24 +263,14 @@ const SavingsGoals: FC = () => {
 
                     {/* Buttons */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                      <button
-                        onClick={() => setAddMoneyGoalId(goal.id)}
-                        style={{
-                          padding: '0.75rem', background: 'var(--gradient-green)',
-                          color: 'white', border: 'none', borderRadius: '6px',
-                          fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem',
-                        }}
-                      >Add Money</button>
-                      <button
-                        onClick={() => handleDeleteGoal(goal.id)}
-                        style={{
-                          padding: '0.75rem', background: 'var(--bg-light)',
-                          color: 'var(--text-dark)', border: '1px solid var(--border-light)',
-                          borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem',
-                        }}
-                      >Delete</button>
+                      <Button variant="primary" onClick={() => setAddMoneyGoalId(goal.id)}>
+                        Add Money
+                      </Button>
+                      <Button variant="ghost" onClick={() => handleDeleteGoal(goal.id)}>
+                        Delete
+                      </Button>
                     </div>
-                  </div>
+                  </Card>
                 )
               })}
             </div>
@@ -366,6 +278,7 @@ const SavingsGoals: FC = () => {
         </div>
       </div>
 
+      {/* Add Money Modal */}
       {addMoneyGoal && (
         <AddMoneyModal
           goalName={addMoneyGoal.name}
@@ -374,6 +287,47 @@ const SavingsGoals: FC = () => {
         />
       )}
     </main>
+  )
+}
+
+// Add Money Modal Component
+const AddMoneyModal: FC<{
+  goalName: string
+  onClose: () => void
+  onAdd: (amount: number) => void
+}> = ({ goalName, onClose, onAdd }) => {
+  const [amount, setAmount] = useState('')
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    const n = parseFloat(amount)
+    if (!n || n <= 0) { alert('Please enter a valid amount.'); return }
+    onAdd(n)
+  }
+
+  return (
+    <Modal isOpen onClose={onClose} title="Add Money">
+      <p style={{ marginBottom: '1rem', color: 'var(--text-medium)', fontSize: '0.95rem' }}>
+        Adding to: <strong>{goalName}</strong>
+      </p>
+      <form onSubmit={handleSubmit}>
+        <FormField
+          label="Amount ($)"
+          type="number"
+          value={amount}
+          onChange={setAmount}
+          placeholder="0.00"
+          min="0.01"
+          step="0.01"
+          required
+        />
+
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+          <Button type="submit" variant="primary" style={{ flex: 2 }}>Add Money</Button>
+          <Button type="button" variant="secondary" onClick={onClose} style={{ flex: 1 }}>Cancel</Button>
+        </div>
+      </form>
+    </Modal>
   )
 }
 

@@ -1,19 +1,18 @@
-import { FC, useState, useEffect } from 'react'
-import StatCard from '../components/StatCard'
+import { FC, useState, useEffect, FormEvent } from 'react'
 import { Transaction } from '../types'
+import { 
+  Card, 
+  PageHeader, 
+  Button, 
+  Modal, 
+  FormField, 
+  EmptyState,
+  IconButton,
+  Badge
+} from '../components/common'
 import '../styles/Transactions.css'
 
 type FilterType = 'all' | 'income' | 'expense'
-type CategoryKey = 'income' | 'food' | 'utilities' | 'entertainment' | 'transport' | 'shopping'
-
-const CATEGORY_CSS: Record<string, string> = {
-  income:        'income-cat',
-  food:          'food',
-  utilities:     'utilities',
-  entertainment: 'entertainment',
-  transport:     'transport',
-  shopping:      'shopping',
-}
 
 const ROWS_PER_PAGE = 5
 
@@ -26,79 +25,24 @@ const formatDate = (dateStr: string): string => {
 const formatNumber = (n: number) =>
   n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-/* ── Modal ── */
-interface ModalProps {
-  editingTx: Transaction | null
-  onClose: () => void
-  onSave: (tx: Omit<Transaction, 'id'> & { id?: string }) => void
-}
-
-const TransactionModal: FC<ModalProps> = ({ editingTx, onClose, onSave }) => {
-  const [date, setDate]         = useState(editingTx?.date        ?? new Date().toISOString().split('T')[0])
-  const [desc, setDesc]         = useState(editingTx?.description ?? '')
-  const [category, setCategory] = useState(editingTx?.category    ?? 'food')
-  const [amount, setAmount]     = useState(editingTx ? String(editingTx.amount) : '')
-
-  const handleSave = () => {
-    if (!desc.trim()) { alert('Please enter a description.'); return }
-    const amt = parseFloat(amount)
-    if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return }
-    const type: 'income' | 'expense' = category === 'income' ? 'income' : 'expense'
-    onSave({ id: editingTx?.id, date, description: desc.trim(), category, amount: amt, type })
-  }
-
-  return (
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="modal">
-        <div className="modal-header">
-          <h2>{editingTx ? 'Edit Transaction' : 'Add Transaction'}</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
-        <div className="modal-field">
-          <label>Date</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-        </div>
-        <div className="modal-field">
-          <label>Description</label>
-          <input type="text" placeholder="e.g. Grocery shopping" value={desc} onChange={e => setDesc(e.target.value)} />
-        </div>
-        <div className="modal-field">
-          <label>Category</label>
-          <select value={category} onChange={e => setCategory(e.target.value)}>
-            <option value="income">Income</option>
-            <option value="food">Food</option>
-            <option value="utilities">Utilities</option>
-            <option value="entertainment">Entertainment</option>
-            <option value="transport">Transport</option>
-            <option value="shopping">Shopping</option>
-          </select>
-        </div>
-        <div className="modal-field">
-          <label>Amount ($)</label>
-          <input type="number" placeholder="0.00" min="0.01" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} />
-        </div>
-        <div className="modal-btns">
-          <button className="btn-save" onClick={handleSave}>Save</button>
-          <button className="btn-cancel" onClick={onClose}>Cancel</button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ── Page ── */
 const Transactions: FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [loading, setLoading]           = useState(true)
-  const [nextId, setNextId]             = useState(1)
-
-  const [filterType,     setFilterType]     = useState<FilterType>('all')
+  const [loading, setLoading] = useState(true)
+  const [nextId, setNextId] = useState(1)
+  const [filterType, setFilterType] = useState<FilterType>('all')
   const [filterCategory, setFilterCategory] = useState('all')
-  const [filterDate,     setFilterDate]     = useState('')
+  const [filterDate, setFilterDate] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [showModal, setShowModal] = useState(false)
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null)
 
-  const [currentPage,  setCurrentPage]  = useState(1)
-  const [showModal,    setShowModal]    = useState(false)
-  const [editingTx,    setEditingTx]    = useState<Transaction | null>(null)
+  // Form state
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    description: '',
+    category: 'food',
+    amount: ''
+  })
 
   /* Load from JSON */
   useEffect(() => {
@@ -110,14 +54,31 @@ const Transactions: FC = () => {
         setNextId(maxId + 1)
         setLoading(false)
       })
-      .catch(() => {
-        setLoading(false)
-      })
+      .catch(() => setLoading(false))
   }, [])
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (showModal && editingTx) {
+      setFormData({
+        date: editingTx.date,
+        description: editingTx.description,
+        category: editingTx.category,
+        amount: String(editingTx.amount)
+      })
+    } else if (showModal) {
+      setFormData({
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+        category: 'food',
+        amount: ''
+      })
+    }
+  }, [showModal, editingTx])
 
   /* Derived: filtered + sorted */
   const filtered = transactions
-    .filter(t => filterType === 'all'     || t.type === filterType)
+    .filter(t => filterType === 'all' || t.type === filterType)
     .filter(t => filterCategory === 'all' || t.category.toLowerCase() === filterCategory)
     .filter(t => {
       if (!filterDate) return true
@@ -126,24 +87,42 @@ const Transactions: FC = () => {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
-  const safePage   = Math.min(currentPage, totalPages)
-  const pageData   = filtered.slice((safePage - 1) * ROWS_PER_PAGE, safePage * ROWS_PER_PAGE)
+  const safePage = Math.min(currentPage, totalPages)
+  const pageData = filtered.slice((safePage - 1) * ROWS_PER_PAGE, safePage * ROWS_PER_PAGE)
 
-  /* Summary (based on ALL transactions, not filtered) */
-  const totalIncome   = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+  /* Summary */
+  const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
-  const balance       = totalIncome - totalExpenses
+  const balance = totalIncome - totalExpenses
 
   /* CRUD */
-  const openAdd  = () => { setEditingTx(null); setShowModal(true) }
+  const openAdd = () => { setEditingTx(null); setShowModal(true) }
   const openEdit = (tx: Transaction) => { setEditingTx(tx); setShowModal(true) }
   const closeModal = () => { setShowModal(false); setEditingTx(null) }
 
-  const handleSave = (data: Omit<Transaction,'id'> & { id?: string }) => {
-    if (data.id) {
-      setTransactions(prev => prev.map(t => t.id === data.id ? { ...t, ...data, id: t.id } : t))
+  const handleSave = (e: FormEvent) => {
+    e.preventDefault()
+    if (!formData.description.trim()) { alert('Please enter a description.'); return }
+    const amt = parseFloat(formData.amount)
+    if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return }
+
+    const type: 'income' | 'expense' = formData.category === 'income' ? 'income' : 'expense'
+
+    if (editingTx) {
+      setTransactions(prev => prev.map(t => 
+        t.id === editingTx.id 
+          ? { ...t, date: formData.date, description: formData.description, category: formData.category, amount: amt, type }
+          : t
+      ))
     } else {
-      const newTx: Transaction = { ...data, id: String(nextId) }
+      const newTx: Transaction = {
+        id: String(nextId),
+        date: formData.date,
+        description: formData.description,
+        category: formData.category,
+        amount: amt,
+        type
+      }
       setTransactions(prev => [...prev, newTx])
       setNextId(n => n + 1)
     }
@@ -151,8 +130,6 @@ const Transactions: FC = () => {
   }
 
   const handleDelete = (id: string) => {
-    const tx = transactions.find(t => t.id === id)
-    if (!tx) return
     setTransactions(prev => prev.filter(t => t.id !== id))
   }
 
@@ -163,80 +140,84 @@ const Transactions: FC = () => {
   return (
     <main>
       <div className="transactions-container">
-        <header>
-          <h1>Transactions</h1>
-          <p>View and manage all your income and expenses</p>
-        </header>
+        <PageHeader
+          title="Transactions"
+          subtitle="View and manage all your income and expenses"
+        />
 
         {/* Summary Cards */}
         <div className="summary-cards">
-          <StatCard 
-            icon="💵" 
-            label="Total Income" 
-            value={`$${formatNumber(totalIncome)}`} 
-            type="income" 
-          />
-          <StatCard 
-            icon="💸" 
-            label="Total Expenses" 
-            value={`$${formatNumber(totalExpenses)}`} 
-            type="expense" 
-          />
-          <StatCard 
-            icon="💳" 
-            label="Remaining Balance" 
-            value={`$${formatNumber(balance)}`} 
-            type="savings" 
-          />
+          <Card variant="stat" className="stat-card-income">
+            <div className="stat-icon">💵</div>
+            <div className="stat-info">
+              <div className="stat-label">Total Income</div>
+              <div className="stat-value">${formatNumber(totalIncome)}</div>
+            </div>
+          </Card>
+
+          <Card variant="stat" className="stat-card-expense">
+            <div className="stat-icon">💸</div>
+            <div className="stat-info">
+              <div className="stat-label">Total Expenses</div>
+              <div className="stat-value">${formatNumber(totalExpenses)}</div>
+            </div>
+          </Card>
+
+          <Card variant="stat" className="stat-card-savings">
+            <div className="stat-icon">💳</div>
+            <div className="stat-info">
+              <div className="stat-label">Remaining Balance</div>
+              <div className="stat-value">${formatNumber(balance)}</div>
+            </div>
+          </Card>
         </div>
 
         {/* Filter Bar */}
         <div className="filter-bar">
-          <div className="filter-group">
-            <label htmlFor="filter-date">From Date</label>
-            <input
-              type="date"
-              id="filter-date"
-              value={filterDate}
-              onChange={e => setFilterDate(e.target.value)}
-            />
-          </div>
-          <div className="filter-group">
-            <label htmlFor="filter-category">Category</label>
-            <select
-              id="filter-category"
-              value={filterCategory}
-              onChange={e => setFilterCategory(e.target.value)}
-            >
-              <option value="all">All Categories</option>
-              <option value="income">Income</option>
-              <option value="food">Food</option>
-              <option value="utilities">Utilities</option>
-              <option value="entertainment">Entertainment</option>
-              <option value="transport">Transport</option>
-              <option value="shopping">Shopping</option>
-            </select>
-          </div>
-          <div className="filter-group">
-            <label htmlFor="filter-type">Type</label>
-            <select
-              id="filter-type"
-              value={filterType}
-              onChange={e => setFilterType(e.target.value as FilterType)}
-            >
-              <option value="all">All</option>
-              <option value="income">Income Only</option>
-              <option value="expense">Expenses Only</option>
-            </select>
-          </div>
-          <button className="btn-filter" onClick={handleApplyFilter}>Apply</button>
+          <FormField
+            label="From Date"
+            type="date"
+            value={filterDate}
+            onChange={setFilterDate}
+          />
+
+          <FormField
+            label="Category"
+            type="select"
+            value={filterCategory}
+            onChange={setFilterCategory}
+            options={[
+              { value: 'all', label: 'All Categories' },
+              { value: 'income', label: 'Income' },
+              { value: 'food', label: 'Food' },
+              { value: 'utilities', label: 'Utilities' },
+              { value: 'entertainment', label: 'Entertainment' },
+              { value: 'transport', label: 'Transport' },
+              { value: 'shopping', label: 'Shopping' }
+            ]}
+          />
+
+          <FormField
+            label="Type"
+            type="select"
+            value={filterType}
+            onChange={(val) => setFilterType(val as FilterType)}
+            options={[
+              { value: 'all', label: 'All' },
+              { value: 'income', label: 'Income Only' },
+              { value: 'expense', label: 'Expenses Only' }
+            ]}
+          />
+
+          <Button variant="filter" onClick={handleApplyFilter}>Apply</Button>
         </div>
 
         {/* Table */}
         {filtered.length === 0 ? (
-          <div className="empty-state">
-            <p>📄 No transactions found. Add one or adjust your filters!</p>
-          </div>
+          <EmptyState
+            icon="📄"
+            message="No transactions found. Add one or adjust your filters!"
+          />
         ) : (
           <div className="data-table-wrapper">
             <div className="table-top-bar">
@@ -245,6 +226,7 @@ const Transactions: FC = () => {
                 Showing {pageData.length} of {filtered.length} transactions
               </span>
             </div>
+
             <table className="transactions-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
@@ -256,32 +238,28 @@ const Transactions: FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {pageData.map(tx => {
-                  const catKey = tx.category.toLowerCase()
-                  const badgeClass = CATEGORY_CSS[catKey] ?? 'other'
-                  return (
-                    <tr key={tx.id}>
-                      <td style={{ color: 'var(--text-lighter)', fontSize: '0.88rem' }}>
-                        {formatDate(tx.date)}
-                      </td>
-                      <td style={{ fontWeight: 600, color: 'var(--text-dark)' }}>
-                        {tx.description}
-                      </td>
-                      <td>
-                        <span className={`tx-category-badge ${badgeClass}`}>
-                          {tx.category.charAt(0).toUpperCase() + tx.category.slice(1)}
-                        </span>
-                      </td>
-                      <td className={`tx-amount-cell ${tx.type}`}>
-                        ${tx.amount.toFixed(2)}
-                      </td>
-                      <td style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                        <button className="icon-btn" title="Edit" onClick={() => openEdit(tx)}>✏️</button>
-                        <button className="icon-btn danger" title="Delete" onClick={() => handleDelete(tx.id)}>🗑</button>
-                      </td>
-                    </tr>
-                  )
-                })}
+                {pageData.map(tx => (
+                  <tr key={tx.id}>
+                    <td style={{ color: 'var(--text-lighter)', fontSize: '0.88rem' }}>
+                      {formatDate(tx.date)}
+                    </td>
+                    <td style={{ fontWeight: 600, color: 'var(--text-dark)' }}>
+                      {tx.description}
+                    </td>
+                    <td>
+                      <Badge variant="category" className={`badge-${tx.category.toLowerCase()}`}>
+                        {tx.category.charAt(0).toUpperCase() + tx.category.slice(1)}
+                      </Badge>
+                    </td>
+                    <td className={`tx-amount-cell ${tx.type}`}>
+                      ${tx.amount.toFixed(2)}
+                    </td>
+                    <td style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                      <IconButton icon="✏️" label="Edit" onClick={() => openEdit(tx)} />
+                      <IconButton icon="🗑" label="Delete" variant="danger" onClick={() => handleDelete(tx.id)} />
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
 
@@ -310,17 +288,66 @@ const Transactions: FC = () => {
           </div>
         )}
 
-        <button className="add-transaction-btn" onClick={openAdd}>
+        <Button variant="primary" fullWidth onClick={openAdd} style={{ marginTop: '1.5rem' }}>
           + Add New Transaction
-        </button>
+        </Button>
 
-        {showModal && (
-          <TransactionModal
-            editingTx={editingTx}
-            onClose={closeModal}
-            onSave={handleSave}
-          />
-        )}
+        {/* Modal */}
+        <Modal
+          isOpen={showModal}
+          onClose={closeModal}
+          title={editingTx ? 'Edit Transaction' : 'Add Transaction'}
+        >
+          <form onSubmit={handleSave}>
+            <FormField
+              label="Date"
+              type="date"
+              value={formData.date}
+              onChange={(val) => setFormData({ ...formData, date: val })}
+              required
+            />
+
+            <FormField
+              label="Description"
+              type="text"
+              value={formData.description}
+              onChange={(val) => setFormData({ ...formData, description: val })}
+              placeholder="e.g. Grocery shopping"
+              required
+            />
+
+            <FormField
+              label="Category"
+              type="select"
+              value={formData.category}
+              onChange={(val) => setFormData({ ...formData, category: val })}
+              options={[
+                { value: 'income', label: 'Income' },
+                { value: 'food', label: 'Food' },
+                { value: 'utilities', label: 'Utilities' },
+                { value: 'entertainment', label: 'Entertainment' },
+                { value: 'transport', label: 'Transport' },
+                { value: 'shopping', label: 'Shopping' }
+              ]}
+            />
+
+            <FormField
+              label="Amount ($)"
+              type="number"
+              value={formData.amount}
+              onChange={(val) => setFormData({ ...formData, amount: val })}
+              placeholder="0.00"
+              min="0.01"
+              step="0.01"
+              required
+            />
+
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+              <Button type="submit" variant="primary" style={{ flex: 2 }}>Save</Button>
+              <Button type="button" variant="secondary" onClick={closeModal} style={{ flex: 1 }}>Cancel</Button>
+            </div>
+          </form>
+        </Modal>
       </div>
     </main>
   )

@@ -45,7 +45,7 @@
 .add-budget-form {
   display: grid;
   /* Updated grid spacing so it beautifully spans the container width */
-  grid-template-columns: 1.5fr 2.5fr 1.5fr 1.5fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.25rem;
   align-items: flex-end;
 }
@@ -307,10 +307,6 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .summary-strip {
-    grid-template-columns: 1fr;
-  }
-
   .budgets-grid {
     grid-template-columns: 1fr;
   }
