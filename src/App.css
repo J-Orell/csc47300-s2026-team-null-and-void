@@ -601,6 +601,49 @@ h1 {
   margin-bottom: 2rem;
 }
 
+/* Stat Card Common Styles */
+.stat-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-label {
+  color: var(--text-faint);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Stat Value Color Variants */
+.stat-value-income { color: var(--green-main); }
+.stat-value-expense { color: var(--red-main); }
+.stat-value-savings { color: var(--yellow-main); }
+.stat-value-rate { color: var(--blue-info); }
+.stat-value-total { color: var(--green-main); }
+.stat-value-spent { color: var(--yellow-main); }
+.stat-value-remaining { color: var(--blue-info); }
+.stat-value-saved { color: var(--green-main); }
+.stat-value-track { color: var(--blue-info); }
+.stat-value-Completion { color: var(--yellow-main); }
+
 .data-table thead {
   background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
   border-bottom: 2px solid var(--border-section);
@@ -707,14 +750,13 @@ h1 {
   .charts-section {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 900px) {
-  .dashboard-container .charts-section {
-    grid-template-columns: 1fr;
+  .stat-icon {
+    font-size: 1.5rem;
+    width: 48px;
+    height: 48px;
   }
-
-  .dashboard-container .chart-container canvas {
-    height: 240px !important;
+  .stat-value {
+    font-size: 1.5rem;
   }
 }

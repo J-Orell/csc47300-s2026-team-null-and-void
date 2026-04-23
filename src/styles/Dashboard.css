@@ -1,72 +1,30 @@
-/*
-Dashboard.css — Dashboard-specific overrides only.
-All shared styles (animations, chart-card, chart-container,
-page-header, stats-grid, etc.) come from App.css.
-Only rules UNIQUE to the dashboard layout live here.
-*/
+/* Dashboard-specific overrides only */
 
-/* Wider max-width for dashboard vs other pages */
 .dashboard-container {
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/* Dashboard pie chart height override */
+/* Dashboard-specific chart layout */
+.dashboard-container .charts-section {
+  grid-template-columns: 1.5fr 1fr;
+}
+
+/* Monthly chart container height */
+.dashboard-container .chart-container {
+  height: 320px !important;
+}
+
+/* Pie chart container */
 .dashboard-container .chart-container.pie-container {
-  height: 350px;
-}
-
-/* ═══════════════════════════════════════════════════════════════ */
-/* STAT VALUE COLORS */
-/* ═══════════════════════════════════════════════════════════════ */
-
-.stat-icon {
-  font-size: 2.5rem;
-  width: 60px;
-  height: 60px;
+  height: 450px; /* Increased from 400px */
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  flex-shrink: 0;
+  flex-direction: column;
+  /* overflow: auto; */
+  padding-bottom: 20px;
 }
 
-.stat-info {
-  flex: 1;
-}
-
-.stat-label {
-  color: var(--text-faint);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-bottom: 0.5rem;
-}
-
-.stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.stat-value-income {
-  color: var(--green-main);
-}
-
-.stat-value-expense {
-  color: var(--red-main);
-}
-
-.stat-value-savings {
-  color: var(--yellow-main);
-}
-
-.stat-value-rate {
-  color: var(--blue-info);
-}
-
-/* ── Expense Categories Section ── */
+/* Expense Categories Section */
 .category-details {
   background: var(--bg-white);
   border-radius: var(--card-radius-lg);
@@ -129,13 +87,7 @@ Only rules UNIQUE to the dashboard layout live here.
 }
 
 @media (max-width: 768px) {
-  .stat-icon {
-    font-size: 1.5rem;
-    width: 48px;
-    height: 48px;
-  }
-
-  .stat-value {
-    font-size: 1.5rem;
+  .dashboard-container .chart-container {
+    height: 280px !important;
   }
 }

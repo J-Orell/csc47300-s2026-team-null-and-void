@@ -124,7 +124,8 @@ const CategoryChart: FC<CategoryChartProps> = ({ data }) => {
         gap: '0.75rem',
         marginTop: '1rem',
         justifyContent: 'center',
-        padding: '0 1rem'
+        padding: '0 1rem',
+        maxWidth: '100%'
       }}>
         {categoryLabels.map((category) => (
           <button

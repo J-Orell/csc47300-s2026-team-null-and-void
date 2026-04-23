@@ -9,6 +9,7 @@ import {
   ProgressBar,
   CreateFormSection
 } from '../components/common'
+import '../styles/SavingsGoals.css'
 
 interface SavingsGoal {
   id: string
@@ -104,6 +105,59 @@ const SavingsGoals: FC = () => {
           subtitle="Track and automate your savings targets"
         />
 
+        {/* Smart Suggestion */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(46,125,50,0.08), rgba(76,175,80,0.08))',
+          borderLeft: '4px solid var(--green-mid)', 
+          borderRadius: '8px',
+          padding: '1.25rem 1.5rem', 
+          marginBottom: '2rem',
+          border: '1px solid rgba(76,175,80,0.25)',
+          animation: 'slideInUp 0.6s ease backwards', 
+          animationDelay: '0.1s'
+        }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--green-dark)', marginBottom: '0.4rem' }}>
+            💡 Smart Suggestion
+          </h3>
+          <p style={{ fontSize: '0.95rem', color: 'var(--green-main)', margin: 0 }}>{suggestion}</p>
+        </div>
+
+        {/* Insights Strip */}
+        <div className="summary-cards">
+          <Card variant="stat" className="stat-card-income">
+            <div className="stat-icon">💰</div>
+            <div className="stat-info">
+              <div className="stat-label">This Month Saved</div>
+              <div className="stat-value stat-value-saved">${totalThisMonth}</div>
+            </div>
+          </Card>
+
+          <Card variant="stat" className="stat-card-rate">
+            <div className="stat-icon">{goals.length > 0 && goals.every(g => isOnTrack(g)) ? '✅' : '❌'}</div>
+            <div className="stat-info">
+              <div className="stat-label">On Track</div>
+              <div 
+                className="stat-value stat-value-track"
+                style={{
+                  color: goals.length > 0 && goals.every(g => isOnTrack(g)) 
+                    ? 'var(--green-main)' 
+                    : 'var(--red-main)'
+                }}
+              >
+                {goals.length > 0 && goals.every(g => isOnTrack(g)) ? 'Yes' : 'No'}
+              </div>
+            </div>
+          </Card>
+
+          <Card variant="stat" className="stat-card-savings">
+            <div className="stat-icon">🎯</div>
+            <div className="stat-info">
+              <div className="stat-label">{topGoal ? 'Projected Completion' : 'Status'}</div>
+              <div className="stat-value stat-value-Completion">{topGoal ? getProjectedCompletion(topGoal) : 'N/A'}</div>
+            </div>
+          </Card>
+        </div>
+
         {/* Create Goal */}
         <CreateFormSection
           title="Create New Goal"
@@ -136,50 +190,6 @@ const SavingsGoals: FC = () => {
             required
           />
         </CreateFormSection>
-
-        {/* Smart Suggestion */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(46,125,50,0.08), rgba(76,175,80,0.08))',
-          borderLeft: '4px solid var(--green-mid)', 
-          borderRadius: '8px',
-          padding: '1.25rem 1.5rem', 
-          marginBottom: '2rem',
-          border: '1px solid rgba(76,175,80,0.25)',
-          animation: 'slideInUp 0.6s ease backwards', 
-          animationDelay: '0.1s'
-        }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--green-dark)', marginBottom: '0.4rem' }}>
-            💡 Smart Suggestion
-          </h3>
-          <p style={{ fontSize: '0.95rem', color: 'var(--green-main)', margin: 0 }}>{suggestion}</p>
-        </div>
-
-        {/* Insights Strip */}
-        <div className="summary-cards">
-          <Card variant="stat" className="stat-card-income">
-            <div className="stat-icon">💰</div>
-            <div className="stat-info">
-              <div className="stat-label">This Month Saved</div>
-              <div className="stat-value">${totalThisMonth}</div>
-            </div>
-          </Card>
-
-          <Card variant="stat" className="stat-card-rate">
-            <div className="stat-icon">✅</div>
-            <div className="stat-info">
-              <div className="stat-label">On Track</div>
-              <div className="stat-value">{goals.length > 0 && goals.every(g => isOnTrack(g)) ? 'Yes' : 'No'}</div>
-            </div>
-          </Card>
-
-          <Card variant="stat" className="stat-card-savings">
-            <div className="stat-icon">🎯</div>
-            <div className="stat-info">
-              <div className="stat-label">{topGoal ? 'Projected Completion' : 'Status'}</div>
-              <div className="stat-value">{topGoal ? getProjectedCompletion(topGoal) : 'N/A'}</div>
-            </div>
-          </Card>
-        </div>
 
         {/* Active Goals */}
         <div style={{ animation: 'slideInUp 0.6s ease backwards', animationDelay: '0.3s' }}>
@@ -230,7 +240,7 @@ const SavingsGoals: FC = () => {
                           ${goal.currentSavings.toFixed(2)} / ${goal.targetAmount.toFixed(2)}
                         </span>
                       </div>
-                      <ProgressBar percentage={progress} />
+                      <ProgressBar percentage={progress} reversed={true} />
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-faint)', marginTop: '0.4rem' }}>
                         {progress}% complete
                       </div>

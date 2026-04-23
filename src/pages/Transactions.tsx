@@ -151,7 +151,7 @@ const Transactions: FC = () => {
             <div className="stat-icon">💵</div>
             <div className="stat-info">
               <div className="stat-label">Total Income</div>
-              <div className="stat-value">${formatNumber(totalIncome)}</div>
+              <div className="stat-value stat-value-income">${formatNumber(totalIncome)}</div>
             </div>
           </Card>
 
@@ -159,7 +159,7 @@ const Transactions: FC = () => {
             <div className="stat-icon">💸</div>
             <div className="stat-info">
               <div className="stat-label">Total Expenses</div>
-              <div className="stat-value">${formatNumber(totalExpenses)}</div>
+              <div className="stat-value stat-value-expense">${formatNumber(totalExpenses)}</div>
             </div>
           </Card>
 
@@ -167,7 +167,7 @@ const Transactions: FC = () => {
             <div className="stat-icon">💳</div>
             <div className="stat-info">
               <div className="stat-label">Remaining Balance</div>
-              <div className="stat-value">${formatNumber(balance)}</div>
+              <div className="stat-value stat-value-savings">${formatNumber(balance)}</div>
             </div>
           </Card>
         </div>

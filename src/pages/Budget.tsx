@@ -104,7 +104,7 @@ const Budget: FC = () => {
             <div className="stat-icon">📊</div>
             <div className="stat-info">
               <div className="stat-label">Total Budget</div>
-              <div className="stat-value">${totalBudget.toFixed(2)}</div>
+              <div className="stat-value stat-value-total">${totalBudget.toFixed(2)}</div>
             </div>
           </Card>
 
@@ -112,7 +112,7 @@ const Budget: FC = () => {
             <div className="stat-icon">💸</div>
             <div className="stat-info">
               <div className="stat-label">Total Spent</div>
-              <div className="stat-value">${totalSpent.toFixed(2)}</div>
+              <div className="stat-value stat-value-spent">${totalSpent.toFixed(2)}</div>
             </div>
           </Card>
 
@@ -120,7 +120,7 @@ const Budget: FC = () => {
             <div className="stat-icon">💰</div>
             <div className="stat-info">
               <div className="stat-label">Remaining</div>
-              <div className="stat-value">
+              <div className="stat-value stat-value-remaining">
                 {totalRemain < 0 ? '-$' : '$'}{Math.abs(totalRemain).toFixed(2)}
               </div>
             </div>
@@ -128,11 +128,11 @@ const Budget: FC = () => {
         </div>
 
         {/* Add Form */}
-        <CreateFormSection
-          title="Add New Budget Category"
-          onSubmit={handleAdd}
-          submitLabel="Add"
-        >
+          <CreateFormSection
+            title="Add New Budget Category"
+            onSubmit={handleAdd}
+            submitLabel="Add"
+          >
           <FormField
             label="Icon"
             type="select"
@@ -180,7 +180,7 @@ const Budget: FC = () => {
             placeholder="0"
             min="0"
           />
-        </CreateFormSection>
+          </CreateFormSection>
 
         {/* Grid or Empty State */}
         {budgets.length === 0 ? (

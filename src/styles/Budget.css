@@ -1,108 +1,12 @@
 /*
-  Budget.css — Page-specific styles.
-  Shared styles (empty-state, modal-overlay, modal, icon-btn,
-  animations, filter-bar) come from App.css.
+Budget.css — Page-specific styles.
+Shared styles (empty-state, modal-overlay, modal, icon-btn,
+animations, filter-bar) come from App.css.
 */
 
 .budget-container {
   max-width: 1400px;
   margin: 0 auto;
-}
-
-.budget-container .summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-/* ── Add Budget Form Section ── */
-.add-budget-section {
-  background: var(--bg-white);
-  border-radius: var(--card-radius-lg);
-  padding: 1.75rem 2rem;
-  margin-bottom: 2rem;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-card);
-  transition: box-shadow var(--transition-normal);
-  animation: slideInUp 0.6s ease backwards;
-  animation-delay: 0.2s;
-}
-
-.add-budget-section:hover {
-  box-shadow: var(--shadow-hover);
-}
-
-.add-budget-section h2 {
-  font-size: 1.2rem;
-  color: var(--green-dark);
-  font-weight: 700;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid var(--green-border);
-}
-
-.add-budget-form {
-  display: grid;
-  /* Updated grid spacing so it beautifully spans the container width */
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.25rem;
-  align-items: flex-end;
-}
-
-.add-budget-field label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--text-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.add-budget-field input,
-.add-budget-field select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--border-light);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  background: var(--bg-input);
-  color: var(--text-dark);
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.add-budget-field input:focus,
-.add-budget-field select:focus {
-  outline: none;
-  border-color: var(--green-main);
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
-  background: var(--bg-white);
-}
-
-.btn-add-budget {
-  padding: 0.75rem 1.5rem;
-  background: var(--gradient-green);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: var(--shadow-green);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  height: 44px;
-}
-
-.btn-add-budget:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-green-hover);
-}
-
-.btn-add-budget:active {
-  transform: translateY(0);
 }
 
 /* ── Budget Cards Grid ── */
@@ -116,14 +20,7 @@
 
 /* ── Individual Budget Card ── */
 .budget-card {
-  background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-off-white) 100%);
-  border-radius: var(--card-radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: 1.5rem;
-  position: relative;
-  border: 1px solid var(--border-card);
   animation: slideInUp 0.5s ease backwards;
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
 .budget-card:nth-child(1) { animation-delay: 0s; }
@@ -132,11 +29,6 @@
 .budget-card:nth-child(4) { animation-delay: 0.15s; }
 .budget-card:nth-child(5) { animation-delay: 0.2s; }
 .budget-card:nth-child(6) { animation-delay: 0.25s; }
-
-.budget-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(46, 125, 50, 0.25);
-}
 
 /* ── Card Header ── */
 .budget-card-header {
@@ -193,116 +85,25 @@
   color: var(--green-main);
 }
 
-/* ── Progress Bar ── */
-.progress-wrap {
-  width: 100%;
-  height: 10px;
-  background: var(--border-light);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 10px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-@keyframes fillBudgetBar {
-  from { width: 0%; }
-}
-
-.budget-progress-bar {
-  height: 100%;
-  border-radius: 10px;
-  animation: fillBudgetBar 1s ease;
-}
-
-.budget-progress-bar.safe {
-  background: linear-gradient(90deg, var(--green-main), var(--green-mid));
-  box-shadow: var(--shadow-green-glow);
-}
-
-.budget-progress-bar.warning {
-  background: linear-gradient(90deg, var(--yellow-dark), #ffcc02);
-  box-shadow: 0 0 8px rgba(249, 168, 37, 0.3);
-}
-
-.budget-progress-bar.danger {
-  background: linear-gradient(90deg, var(--red-dark), #ef5350);
-  box-shadow: 0 0 8px rgba(211, 47, 47, 0.3);
-}
-
 /* ── Card Footer ── */
 .budget-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 0.82rem;
+  margin-top: 10px;
 }
 
 .budget-remaining {
   font-weight: 600;
 }
 
-.budget-remaining.safe    { color: var(--green-main); }
+.budget-remaining.safe { color: var(--green-main); }
 .budget-remaining.warning { color: var(--yellow-dark); }
-.budget-remaining.danger  { color: var(--red-dark); }
+.budget-remaining.danger { color: var(--red-dark); }
 
 .budget-pct-label {
   color: var(--text-faint);
-}
-
-/* ── Alert Badge ── */
-.alert-badge {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 20px;
-  margin-top: 10px;
-  transition: transform var(--transition-fast);
-}
-
-.alert-badge.warning {
-  background: #fff3e0;
-  color: var(--orange-main);
-}
-
-.alert-badge.danger {
-  background: #ffebee;
-  color: var(--red-darker);
-}
-
-.alert-badge:hover {
-  transform: scale(1.05);
-}
-
-/* ── Edit Modal ── */
-.budget-modal-field {
-  margin-bottom: 1rem;
-}
-
-.budget-modal-field label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-medium);
-  margin-bottom: 6px;
-}
-
-.budget-modal-field input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--border-light);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  background: var(--bg-input);
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.budget-modal-field input:focus {
-  outline: none;
-  border-color: var(--green-main);
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
-  background: var(--bg-white);
 }
 
 /* ── Responsive ── */
@@ -311,7 +112,13 @@
     grid-template-columns: 1fr;
   }
 
-  .add-budget-form {
-    grid-template-columns: 1fr;
+  .stat-icon {
+    font-size: 1.5rem;
+    width: 48px;
+    height: 48px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
   }
 }

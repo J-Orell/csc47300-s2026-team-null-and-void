@@ -61,42 +61,6 @@ Shared styles (animations, header, empty-state) come from App.css.
   gap: 6px;
 }
 
-.settings-field label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.settings-field input,
-.settings-field select {
-  width: 100%;
-  padding: 0.75rem 0.875rem;
-  border: 2px solid var(--border-light);
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  background: var(--bg-input);
-  color: var(--text-dark);
-  transition: border-color var(--transition-normal),
-              box-shadow var(--transition-normal),
-              background var(--transition-normal);
-}
-
-.settings-field input:hover,
-.settings-field select:hover {
-  border-color: var(--text-faint);
-}
-
-.settings-field input:focus,
-.settings-field select:focus {
-  outline: none;
-  border-color: var(--green-main);
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
-  background: var(--bg-white);
-}
-
 /* ── CSS Toggle Switches ── */
 .notification-options {
   display: flex;
@@ -107,9 +71,10 @@ Shared styles (animations, header, empty-state) come from App.css.
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0;
+  padding: 1rem 0.5rem; /* Add horizontal padding */
   border-bottom: 1px solid var(--border-divider);
-  transition: padding-left var(--transition-normal), background var(--transition-normal);
+  border-radius: 8px; /* Pre-set border radius */
+  transition: all 0.3s ease; /* Smooth transition */
 }
 
 .toggle-row:last-child {
@@ -117,15 +82,15 @@ Shared styles (animations, header, empty-state) come from App.css.
 }
 
 .toggle-row:hover {
-  padding-left: 8px;
-  background: rgba(46, 125, 50, 0.02);
-  border-radius: 8px;
+  padding-left: 1rem; /* Subtle shift */
+  background: rgba(46, 125, 50, 0.04); /* Lighter background */
 }
 
 .toggle-info {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: 1;
 }
 
 .toggle-label {
@@ -137,55 +102,6 @@ Shared styles (animations, header, empty-state) come from App.css.
 .toggle-desc {
   font-size: 0.82rem;
   color: var(--text-faint);
-}
-
-.toggle-switch {
-  position: relative;
-  width: 50px;
-  height: 28px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-}
-
-.toggle-slider {
-  position: absolute;
-  inset: 0;
-  background: #ccc;
-  border-radius: 28px;
-  transition: background var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.toggle-slider::before {
-  content: "";
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  left: 3px;
-  bottom: 3px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: transform var(--transition-normal);
-}
-
-.toggle-switch input:checked + .toggle-slider {
-  background: var(--gradient-green);
-  box-shadow: var(--shadow-green-glow);
-}
-
-.toggle-switch input:checked + .toggle-slider::before {
-  transform: translateX(22px);
-}
-
-.toggle-switch:hover .toggle-slider {
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
 
 /* ── Payment Methods ── */
@@ -273,21 +189,7 @@ Shared styles (animations, header, empty-state) come from App.css.
 }
 
 .btn-add-card {
-  background: var(--gradient-green);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.9rem;
-  box-shadow: var(--shadow-green);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.btn-add-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-green-hover);
+  margin-top: 1rem;
 }
 
 /* ── Account Management ── */
@@ -297,28 +199,12 @@ Shared styles (animations, header, empty-state) come from App.css.
   gap: 0.75rem;
 }
 
-.account-action-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.1rem 1.25rem;
-  border-radius: var(--card-radius);
-  background: #f8fdf8;
-  border: 1px solid rgba(46, 125, 50, 0.08);
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.account-action-card:hover {
-  transform: translateX(5px);
-  box-shadow: var(--shadow-sm);
-}
-
-.account-action-card.danger-card {
+.danger-card {
   background: #fef8f8;
   border-color: rgba(220, 53, 69, 0.1);
 }
 
-.account-action-card.danger-card:hover {
+.danger-card:hover {
   box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
 }
 
@@ -339,17 +225,21 @@ Shared styles (animations, header, empty-state) come from App.css.
   color: var(--text-faint);
 }
 
-.btn-action-export {
+.btn-action-export,
+.btn-action-pause {
   padding: 8px 20px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   font-size: 0.88rem;
   border: none;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn-action-export {
   background: linear-gradient(135deg, var(--blue-info), var(--blue-accent));
   color: white;
   box-shadow: 0 3px 10px rgba(23, 162, 184, 0.25);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .btn-action-export:hover {
@@ -358,43 +248,14 @@ Shared styles (animations, header, empty-state) come from App.css.
 }
 
 .btn-action-pause {
-  padding: 8px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.88rem;
-  border: none;
   background: linear-gradient(135deg, var(--yellow-dark), #ffcc02);
   color: var(--text-dark);
   box-shadow: 0 3px 10px rgba(249, 168, 37, 0.25);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .btn-action-pause:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(249, 168, 37, 0.35);
-}
-
-.btn-action-delete {
-  padding: 8px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.88rem;
-  background: white;
-  color: var(--red-main);
-  border: 2px solid var(--red-main);
-  transition: background var(--transition-fast),
-              color var(--transition-fast),
-              transform var(--transition-fast),
-              box-shadow var(--transition-fast);
-}
-
-.btn-action-delete:hover {
-  background: var(--red-main);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
 }
 
 /* ── Save / Discard Bar ── */
@@ -408,64 +269,6 @@ Shared styles (animations, header, empty-state) come from App.css.
   animation-delay: 0.3s;
 }
 
-.btn-save-settings {
-  flex: 2;
-  padding: 1rem 1.5rem;
-  background: var(--gradient-green);
-  color: white;
-  border: none;
-  border-radius: var(--card-radius);
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow-green);
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-save-settings:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-green-hover);
-}
-
-.btn-save-settings:active {
-  transform: translateY(-1px);
-}
-
-.btn-save-settings::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.btn-save-settings:hover::after {
-  left: 100%;
-}
-
-.btn-discard {
-  flex: 1;
-  padding: 1rem 1.5rem;
-  background: #f0f0f0;
-  color: var(--text-medium);
-  border: none;
-  border-radius: var(--card-radius);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--transition-normal), transform var(--transition-fast);
-}
-
-.btn-discard:hover {
-  background: #e0e0e0;
-  transform: translateY(-2px);
-}
-
 .save-success {
   margin-top: 1rem;
   padding: 1rem;
@@ -474,6 +277,7 @@ Shared styles (animations, header, empty-state) come from App.css.
   border-radius: 8px;
   color: var(--green-dark);
   font-weight: 500;
+  animation: slideInUp 0.3s ease;
 }
 
 /* ── Responsive ── */
@@ -511,17 +315,10 @@ Shared styles (animations, header, empty-state) come from App.css.
     justify-content: space-between;
   }
 
-  .account-action-card {
+  .account-actions .card-action {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
-  }
-
-  .btn-action-export,
-  .btn-action-pause,
-  .btn-action-delete {
-    width: 100%;
-    text-align: center;
   }
 
   .save-bar {
@@ -538,9 +335,5 @@ Shared styles (animations, header, empty-state) come from App.css.
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
-  }
-
-  .toggle-switch {
-    align-self: flex-end;
   }
 }
