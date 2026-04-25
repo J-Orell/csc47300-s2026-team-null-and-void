@@ -1,9 +1,14 @@
 import { FC } from 'react'
-import MonthlyChart from '../components/MonthlyChart'
-import CategoryChart from '../components/CategoryChart'
 import useDashboardData from '../hooks/useDashboardData'
-import { formatNumber, getCurrentDate } from '../utils/helpers'
-import { Card, PageHeader } from '../components/common'
+import { getCurrentDate } from '../utils/helpers'
+import { PageHeader } from '../components/common'
+import {
+  ChartCard,
+  CategoryDetail,
+  DashboardSummary,
+  MonthlyChart,
+  CategoryChart
+} from '../components/dashboard'
 import '../styles/Dashboard.css'
 
 const Dashboard: FC = () => {
@@ -12,6 +17,10 @@ const Dashboard: FC = () => {
   if (loading) return <main><div className="loading">Loading dashboard...</div></main>
   if (error) return <main><div className="error">Error loading dashboard: {error.message}</div></main>
   if (!data) return <main><div className="error">No data available</div></main>
+
+  // Calculate category breakdown data
+  const categoryEntries = Object.entries(data.categoryBreakdown)
+  const total = categoryEntries.reduce((sum, [, amount]) => sum + amount, 0)
 
   return (
     <main className="dashboard-container">
@@ -22,77 +31,45 @@ const Dashboard: FC = () => {
         extra={getCurrentDate()}
       />
 
-      {/* Stats Grid */}
-      <div className="summary-cards">
-        <Card variant="stat">
-          <div className="stat-icon">📈</div>
-          <div className="stat-info">
-            <div className="stat-label">Total Income</div>
-            <div className="stat-value stat-value-income">${formatNumber(data.currentMonth.totalIncome)}</div>
-          </div>
-        </Card>
+      {/* Dashboard Summary */}
+      <DashboardSummary
+        totalIncome={data.currentMonth.totalIncome}
+        totalExpenses={data.currentMonth.totalExpenses}
+        totalSavings={data.currentMonth.savings}
+        savingsRate={data.currentMonth.savingsRate}
+      />
 
-        <Card variant="stat">
-          <div className="stat-icon">💸</div>
-          <div className="stat-info">
-            <div className="stat-label">Total Expenses</div>
-            <div className="stat-value stat-value-expense">${formatNumber(data.currentMonth.totalExpenses)}</div>
-          </div>
-        </Card>
-
-        <Card variant="stat">
-          <div className="stat-icon">🎯</div>
-          <div className="stat-info">
-            <div className="stat-label">Total Savings</div>
-            <div className="stat-value stat-value-savings">${formatNumber(data.currentMonth.savings)}</div>
-          </div>
-        </Card>
-
-        <Card variant="stat">
-          <div className="stat-icon">📊</div>
-          <div className="stat-info">
-            <div className="stat-label">Savings Rate</div>
-            <div className="stat-value stat-value-rate">{data.currentMonth.savingsRate}</div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Charts */}
+      {/* Charts Section */}
       <div className="charts-section">
-        <Card variant="chart">
-          <div className="chart-header">
-            <h2>Monthly Income vs Expenses</h2>
-            <p className="chart-subtitle">6-month comparison</p>
-          </div>
-          <div className="chart-container">
-            <MonthlyChart data={data.monthlyData} />
-          </div>
-        </Card>
+        <ChartCard
+          title="Monthly Income vs Expenses"
+          subtitle="6-month comparison"
+        >
+          <MonthlyChart data={data.monthlyData} />
+        </ChartCard>
 
-        <Card variant="chart">
-          <div className="chart-header">
-            <h2>Expense Breakdown by Category</h2>
-            <p className="chart-subtitle">Current month distribution</p>
-          </div>
-          <div className="chart-container pie-container">
-            <CategoryChart data={data.categoryBreakdown} />
-          </div>
-        </Card>
+        <ChartCard
+          title="Expense Breakdown by Category"
+          subtitle="Current month distribution"
+          className="pie-container"
+        >
+          <CategoryChart data={data.categoryBreakdown} />
+        </ChartCard>
       </div>
 
       {/* Expense Categories */}
       <div className="category-details">
         <h3 className="section-title">Expense Categories</h3>
         <div className="category-list">
-          {Object.entries(data.categoryBreakdown).map(([name, amount]) => {
-            const total = Object.values(data.categoryBreakdown).reduce((a, b) => a + b, 0)
+          {categoryEntries.map(([name, amount]) => {
             const percentage = ((amount / total) * 100).toFixed(1)
             return (
-              <div key={name} className="category-item">
-                <div className="category-name">{name}</div>
-                <div className="category-amount">${formatNumber(amount)}</div>
-                <div className="category-percentage">{percentage}% of total</div>
-              </div>
+              <CategoryDetail
+                key={name}
+                name={name}
+                amount={amount}
+                percentage={parseFloat(percentage)}
+              />
             )
           })}
         </div>

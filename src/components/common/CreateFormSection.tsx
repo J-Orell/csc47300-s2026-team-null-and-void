@@ -19,7 +19,6 @@ const CreateFormSection: FC<CreateFormSectionProps> = ({
   submitDisabled = false
 }) => {
   return (
-    // Just in case, there's also the option to do this in Card.css
     <Card variant="form" className="create-form-section" hover={false}>
       <h2 className="create-form-title">{title}</h2>
       <form onSubmit={onSubmit} className="create-form">

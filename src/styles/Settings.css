@@ -71,10 +71,10 @@ Shared styles (animations, header, empty-state) come from App.css.
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0.5rem; /* Add horizontal padding */
+  padding: 1rem 0.5rem;
   border-bottom: 1px solid var(--border-divider);
-  border-radius: 8px; /* Pre-set border radius */
-  transition: all 0.3s ease; /* Smooth transition */
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .toggle-row:last-child {
@@ -82,8 +82,8 @@ Shared styles (animations, header, empty-state) come from App.css.
 }
 
 .toggle-row:hover {
-  padding-left: 1rem; /* Subtle shift */
-  background: rgba(46, 125, 50, 0.04); /* Lighter background */
+  padding-left: 1rem;
+  background: rgba(46, 125, 50, 0.04);
 }
 
 .toggle-info {

@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { Chart as ChartJS, ArcElement, DoughnutController, Tooltip, Legend } from 'chart.js'
 import { ChartOptions } from 'chart.js'
-import { CategoryBreakdown } from '../types'
+import { CategoryBreakdown } from '../../types'
 
 ChartJS.register(ArcElement, DoughnutController, Tooltip, Legend)
 

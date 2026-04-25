@@ -128,11 +128,11 @@ const Budget: FC = () => {
         </div>
 
         {/* Add Form */}
-          <CreateFormSection
-            title="Add New Budget Category"
-            onSubmit={handleAdd}
-            submitLabel="Add"
-          >
+        <CreateFormSection
+          title="Add New Budget Category"
+          onSubmit={handleAdd}
+          submitLabel="Add"
+        >
           <FormField
             label="Icon"
             type="select"
@@ -180,7 +180,7 @@ const Budget: FC = () => {
             placeholder="0"
             min="0"
           />
-          </CreateFormSection>
+        </CreateFormSection>
 
         {/* Grid or Empty State */}
         {budgets.length === 0 ? (

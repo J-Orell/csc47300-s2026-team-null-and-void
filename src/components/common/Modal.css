@@ -56,10 +56,6 @@
   color: var(--red-main);
 }
 
-.modal-body {
-  /* Content goes here */
-}
-
 @keyframes modalFadeIn {
   from {
     opacity: 0;

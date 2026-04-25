@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef } from 'react'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend } from 'chart.js'
 import { ChartOptions } from 'chart.js'
-import { MonthlyData } from '../types'
+import { MonthlyData } from '../../types'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend)
 
@@ -138,4 +138,3 @@ const MonthlyChart: FC<MonthlyChartProps> = ({ data }) => {
 }
 
 export default MonthlyChart
-

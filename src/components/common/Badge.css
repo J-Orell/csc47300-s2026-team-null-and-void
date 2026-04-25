@@ -64,10 +64,6 @@
   color: #1565c0;
 }
 
-.badge-category {
-  /* Will be styled with specific category classes */
-}
-
 /* Category-specific badge colors (for transactions) */
 .badge-income {
   background: var(--green-bg);
