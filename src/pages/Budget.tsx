@@ -1,20 +1,15 @@
 import { FC, useState, useEffect, FormEvent } from 'react'
 import { Budget as BudgetType } from '../types'
-import { 
-  Card, 
-  PageHeader, 
-  Button, 
-  Modal, 
-  FormField, 
+import {
+  PageHeader,
+  Modal,
+  FormField,
   EmptyState,
-  IconButton,
-  ProgressBar,
   CreateFormSection,
-  Badge
+  Button
 } from '../components/common'
+import { BudgetCard, BudgetSummary } from '../components/budget'
 import '../styles/Budget.css'
-
-type BudgetState = 'safe' | 'warning' | 'danger'
 
 interface BudgetCategory extends BudgetType {
   id: string
@@ -26,7 +21,10 @@ const Budget: FC = () => {
   const [loading, setLoading] = useState(true)
   const [editingBudget, setEditingBudget] = useState<BudgetCategory | null>(null)
   const [newCat, setNewCat] = useState({
-    icon: '🛒', name: '', limit: '', spent: ''
+    icon: '🛒',
+    name: '',
+    limit: '',
+    spent: ''
   })
 
   /* Load from JSON */
@@ -46,17 +44,23 @@ const Budget: FC = () => {
   /* Add */
   const handleAdd = (e: FormEvent) => {
     e.preventDefault()
-    if (!newCat.name.trim()) { alert('Please enter a category name.'); return }
+    if (!newCat.name.trim()) {
+      alert('Please enter a category name.')
+      return
+    }
     const limit = parseFloat(newCat.limit)
-    if (!limit || limit <= 0) { alert('Please enter a valid budget limit.'); return }
+    if (!limit || limit <= 0) {
+      alert('Please enter a valid budget limit.')
+      return
+    }
     const spent = parseFloat(newCat.spent) || 0
 
     const nextId = String(Date.now())
     setBudgets(prev => [...prev, {
-      id: nextId, 
-      icon: newCat.icon, 
+      id: nextId,
+      icon: newCat.icon,
       name: newCat.name.trim(),
-      limit, 
+      limit,
       spent
     }])
     setNewCat({ icon: '🛒', name: '', limit: '', spent: '' })
@@ -81,13 +85,6 @@ const Budget: FC = () => {
   const totalSpent = budgets.reduce((s, b) => s + b.spent, 0)
   const totalRemain = totalBudget - totalSpent
 
-  const getState = (spent: number, limit: number): BudgetState => {
-    const pct = (spent / limit) * 100
-    if (pct > 100) return 'danger'
-    if (pct >= 90) return 'warning'
-    return 'safe'
-  }
-
   if (loading) return <main><div className="loading">Loading budgets...</div></main>
 
   return (
@@ -98,34 +95,12 @@ const Budget: FC = () => {
           subtitle="Set monthly limits per category and track your spending."
         />
 
-        {/* Summary Strip */}
-        <div className="summary-cards">
-          <Card variant="stat" className="stat-card-income">
-            <div className="stat-icon">📊</div>
-            <div className="stat-info">
-              <div className="stat-label">Total Budget</div>
-              <div className="stat-value stat-value-total">${totalBudget.toFixed(2)}</div>
-            </div>
-          </Card>
-
-          <Card variant="stat" className={totalSpent > totalBudget ? 'stat-card-expense' : 'stat-card-rate'}>
-            <div className="stat-icon">💸</div>
-            <div className="stat-info">
-              <div className="stat-label">Total Spent</div>
-              <div className="stat-value stat-value-spent">${totalSpent.toFixed(2)}</div>
-            </div>
-          </Card>
-
-          <Card variant="stat" className={totalRemain < 0 ? 'stat-card-expense' : 'stat-card-savings'}>
-            <div className="stat-icon">💰</div>
-            <div className="stat-info">
-              <div className="stat-label">Remaining</div>
-              <div className="stat-value stat-value-remaining">
-                {totalRemain < 0 ? '-$' : '$'}{Math.abs(totalRemain).toFixed(2)}
-              </div>
-            </div>
-          </Card>
-        </div>
+        {/* Budget Summary */}
+        <BudgetSummary
+          totalBudget={totalBudget}
+          totalSpent={totalSpent}
+          totalRemain={totalRemain}
+        />
 
         {/* Add Form */}
         <CreateFormSection
@@ -152,7 +127,6 @@ const Budget: FC = () => {
               { value: '💰', label: '💰 Other' }
             ]}
           />
-
           <FormField
             label="Category Name"
             type="text"
@@ -161,7 +135,6 @@ const Budget: FC = () => {
             placeholder="e.g. Groceries"
             required
           />
-
           <FormField
             label="Monthly Limit ($)"
             type="number"
@@ -171,7 +144,6 @@ const Budget: FC = () => {
             min="1"
             required
           />
-
           <FormField
             label="Spent So Far ($)"
             type="number"
@@ -190,49 +162,18 @@ const Budget: FC = () => {
           />
         ) : (
           <div className="budgets-grid">
-            {budgets.map(b => {
-              const pct = Math.min((b.spent / b.limit) * 100, 100)
-              const state = getState(b.spent, b.limit)
-              const remain = b.limit - b.spent
-
-              return (
-                <Card key={b.id} variant="budget" className="budget-card">
-                  <div className="budget-card-header">
-                    <div className="budget-card-title">
-                      <span className="budget-card-icon">{b.icon}</span>
-                      <span className="budget-card-name">{b.name}</span>
-                    </div>
-                    <div className="budget-card-actions">
-                      <IconButton icon="✏️" label="Edit" onClick={() => setEditingBudget(b)} />
-                      <IconButton icon="🗑" label="Delete" variant="danger" onClick={() => handleDelete(b.id)} />
-                    </div>
-                  </div>
-
-                  <div className="budget-amounts">
-                    <span className="budget-spent-label">
-                      Spent: <span>${b.spent.toFixed(2)}</span>
-                    </span>
-                    <span className="budget-limit-label">
-                      Limit: <span>${b.limit.toFixed(2)}</span>
-                    </span>
-                  </div>
-
-                  <ProgressBar percentage={pct} variant={state} />
-
-                  <div className="budget-card-footer">
-                    <span className={`budget-remaining ${state}`}>
-                      {remain < 0
-                        ? `Over by $${Math.abs(remain).toFixed(2)}`
-                        : `$${remain.toFixed(2)} left`}
-                    </span>
-                    <span className="budget-pct-label">{pct.toFixed(0)}% used</span>
-                  </div>
-
-                  {remain < 0 && <Badge variant="danger" size="small">⚠️ Over Budget</Badge>}
-                  {remain >= 0 && pct >= 90 && <Badge variant="warning" size="small">⚠️ Near Limit</Badge>}
-                </Card>
-              )
-            })}
+            {budgets.map(b => (
+              <BudgetCard
+                key={b.id}
+                id={b.id}
+                icon={b.icon}
+                name={b.name}
+                limit={b.limit}
+                spent={b.spent}
+                onEdit={() => setEditingBudget(b)}
+                onDelete={() => handleDelete(b.id)}
+              />
+            ))}
           </div>
         )}
 
@@ -266,9 +207,15 @@ const EditBudgetForm: FC<{
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) { alert('Please enter a category name.'); return }
+    if (!name.trim()) {
+      alert('Please enter a category name.')
+      return
+    }
     const l = parseFloat(limit)
-    if (!l || l <= 0) { alert('Please enter a valid limit.'); return }
+    if (!l || l <= 0) {
+      alert('Please enter a valid limit.')
+      return
+    }
     onSave(name.trim(), l, parseFloat(spent) || 0)
   }
 
@@ -281,7 +228,6 @@ const EditBudgetForm: FC<{
         onChange={setName}
         required
       />
-
       <FormField
         label="Monthly Limit ($)"
         type="number"
@@ -290,7 +236,6 @@ const EditBudgetForm: FC<{
         min="1"
         required
       />
-
       <FormField
         label="Spent So Far ($)"
         type="number"
@@ -298,7 +243,6 @@ const EditBudgetForm: FC<{
         onChange={setSpent}
         min="0"
       />
-
       <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
         <Button type="submit" variant="primary" style={{ flex: 2 }}>Save</Button>
         <Button type="button" variant="secondary" onClick={() => {}} style={{ flex: 1 }}>Cancel</Button>

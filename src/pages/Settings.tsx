@@ -1,66 +1,30 @@
-import { FC, useState } from 'react'
-import { 
-  Card, 
-  PageHeader, 
-  Button, 
-  FormField,
-  Toggle
+import { FC } from 'react'
+import {
+  PageHeader,
+  Button,
+  FormField
 } from '../components/common'
+import {
+  SettingsSection,
+  NotificationToggle,
+  PaymentCard,
+  AccountActionCard
+} from '../components/settings'
+import { useSettings, usePaymentCards } from '../hooks'
 import '../styles/Settings.css'
 
 const Settings: FC = () => {
-  const [settings, setSettings] = useState({
-    fullName: 'Raeesah Iram',
-    email: 'riram000@citymail.cuny.edu',
-    phone: '(212) 555-0199',
-    currency: 'USD',
-    threshold: 90,
-    dateFormat: 'mdy',
-    budgetCycleStart: '1',
-  })
+  const {
+    settings,
+    notifications,
+    saved,
+    updateSetting,
+    toggleNotification,
+    saveSettings,
+    resetSettings
+  } = useSettings()
 
-  const [notifications, setNotifications] = useState({
-    budgetAlerts: true,
-    weeklySummary: true,
-    transactionAlerts: false,
-    monthlyReport: true,
-  })
-
-  const [saved, setSaved] = useState(false)
-
-  const handleChange = (field: string, value: string | number) => {
-    setSettings(prev => ({ ...prev, [field]: value }))
-    setSaved(false)
-  }
-
-  const handleToggle = (field: keyof typeof notifications) => {
-    setNotifications(prev => ({ ...prev, [field]: !prev[field] }))
-    setSaved(false)
-  }
-
-  const handleSave = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
-  }
-
-  const handleDiscard = () => {
-    setSettings({
-      fullName: 'Raeesah Iram',
-      email: 'riram000@citymail.cuny.edu',
-      phone: '(212) 555-0199',
-      currency: 'USD',
-      threshold: 90,
-      dateFormat: 'mdy',
-      budgetCycleStart: '1',
-    })
-    setNotifications({
-      budgetAlerts: true,
-      weeklySummary: true,
-      transactionAlerts: false,
-      monthlyReport: true,
-    })
-    setSaved(false)
-  }
+  const { cards, removeCard } = usePaymentCards()
 
   return (
     <main>
@@ -72,44 +36,40 @@ const Settings: FC = () => {
 
         <form onSubmit={e => e.preventDefault()}>
           {/* Personal Information */}
-          <Card variant="form" className="settings-section">
-            <h2>Personal Information</h2>
+          <SettingsSection title="Personal Information">
             <div className="settings-grid">
               <div className="settings-full-row">
                 <FormField
                   label="Full Name"
                   type="text"
                   value={settings.fullName}
-                  onChange={(val) => handleChange('fullName', val)}
+                  onChange={(val) => updateSetting('fullName', val)}
                 />
               </div>
-
               <FormField
                 label="Email Address"
                 type="email"
                 value={settings.email}
-                onChange={(val) => handleChange('email', val)}
+                onChange={(val) => updateSetting('email', val)}
               />
-
               <FormField
                 label="Phone Number"
                 type="tel"
                 value={settings.phone}
-                onChange={(val) => handleChange('phone', val)}
+                onChange={(val) => updateSetting('phone', val)}
                 placeholder="(212) 555-0199"
               />
             </div>
-          </Card>
+          </SettingsSection>
 
           {/* Preferences */}
-          <Card variant="form" className="settings-section">
-            <h2>Preferences</h2>
+          <SettingsSection title="Preferences">
             <div className="settings-grid">
               <FormField
                 label="Local Currency"
                 type="select"
                 value={settings.currency}
-                onChange={(val) => handleChange('currency', val)}
+                onChange={(val) => updateSetting('currency', val)}
                 options={[
                   { value: 'USD', label: 'USD ($)' },
                   { value: 'EUR', label: 'EUR (€)' },
@@ -118,33 +78,30 @@ const Settings: FC = () => {
                   { value: 'CAD', label: 'CAD (C$)' }
                 ]}
               />
-
               <FormField
                 label="Spending Alert Threshold (%)"
                 type="number"
                 value={settings.threshold}
-                onChange={(val) => handleChange('threshold', Number(val))}
+                onChange={(val) => updateSetting('threshold', Number(val))}
                 min="1"
                 max="100"
               />
-
               <FormField
                 label="Date Format"
                 type="select"
                 value={settings.dateFormat}
-                onChange={(val) => handleChange('dateFormat', val)}
+                onChange={(val) => updateSetting('dateFormat', val)}
                 options={[
                   { value: 'mdy', label: 'MM/DD/YYYY' },
                   { value: 'dmy', label: 'DD/MM/YYYY' },
                   { value: 'ymd', label: 'YYYY-MM-DD' }
                 ]}
               />
-
               <FormField
                 label="Budget Cycle Start"
                 type="select"
                 value={settings.budgetCycleStart}
-                onChange={(val) => handleChange('budgetCycleStart', val)}
+                onChange={(val) => updateSetting('budgetCycleStart', val)}
                 options={[
                   { value: '1', label: '1st of month' },
                   { value: '15', label: '15th of month' },
@@ -152,123 +109,96 @@ const Settings: FC = () => {
                 ]}
               />
             </div>
-          </Card>
+          </SettingsSection>
 
           {/* Notifications */}
-          <Card variant="form" className="settings-section">
-            <h2>Notifications</h2>
+          <SettingsSection title="Notifications">
             <div className="notification-options">
-              <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Budget Alerts</span>
-                  <span className="toggle-desc">Get notified when spending nears your limit</span>
-                </div>
-                <Toggle
-                  checked={notifications.budgetAlerts}
-                  onChange={() => handleToggle('budgetAlerts')}
-                />
-              </div>
-
-              <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Weekly Summary</span>
-                  <span className="toggle-desc">Receive a weekly spending report via email</span>
-                </div>
-                <Toggle
-                  checked={notifications.weeklySummary}
-                  onChange={() => handleToggle('weeklySummary')}
-                />
-              </div>
-
-              <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Transaction Alerts</span>
-                  <span className="toggle-desc">Get notified for every new transaction</span>
-                </div>
-                <Toggle
-                  checked={notifications.transactionAlerts}
-                  onChange={() => handleToggle('transactionAlerts')}
-                />
-              </div>
-
-              <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Monthly Report</span>
-                  <span className="toggle-desc">Detailed monthly breakdown sent to your email</span>
-                </div>
-                <Toggle
-                  checked={notifications.monthlyReport}
-                  onChange={() => handleToggle('monthlyReport')}
-                />
-              </div>
+              <NotificationToggle
+                label="Budget Alerts"
+                description="Get notified when spending nears your limit"
+                checked={notifications.budgetAlerts}
+                onChange={() => toggleNotification('budgetAlerts')}
+              />
+              <NotificationToggle
+                label="Weekly Summary"
+                description="Receive a weekly spending report via email"
+                checked={notifications.weeklySummary}
+                onChange={() => toggleNotification('weeklySummary')}
+              />
+              <NotificationToggle
+                label="Transaction Alerts"
+                description="Get notified for every new transaction"
+                checked={notifications.transactionAlerts}
+                onChange={() => toggleNotification('transactionAlerts')}
+              />
+              <NotificationToggle
+                label="Monthly Report"
+                description="Detailed monthly breakdown sent to your email"
+                checked={notifications.monthlyReport}
+                onChange={() => toggleNotification('monthlyReport')}
+              />
             </div>
-          </Card>
+          </SettingsSection>
 
           {/* Payment Methods */}
-          <Card variant="form" className="settings-section">
-            <h2>Payment Methods</h2>
+          <SettingsSection title="Payment Methods">
             <div className="card-list">
-              <div className="payment-card-item">
-                <div className="payment-card-info">
-                  <span className="card-type-badge visa">VISA</span>
-                  <span className="payment-card-number">**** **** **** 4242</span>
-                </div>
-                <div className="payment-card-meta">
-                  <span className="payment-card-expiry">Exp: 08/27</span>
-                  <button type="button" className="btn-remove-card">Remove</button>
-                </div>
-              </div>
-
-              <div className="payment-card-item">
-                <div className="payment-card-info">
-                  <span className="card-type-badge mc">MC</span>
-                  <span className="payment-card-number">**** **** **** 8899</span>
-                </div>
-                <div className="payment-card-meta">
-                  <span className="payment-card-expiry">Exp: 03/28</span>
-                  <button type="button" className="btn-remove-card">Remove</button>
-                </div>
-              </div>
+              {cards.map(card => (
+                <PaymentCard
+                  key={card.id}
+                  type={card.type}
+                  lastFour={card.lastFour}
+                  expiryDate={card.expiryDate}
+                  onRemove={() => removeCard(card.id)}
+                />
+              ))}
             </div>
-            <Button variant="primary" className="btn-add-card">+ Add Payment Method</Button>
-          </Card>
+            <Button variant="primary" className="btn-add-card">
+              + Add Payment Method
+            </Button>
+          </SettingsSection>
 
           {/* Account Management */}
-          <Card variant="form" className="settings-section">
-            <h2>Account Management</h2>
+          <SettingsSection title="Account Management">
             <div className="account-actions">
-              <Card variant="action">
-                <div className="action-info">
-                  <span className="action-title">Export Data</span>
-                  <span className="action-desc">Download all your transaction data as CSV</span>
-                </div>
-                <Button variant="primary" size="small" className="btn-action-export">Export</Button>
-              </Card>
-
-              <Card variant="action">
-                <div className="action-info">
-                  <span className="action-title">Pause Account</span>
-                  <span className="action-desc">Temporarily disable tracking and notifications</span>
-                </div>
-                <Button variant="secondary" size="small" className="btn-action-pause">Pause</Button>
-              </Card>
-
-              <Card variant="action" className="danger-card">
-                <div className="action-info">
-                  <span className="action-title">Delete Account</span>
-                  <span className="action-desc">Permanently remove your account and all data</span>
-                </div>
-                <Button variant="danger" size="small">Delete</Button>
-              </Card>
+              <AccountActionCard
+                title="Export Data"
+                description="Download all your transaction data as CSV"
+                actionLabel="Export"
+                buttonVariant="primary"
+                buttonClassName="btn-action-export"
+                onAction={() => alert('Exporting data...')}
+              />
+              <AccountActionCard
+                title="Pause Account"
+                description="Temporarily disable tracking and notifications"
+                actionLabel="Pause"
+                buttonVariant="secondary"
+                buttonClassName="btn-action-pause"
+                onAction={() => alert('Pausing account...')}
+              />
+              <AccountActionCard
+                title="Delete Account"
+                description="Permanently remove your account and all data"
+                actionLabel="Delete"
+                variant="danger"
+                buttonVariant="danger"
+                onAction={() => {
+                  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
+                    alert('Account deleted')
+                  }
+                }}
+              />
             </div>
-          </Card>
+          </SettingsSection>
 
           {/* Save / Discard Bar */}
           <div className="save-bar">
-            <Button variant="primary" onClick={handleSave} size="large" style={{ flex: 2 }}>
+            <Button variant="primary" onClick={saveSettings} size="large">
               Save Changes
             </Button>
-            <Button variant="secondary" onClick={handleDiscard} size="large" style={{ flex: 1 }}>
+            <Button variant="secondary" onClick={resetSettings} size="large">
               Discard
             </Button>
           </div>
