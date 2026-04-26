@@ -1,13 +1,10 @@
 import { FC, useState, FormEvent } from 'react'
 import {
-  PageHeader,
-  Button,
-  Modal,
-  FormField,
-  EmptyState,
-  CreateFormSection
+  PageHeader, Button, Modal,
+  FormField, EmptyState, CreateFormSection
 } from '../components/common'
 import { GoalCard, SavingsSummary } from '../components/savings'
+import { useLocalStorage } from '../hooks'
 import '../styles/SavingsGoals.css'
 
 interface SavingsGoal {
@@ -20,7 +17,8 @@ interface SavingsGoal {
 }
 
 const SavingsGoals: FC = () => {
-  const [goals, setGoals] = useState<SavingsGoal[]>([
+  // Uses hook for persistent storage
+  const [goals, setGoals] = useLocalStorage<SavingsGoal[]>('savings-goals', [
     {
       id: '1',
       name: 'Vacation to Hawaii',
@@ -54,12 +52,8 @@ const SavingsGoals: FC = () => {
   })
 
   const [addMoneyGoalId, setAddMoneyGoalId] = useState<string | null>(null)
-
   const totalThisMonth = 450
 
-  /**
-   * Calculate monthly savings needed to reach goal by deadline
-   */
   const calculateMonthlyNeeded = (goal: SavingsGoal): number => {
     const deadlineDate = new Date(goal.deadline)
     const today = new Date()
@@ -71,15 +65,9 @@ const SavingsGoals: FC = () => {
     return Math.round((amountRemaining / monthsRemaining) * 100) / 100
   }
 
-  /**
-   * Check if user is on track for goal based on current monthly savings
-   */
   const isOnTrack = (goal: SavingsGoal): boolean =>
     totalThisMonth >= calculateMonthlyNeeded(goal)
 
-  /**
-   * Calculate projected completion date based on current savings rate
-   */
   const getProjectedCompletion = (goal: SavingsGoal): string => {
     if (goal.currentSavings >= goal.targetAmount) return 'Completed!'
     const monthsNeeded = Math.ceil((goal.targetAmount - goal.currentSavings) / (totalThisMonth || 1))
@@ -91,21 +79,17 @@ const SavingsGoals: FC = () => {
   // Get the highest priority goal (earliest deadline, not yet completed)
   const topGoal = goals.length > 0
     ? goals
-        .filter(g => g.currentSavings < g.targetAmount)
-        .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0]
-        ?? goals[0]
+      .filter(g => g.currentSavings < g.targetAmount)
+      .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0]
+      ?? goals[0]
     : null
 
   const suggestion = topGoal
     ? `You need to save $${calculateMonthlyNeeded(topGoal).toFixed(2)}/month to reach "${topGoal.name}" by ${new Date(topGoal.deadline).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
     : 'Create a savings goal to get personalized recommendations'
 
-  // Check if all goals are on track
   const allGoalsOnTrack = goals.length > 0 && goals.every(g => isOnTrack(g))
 
-  /**
-   * Handle creating a new savings goal
-   */
   const handleAddGoal = (e: FormEvent) => {
     e.preventDefault()
     if (!formData.goalName.trim()) {
@@ -133,16 +117,10 @@ const SavingsGoals: FC = () => {
     setFormData({ goalName: '', targetAmount: '', deadline: '' })
   }
 
-  /**
-   * Handle deleting a goal
-   */
   const handleDeleteGoal = (id: string) => {
     setGoals(prev => prev.filter(g => g.id !== id))
   }
 
-  /**
-   * Handle adding money to a goal
-   */
   const handleAddMoney = (amount: number) => {
     setGoals(prev => prev.map(g =>
       g.id === addMoneyGoalId
@@ -162,38 +140,17 @@ const SavingsGoals: FC = () => {
           subtitle="Track and automate your savings targets"
         />
 
-        {/* Smart Suggestion */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(46,125,50,0.08), rgba(76,175,80,0.08))',
-          borderLeft: '4px solid var(--green-mid)',
-          borderRadius: '8px',
-          padding: '1.25rem 1.5rem',
-          marginBottom: '2rem',
-          border: '1px solid rgba(76,175,80,0.25)',
-          animation: 'slideInUp 0.6s ease backwards',
-          animationDelay: '0.1s'
-        }}>
-          <h3 style={{
-            fontSize: '0.95rem',
-            fontWeight: 700,
-            color: 'var(--green-dark)',
-            marginBottom: '0.4rem'
-          }}>
-            💡 Smart Suggestion
-          </h3>
-          <p style={{ fontSize: '0.95rem', color: 'var(--green-main)', margin: 0 }}>
-            {suggestion}
-          </p>
+        <div className="smart-suggestion">
+          <h3 className="smart-suggestion-title">💡 Smart Suggestion</h3>
+          <p className="smart-suggestion-text">{suggestion}</p>
         </div>
 
-        {/* Savings Summary */}
         <SavingsSummary
           totalSavedThisMonth={totalThisMonth}
           isOnTrack={allGoalsOnTrack}
           projectedCompletion={topGoal ? getProjectedCompletion(topGoal) : 'N/A'}
         />
 
-        {/* Create Goal */}
         <CreateFormSection
           title="Create New Goal"
           onSubmit={handleAddGoal}
@@ -226,26 +183,14 @@ const SavingsGoals: FC = () => {
 
         {/* Active Goals */}
         <div style={{ animation: 'slideInUp 0.6s ease backwards', animationDelay: '0.3s' }}>
-          <h2 style={{
-            fontSize: '1.3rem',
-            marginBottom: '1.5rem',
-            color: 'var(--text-dark)',
-            fontWeight: 700
-          }}>
-            Active Goals ({goals.length})
-          </h2>
-
+          <h2 className="goals-section-title">Active Goals ({goals.length})</h2>
           {goals.length === 0 ? (
             <EmptyState
               icon="🎯"
               message="No savings goals yet. Create one to get started!"
             />
           ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '1.5rem'
-            }}>
+            <div className="goals-grid">
               {goals.map(goal => (
                 <GoalCard
                   key={goal.id}
@@ -266,7 +211,6 @@ const SavingsGoals: FC = () => {
         </div>
       </div>
 
-      {/* Add Money Modal */}
       {addMoneyGoal && (
         <AddMoneyModal
           goalName={addMoneyGoal.name}
@@ -298,11 +242,7 @@ const AddMoneyModal: FC<{
 
   return (
     <Modal isOpen onClose={onClose} title="Add Money">
-      <p style={{
-        marginBottom: '1rem',
-        color: 'var(--text-medium)',
-        fontSize: '0.95rem'
-      }}>
+      <p className="add-money-description">
         Adding to: <strong>{goalName}</strong>
       </p>
       <form onSubmit={handleSubmit}>
@@ -316,9 +256,9 @@ const AddMoneyModal: FC<{
           step="0.01"
           required
         />
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-          <Button type="submit" variant="primary" style={{ flex: 2 }}>Add Money</Button>
-          <Button type="button" variant="secondary" onClick={onClose} style={{ flex: 1 }}>Cancel</Button>
+        <div className="add-money-actions">
+          <Button type="submit" variant="primary" className="add-money-submit">Add Money</Button>
+          <Button type="button" variant="secondary" onClick={onClose} className="add-money-cancel">Cancel</Button>
         </div>
       </form>
     </Modal>

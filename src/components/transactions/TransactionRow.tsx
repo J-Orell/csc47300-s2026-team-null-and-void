@@ -22,10 +22,10 @@ const TransactionRow: FC<TransactionRowProps> = ({ transaction, onEdit, onDelete
 
   return (
     <tr>
-      <td style={{ color: 'var(--text-lighter)', fontSize: '0.88rem' }}>
+      <td className="transaction-date-cell">
         {formatDate(transaction.date)}
       </td>
-      <td style={{ fontWeight: 600, color: 'var(--text-dark)' }}>
+      <td className="transaction-description-cell">
         {transaction.description}
       </td>
       <td>
@@ -36,14 +36,9 @@ const TransactionRow: FC<TransactionRowProps> = ({ transaction, onEdit, onDelete
       <td className={`tx-amount-cell ${transaction.type}`}>
         ${transaction.amount.toFixed(2)}
       </td>
-      <td style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+      <td className="transaction-actions-cell">
         <IconButton icon="✏️" label="Edit" onClick={() => onEdit(transaction)} />
-        <IconButton 
-          icon="🗑" 
-          label="Delete" 
-          variant="danger" 
-          onClick={() => onDelete(transaction.id)} 
-        />
+        <IconButton icon="🗑" label="Delete" variant="danger" onClick={() => onDelete(transaction.id)} />
       </td>
     </tr>
   )

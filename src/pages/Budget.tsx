@@ -1,14 +1,11 @@
 import { FC, useState, useEffect, FormEvent } from 'react'
 import { Budget as BudgetType } from '../types'
 import {
-  PageHeader,
-  Modal,
-  FormField,
-  EmptyState,
-  CreateFormSection,
-  Button
+  PageHeader, Modal, FormField,
+  EmptyState, CreateFormSection, Button
 } from '../components/common'
 import { BudgetCard, BudgetSummary } from '../components/budget'
+import { useDataFetch } from '../hooks'
 import '../styles/Budget.css'
 
 interface BudgetCategory extends BudgetType {
@@ -17,8 +14,10 @@ interface BudgetCategory extends BudgetType {
 }
 
 const Budget: FC = () => {
+  // Uses hook for data fetching
+  const { data: fetchedBudgets, loading } = useDataFetch<Array<{ icon: string; name: string; limit: number; spent: number }>>('/data/budget-data.json')
+  
   const [budgets, setBudgets] = useState<BudgetCategory[]>([])
-  const [loading, setLoading] = useState(true)
   const [editingBudget, setEditingBudget] = useState<BudgetCategory | null>(null)
   const [newCat, setNewCat] = useState({
     icon: '🛒',
@@ -27,21 +26,13 @@ const Budget: FC = () => {
     spent: ''
   })
 
-  /* Load from JSON */
+  // Update local state when data is fetched
   useEffect(() => {
-    fetch('/data/budget-data.json')
-      .then(r => r.json())
-      .then((data: Array<{ icon: string; name: string; limit: number; spent: number }>) => {
-        setBudgets(data.map((b, i) => ({ ...b, id: String(i + 1) })))
-        setLoading(false)
-      })
-      .catch(() => {
-        setBudgets([])
-        setLoading(false)
-      })
-  }, [])
+    if (fetchedBudgets && budgets.length === 0) {
+      setBudgets(fetchedBudgets.map((b, i) => ({ ...b, id: String(i + 1) })))
+    }
+  }, [fetchedBudgets])
 
-  /* Add */
   const handleAdd = (e: FormEvent) => {
     e.preventDefault()
     if (!newCat.name.trim()) {
@@ -66,12 +57,10 @@ const Budget: FC = () => {
     setNewCat({ icon: '🛒', name: '', limit: '', spent: '' })
   }
 
-  /* Delete */
   const handleDelete = (id: string) => {
     setBudgets(prev => prev.filter(b => b.id !== id))
   }
 
-  /* Edit save */
   const handleEditSave = (name: string, limit: number, spent: number) => {
     if (!editingBudget) return
     setBudgets(prev => prev.map(b =>
@@ -80,7 +69,6 @@ const Budget: FC = () => {
     setEditingBudget(null)
   }
 
-  /* Totals */
   const totalBudget = budgets.reduce((s, b) => s + b.limit, 0)
   const totalSpent = budgets.reduce((s, b) => s + b.spent, 0)
   const totalRemain = totalBudget - totalSpent
@@ -95,14 +83,12 @@ const Budget: FC = () => {
           subtitle="Set monthly limits per category and track your spending."
         />
 
-        {/* Budget Summary */}
         <BudgetSummary
           totalBudget={totalBudget}
           totalSpent={totalSpent}
           totalRemain={totalRemain}
         />
 
-        {/* Add Form */}
         <CreateFormSection
           title="Add New Budget Category"
           onSubmit={handleAdd}
@@ -154,7 +140,6 @@ const Budget: FC = () => {
           />
         </CreateFormSection>
 
-        {/* Grid or Empty State */}
         {budgets.length === 0 ? (
           <EmptyState
             icon="📋"

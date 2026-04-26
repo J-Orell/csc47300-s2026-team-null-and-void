@@ -269,6 +269,14 @@ Shared styles (animations, header, empty-state) come from App.css.
   animation-delay: 0.3s;
 }
 
+.save-bar button:first-child {
+  flex: 2;
+}
+
+.save-bar button:last-child {
+  flex: 1;
+}
+
 .save-success {
   margin-top: 1rem;
   padding: 1rem;
@@ -323,6 +331,11 @@ Shared styles (animations, header, empty-state) come from App.css.
 
   .save-bar {
     flex-direction: column;
+  }
+  
+  .save-bar button:first-child,
+  .save-bar button:last-child {
+    flex: 1;
   }
 
   .settings-section {

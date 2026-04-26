@@ -6,3 +6,171 @@ SavingsGoals.css — Page-specific styles.
   max-width: 1400px;
   margin: 0 auto;
 }
+
+/* Smart suggestion box */
+.smart-suggestion {
+  background: linear-gradient(135deg, rgba(46,125,50,0.08), rgba(76,175,80,0.08));
+  border-left: 4px solid var(--green-mid);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(76,175,80,0.25);
+  animation: slideInUp 0.6s ease backwards;
+  animation-delay: 0.1s;
+}
+
+.smart-suggestion-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 0.4rem;
+}
+
+.smart-suggestion-text {
+  font-size: 0.95rem;
+  color: var(--green-main);
+  margin: 0;
+}
+
+/* Goals section title */
+.goals-section-title {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+/* Goals grid */
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Goal card sections */
+.goal-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.goal-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 4px 0;
+}
+
+.goal-card-deadline {
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.goal-progress-section {
+  background: var(--bg-section);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.goal-progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.goal-progress-label {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.goal-progress-amount {
+  color: var(--text-medium);
+}
+
+.goal-progress-percentage {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  margin-top: 0.4rem;
+}
+
+.goal-monthly-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.goal-monthly-info.on-track {
+  background: rgba(76,175,80,0.1);
+  border-left: 4px solid var(--green-main);
+}
+
+.goal-monthly-info.behind {
+  background: rgba(255,107,107,0.1);
+  border-left: 4px solid var(--red-main);
+}
+
+.goal-info-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-info-label {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.goal-info-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.goal-info-value.on-track {
+  color: var(--green-main);
+}
+
+.goal-info-value.behind {
+  color: var(--red-main);
+}
+
+.goal-status-section {
+  text-align: right;
+}
+
+.goal-status-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.goal-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* Add money modal */
+.add-money-description {
+  margin-bottom: 1rem;
+  color: var(--text-medium);
+  font-size: 0.95rem;
+}
+
+.add-money-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.add-money-submit {
+  flex: 2;
+}
+
+.add-money-cancel {
+  flex: 1;
+}

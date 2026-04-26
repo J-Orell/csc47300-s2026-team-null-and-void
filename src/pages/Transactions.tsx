@@ -1,18 +1,14 @@
 import { FC, useState, useEffect, FormEvent } from 'react'
 import { Transaction } from '../types'
 import {
-  PageHeader,
-  Button,
-  Modal,
-  FormField,
-  EmptyState
+  PageHeader, Button, Modal,
+  FormField, EmptyState
 } from '../components/common'
 import {
-  TransactionTable,
-  TransactionFilters,
-  Pagination,
-  TransactionsSummary
+  TransactionTable, TransactionFilters,
+  Pagination, TransactionsSummary
 } from '../components/transactions'
+import { useFilter, usePagination } from '../hooks'
 import '../styles/Transactions.css'
 
 type FilterType = 'all' | 'income' | 'expense'
@@ -22,13 +18,7 @@ const Transactions: FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [nextId, setNextId] = useState(1)
-  
-  // Filter state
-  const [filterType, setFilterType] = useState<FilterType>('all')
-  const [filterCategory, setFilterCategory] = useState('all')
-  const [filterDate, setFilterDate] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  
+
   // Modal state
   const [showModal, setShowModal] = useState(false)
   const [editingTx, setEditingTx] = useState<Transaction | null>(null)
@@ -73,19 +63,53 @@ const Transactions: FC = () => {
     }
   }, [showModal, editingTx])
 
-  /* Derived: filtered + sorted */
-  const filtered = transactions
-    .filter(t => filterType === 'all' || t.type === filterType)
-    .filter(t => filterCategory === 'all' || t.category.toLowerCase() === filterCategory)
-    .filter(t => {
-      if (!filterDate) return true
-      return new Date(t.date + 'T00:00:00') >= new Date(filterDate + 'T00:00:00')
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  /* Uses hook for filter */
+  const {
+    filteredItems: filtered,
+    filters,
+    updateFilter,
+    resetFilters
+  } = useFilter<Transaction>(
+    transactions,
+    (transaction, filterValues) => {
+      // Type filter
+      const typeFilter = filterValues.filterType || 'all'
+      if (typeFilter !== 'all' && transaction.type !== typeFilter) {
+        return false
+      }
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
-  const safePage = Math.min(currentPage, totalPages)
-  const pageData = filtered.slice((safePage - 1) * ROWS_PER_PAGE, safePage * ROWS_PER_PAGE)
+      // Category filter
+      const categoryFilter = filterValues.filterCategory || 'all'
+      if (categoryFilter !== 'all' && transaction.category.toLowerCase() !== categoryFilter) {
+        return false
+      }
+
+      // Date filter
+      const dateFilter = filterValues.filterDate || ''
+      if (dateFilter) {
+        const txDate = new Date(transaction.date + 'T00:00:00')
+        const filterDate = new Date(dateFilter + 'T00:00:00')
+        if (txDate < filterDate) {
+          return false
+        }
+      }
+
+      return true
+    }
+  )
+
+  // Sort filtered transactions by date
+  const sortedFiltered = [...filtered].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
+  /* Uses pagination hook */
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: pageData,
+    setCurrentPage
+  } = usePagination(sortedFiltered, ROWS_PER_PAGE)
 
   /* Summary */
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
@@ -151,12 +175,12 @@ const Transactions: FC = () => {
 
         {/* Filter Bar */}
         <TransactionFilters
-          filterDate={filterDate}
-          filterCategory={filterCategory}
-          filterType={filterType}
-          onDateChange={setFilterDate}
-          onCategoryChange={setFilterCategory}
-          onTypeChange={setFilterType}
+          filterDate={(filters.filterDate as string) || ''}
+          filterCategory={(filters.filterCategory as string) || 'all'}
+          filterType={(filters.filterType as FilterType) || 'all'}
+          onDateChange={(val) => updateFilter('filterDate', val)}
+          onCategoryChange={(val) => updateFilter('filterCategory', val)}
+          onTypeChange={(val) => updateFilter('filterType', val)}
           onApply={handleApplyFilter}
         />
 
@@ -174,23 +198,20 @@ const Transactions: FC = () => {
                 Showing {pageData.length} of {filtered.length} transactions
               </span>
             </div>
-            
             <TransactionTable
               transactions={pageData}
               onEdit={openEdit}
               onDelete={handleDelete}
             />
-
-            {/* Pagination */}
             <Pagination
-              currentPage={safePage}
+              currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
             />
           </div>
         )}
 
-        <Button variant="primary" fullWidth onClick={openAdd} style={{ marginTop: '1.5rem' }}>
+        <Button variant="primary" fullWidth onClick={openAdd} className="add-transaction-btn">
           + Add New Transaction
         </Button>
 
@@ -241,8 +262,8 @@ const Transactions: FC = () => {
               required
             />
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-              <Button type="submit" variant="primary" style={{ flex: 2 }}>Save</Button>
-              <Button type="button" variant="secondary" onClick={closeModal} style={{ flex: 1 }}>Cancel</Button>
+              <Button type="submit" variant="primary" className="modal-form-submit">Save</Button>
+              <Button type="button" variant="secondary" onClick={closeModal} className="modal-form-cancel">Cancel</Button>
             </div>
           </form>
         </Modal>

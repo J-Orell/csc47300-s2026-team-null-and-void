@@ -48,6 +48,43 @@
   border-radius: 20px;
 }
 
+/* Transaction table cell styles */
+.transaction-date-cell {
+  color: var(--text-lighter);
+  font-size: 0.88rem;
+}
+
+.transaction-description-cell {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.transaction-actions-cell {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+/* Modal form actions */
+.modal-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-form-submit {
+  flex: 2;
+}
+
+.modal-form-cancel {
+  flex: 1;
+}
+
+/* Add transaction button */
+.add-transaction-btn {
+  margin-top: 1.5rem;
+}
+
 /* ── Green Gradient Table Header ── */
 .transactions-table thead {
   background: linear-gradient(135deg, var(--green-main), #388e3c, #43a047);

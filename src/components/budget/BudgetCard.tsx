@@ -58,9 +58,7 @@ const BudgetCard: FC<BudgetCardProps> = ({ icon, name, limit, spent, onEdit, onD
       {/* Footer */}
       <div className="budget-card-footer">
         <span className={`budget-remaining ${state}`}>
-          {remain < 0
-            ? `Over by $${Math.abs(remain).toFixed(2)}`
-            : `$${remain.toFixed(2)} left`}
+          {remain < 0 ? `Over by $${Math.abs(remain).toFixed(2)}` : `$${remain.toFixed(2)} left`}
         </span>
         <span className="budget-pct-label">{pct.toFixed(0)}% used</span>
       </div>
