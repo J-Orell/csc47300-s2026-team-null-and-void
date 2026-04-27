@@ -8,13 +8,15 @@ import {
   TransactionTable, TransactionFilters,
   Pagination, TransactionsSummary
 } from '../components/transactions'
-import { useFilter, usePagination } from '../hooks'
+import { useFilter, usePagination, useDataFetch } from '../hooks'
 import '../styles/Transactions.css'
 
 type FilterType = 'all' | 'income' | 'expense'
 const ROWS_PER_PAGE = 5
 
 const Transactions: FC = () => {
+  // Fetch initial data
+  const { data: fetchedTransactions, loading: initialLoading } = useDataFetch<Transaction[]>('/data/transactions-data.json')
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [nextId, setNextId] = useState(1)
@@ -31,18 +33,15 @@ const Transactions: FC = () => {
     amount: ''
   })
 
-  /* Load from JSON */
+  // Initialize transactions when data is fetched
   useEffect(() => {
-    fetch('/data/transactions-data.json')
-      .then(r => r.json())
-      .then((data: Transaction[]) => {
-        setTransactions(data)
-        const maxId = data.reduce((m, t) => Math.max(m, parseInt(t.id) || 0), 0)
-        setNextId(maxId + 1)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
-  }, [])
+    if (fetchedTransactions && transactions.length == 0) {
+      setTransactions(fetchedTransactions)
+      const maxId = fetchedTransactions.reduce((m, t) => Math.max(m, parseInt(t.id) || 0), 0)
+      setNextId(maxId + 1)
+      setLoading(false)
+    }
+  }, [fetchedTransactions])
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -156,7 +155,7 @@ const Transactions: FC = () => {
 
   const handleApplyFilter = () => setCurrentPage(1)
 
-  if (loading) return <main><div className="loading">Loading transactions...</div></main>
+  if (loading || initialLoading) return <main><div className="loading">Loading transactions...</div></main>
 
   return (
     <main>

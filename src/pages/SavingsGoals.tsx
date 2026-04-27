@@ -1,10 +1,10 @@
-import { FC, useState, FormEvent } from 'react'
+import { FC, useState, FormEvent, useEffect } from 'react'
 import {
   PageHeader, Button, Modal,
   FormField, EmptyState, CreateFormSection
 } from '../components/common'
 import { GoalCard, SavingsSummary } from '../components/savings'
-import { useLocalStorage } from '../hooks'
+import { useDataFetch } from '../hooks'
 import '../styles/SavingsGoals.css'
 
 interface SavingsGoal {
@@ -17,42 +17,23 @@ interface SavingsGoal {
 }
 
 const SavingsGoals: FC = () => {
-  // Uses hook for persistent storage
-  const [goals, setGoals] = useLocalStorage<SavingsGoal[]>('savings-goals', [
-    {
-      id: '1',
-      name: 'Vacation to Hawaii',
-      targetAmount: 10000,
-      currentSavings: 2500,
-      deadline: '2026-12-31',
-      createdDate: '2026-01-15'
-    },
-    {
-      id: '2',
-      name: 'Emergency Fund',
-      targetAmount: 15000,
-      currentSavings: 8500,
-      deadline: '2026-11-30',
-      createdDate: '2026-02-01'
-    },
-    {
-      id: '3',
-      name: 'New Laptop',
-      targetAmount: 2000,
-      currentSavings: 1800,
-      deadline: '2026-06-15',
-      createdDate: '2026-03-01'
-    },
-  ])
-
+  // Fetch initial data from JSON
+  const { data: fetchedGoals, loading } = useDataFetch<SavingsGoal[]>('/data/savings-goals-data.json')
+  const [goals, setGoals] = useState<SavingsGoal[]>([])
   const [formData, setFormData] = useState({
     goalName: '',
     targetAmount: '',
     deadline: ''
   })
-
   const [addMoneyGoalId, setAddMoneyGoalId] = useState<string | null>(null)
   const totalThisMonth = 450
+
+  // Update local state when data is fetched
+  useEffect(() => {
+    if (fetchedGoals && goals.length === 0) {
+      setGoals(fetchedGoals)
+    }
+  }, [fetchedGoals])
 
   const calculateMonthlyNeeded = (goal: SavingsGoal): number => {
     const deadlineDate = new Date(goal.deadline)
@@ -79,9 +60,9 @@ const SavingsGoals: FC = () => {
   // Get the highest priority goal (earliest deadline, not yet completed)
   const topGoal = goals.length > 0
     ? goals
-      .filter(g => g.currentSavings < g.targetAmount)
-      .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0]
-      ?? goals[0]
+        .filter(g => g.currentSavings < g.targetAmount)
+        .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0]
+        ?? goals[0]
     : null
 
   const suggestion = topGoal
@@ -131,6 +112,8 @@ const SavingsGoals: FC = () => {
   }
 
   const addMoneyGoal = goals.find(g => g.id === addMoneyGoalId) ?? null
+
+  if (loading) return <main><div className="loading">Loading savings goals...</div></main>
 
   return (
     <main>

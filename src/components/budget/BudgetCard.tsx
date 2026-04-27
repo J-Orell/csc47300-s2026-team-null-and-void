@@ -21,8 +21,8 @@ const BudgetCard: FC<BudgetCardProps> = ({ icon, name, limit, spent, onEdit, onD
   
   // Determine state based on percentage
   const getState = (): 'safe' | 'warning' | 'danger' => {
-    if (pct > 100) return 'danger'
-    if (pct >= 90) return 'warning'
+    if (pct >= 95) return 'danger'
+    if (pct >= 70) return 'warning'
     return 'safe'
   }
   
@@ -65,7 +65,7 @@ const BudgetCard: FC<BudgetCardProps> = ({ icon, name, limit, spent, onEdit, onD
 
       {/* Alerts */}
       {remain < 0 && <Badge variant="danger" size="small">⚠️ Over Budget</Badge>}
-      {remain >= 0 && pct >= 90 && <Badge variant="warning" size="small">⚠️ Near Limit</Badge>}
+      {remain >= 0 && pct >= 70 && <Badge variant="warning" size="small">⚠️ Near Limit</Badge>}
     </Card>
   )
 }

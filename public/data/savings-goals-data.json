@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "Vacation to Hawaii",
+    "targetAmount": 10000,
+    "currentSavings": 2500,
+    "deadline": "2026-12-31",
+    "createdDate": "2026-01-15"
+  },
+  {
+    "id": "2",
+    "name": "Emergency Fund",
+    "targetAmount": 15000,
+    "currentSavings": 8500,
+    "deadline": "2026-11-30",
+    "createdDate": "2026-02-01"
+  },
+  {
+    "id": "3",
+    "name": "New Laptop",
+    "targetAmount": 2000,
+    "currentSavings": 1800,
+    "deadline": "2026-06-15",
+    "createdDate": "2026-03-01"
+  }
+]

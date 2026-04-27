@@ -28,8 +28,8 @@ const ProgressBar: FC<ProgressBarProps> = ({
       return 'safe'
     } else {
       // For budgets: high = danger, low = safe
-      if (percentage >= 100) return 'danger'
-      if (percentage >= 90) return 'warning'
+      if (percentage >= 95) return 'danger'
+      if (percentage >= 70) return 'warning'
       return 'safe'
     }
   }

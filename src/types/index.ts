@@ -1,3 +1,4 @@
+// Dashboard types
 export interface MonthlyData {
   months: string[];
   income: number[];
@@ -21,6 +22,7 @@ export interface DashboardData {
   currentMonth: CurrentMonth;
 }
 
+// Transaction types
 export interface Transaction {
   id: string;
   date: string;
@@ -30,10 +32,44 @@ export interface Transaction {
   type: 'income' | 'expense';
 }
 
+// Budget types
 export interface Budget {
   id: string;
   icon: string;
   name: string;
   limit: number;
   spent: number;
+}
+
+// Settings types
+export interface UserSettings {
+  fullName: string;
+  email: string;
+  phone: string;
+  currency: string;
+  threshold: number;
+  dateFormat: string;
+  budgetCycleStart: string;
+}
+
+export interface NotificationSettings {
+  budgetAlerts: boolean;
+  weeklySummary: boolean;
+  transactionAlerts: boolean;
+  monthlyReport: boolean;
+}
+
+export interface SettingsData {
+  userSettings: UserSettings;
+  notifications: NotificationSettings;
+}
+
+// Savings Goals types
+export interface SavingsGoal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentSavings: number;
+  deadline: string;
+  createdDate: string;
 }

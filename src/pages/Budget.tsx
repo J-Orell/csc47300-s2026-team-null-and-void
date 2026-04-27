@@ -16,7 +16,6 @@ interface BudgetCategory extends BudgetType {
 const Budget: FC = () => {
   // Uses hook for data fetching
   const { data: fetchedBudgets, loading } = useDataFetch<Array<{ icon: string; name: string; limit: number; spent: number }>>('/data/budget-data.json')
-  
   const [budgets, setBudgets] = useState<BudgetCategory[]>([])
   const [editingBudget, setEditingBudget] = useState<BudgetCategory | null>(null)
   const [newCat, setNewCat] = useState({

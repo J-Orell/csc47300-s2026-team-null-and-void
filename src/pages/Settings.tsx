@@ -1,30 +1,72 @@
-import { FC } from 'react'
+import { FC, useState, useEffect } from 'react'
+import { PageHeader, Button, FormField } from '../components/common'
 import {
-  PageHeader,
-  Button,
-  FormField
-} from '../components/common'
-import {
-  SettingsSection,
-  NotificationToggle,
-  PaymentCard,
-  AccountActionCard
+  SettingsSection, NotificationToggle,
+  PaymentCard, AccountActionCard
 } from '../components/settings'
-import { useSettings, usePaymentCards } from '../hooks'
+import { useDataFetch, usePaymentCards } from '../hooks'
+import { SettingsData, UserSettings, NotificationSettings } from '../types'
 import '../styles/Settings.css'
 
 const Settings: FC = () => {
-  const {
-    settings,
-    notifications,
-    saved,
-    updateSetting,
-    toggleNotification,
-    saveSettings,
-    resetSettings
-  } = useSettings()
+  const { data: fetchedData, loading } = useDataFetch<SettingsData>('/data/settings-data.json')
+  
+  const [settings, setSettings] = useState<UserSettings>({
+    fullName: '',
+    email: '',
+    phone: '',
+    currency: 'USD',
+    threshold: 90,
+    dateFormat: 'mdy',
+    budgetCycleStart: '1'
+  })
 
+  const [notifications, setNotifications] = useState<NotificationSettings>({
+    budgetAlerts: true,
+    weeklySummary: false,
+    transactionAlerts: true,
+    monthlyReport: true
+  })
+
+  const [saved, setSaved] = useState(false)
   const { cards, removeCard } = usePaymentCards()
+
+  // Initialize state when data is fetched
+  useEffect(() => {
+    if (fetchedData) {
+      setSettings(fetchedData.userSettings)
+      setNotifications(fetchedData.notifications)
+    }
+  }, [fetchedData])
+
+  const updateSetting = <K extends keyof UserSettings>(
+    key: K,
+    value: UserSettings[K]
+  ) => {
+    setSettings(prev => ({ ...prev, [key]: value }))
+    setSaved(false)
+  }
+
+  const toggleNotification = (key: keyof NotificationSettings) => {
+    setNotifications(prev => ({ ...prev, [key]: !prev[key] }))
+    setSaved(false)
+  }
+
+  const saveSettings = () => {
+    console.log('Saving settings:', { settings, notifications })
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
+  const resetSettings = () => {
+    if (fetchedData) {
+      setSettings(fetchedData.userSettings)
+      setNotifications(fetchedData.notifications)
+      setSaved(false)
+    }
+  }
+
+  if (loading) return <main><div className="loading">Loading settings...</div></main>
 
   return (
     <main>

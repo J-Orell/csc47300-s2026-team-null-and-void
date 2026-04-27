@@ -1,0 +1,17 @@
+{
+  "userSettings": {
+    "fullName": "Raeesah Iram",
+    "email": "riram000@citymail.cuny.edu",
+    "phone": "(212) 555-0199",
+    "currency": "USD",
+    "threshold": 90,
+    "dateFormat": "mdy",
+    "budgetCycleStart": "1"
+  },
+  "notifications": {
+    "budgetAlerts": true,
+    "weeklySummary": true,
+    "transactionAlerts": false,
+    "monthlyReport": true
+  }
+}

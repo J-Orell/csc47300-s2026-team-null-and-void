@@ -1,18 +1,16 @@
 import { FC } from 'react'
-import useDashboardData from '../hooks/useDashboardData'
+import { useDataFetch } from '../hooks/useDataFetch'
+import { DashboardData } from '../types'
 import { getCurrentDate } from '../utils/helpers'
 import { PageHeader } from '../components/common'
 import {
-  ChartCard,
-  CategoryDetail,
-  DashboardSummary,
-  MonthlyChart,
-  CategoryChart
+  ChartCard, CategoryDetail, DashboardSummary,
+  MonthlyChart, CategoryChart
 } from '../components/dashboard'
 import '../styles/Dashboard.css'
 
 const Dashboard: FC = () => {
-  const { data, loading, error } = useDashboardData()
+  const { data, loading, error } = useDataFetch<DashboardData>('/data/dashboard-data.json')
 
   if (loading) return <main><div className="loading">Loading dashboard...</div></main>
   if (error) return <main><div className="error">Error loading dashboard: {error.message}</div></main>
