@@ -110,41 +110,62 @@ const CategoryChart: FC<CategoryChartProps> = ({ data }) => {
   }, [data, hiddenCategories])
 
   return (
-    <div>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      minHeight: '300px',
+      gap: '1rem',
+      width: '100%',
+      overflow: 'hidden'
+    }}>
       <div style={{
         position: 'relative',
-        height: '300px',
-        marginBottom: '0.5rem'
+        flex: '1 1 auto',
+        minHeight: '200px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        overflow: 'hidden'
       }}>
-        <canvas ref={canvasRef} />
+        <canvas ref={canvasRef} style={{
+          maxWidth: '100%',
+          maxHeight: '100%'
+        }} />
       </div>
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
         gap: '0.75rem',
-        marginTop: '1rem',
         justifyContent: 'center',
-        padding: '0 1rem',
-        maxWidth: '100%'
+        padding: '0 0.5rem',
+        width: '100%',
+        boxSizing: 'border-box',
+        flex: '0 1 auto',
+        minHeight: 'auto',
+        overflow: 'visible'
       }}>
         {categoryLabels.map((category) => (
           <button
             key={category}
             onClick={() => toggleCategory(category)}
             style={{
-              padding: '0.6rem 1.2rem',
+              padding: '0.3rem 0.6rem',
               border: hiddenCategories.has(category) ? '1px solid #c8e6c9' : '2px solid #2e7d32',
               borderRadius: '8px',
               background: hiddenCategories.has(category) ? '#f0f0f0' : '#ffffff',
               color: hiddenCategories.has(category) ? '#999999' : '#2e7d32',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '0.9rem',
+              fontSize: '0.75rem',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               opacity: hiddenCategories.has(category) ? 0.5 : 1,
               textDecoration: hiddenCategories.has(category) ? 'line-through' : 'none',
               boxShadow: hiddenCategories.has(category) ? 'none' : '0 2px 8px rgba(46, 125, 50, 0.1)',
-              transform: hiddenCategories.has(category) ? 'scale(0.95)' : 'scale(1)'
+              transform: hiddenCategories.has(category) ? 'scale(0.95)' : 'scale(1)',
+              whiteSpace: 'nowrap',
+              flex: '0 1 auto'
             }}
             onMouseEnter={(e) => {
               if (!hiddenCategories.has(category)) {

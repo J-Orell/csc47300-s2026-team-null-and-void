@@ -510,11 +510,18 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .dashboard-container .chart-container canvas {
   width: 100% !important;
   height: 280px !important;
+}
+
+.dashboard-container .chart-container.pie-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 300px;
 }
 
 /* ═══════════════════════════════════════════════════════════════ */
