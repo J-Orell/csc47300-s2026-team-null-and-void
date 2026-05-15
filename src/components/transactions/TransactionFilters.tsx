@@ -3,10 +3,16 @@ import { FormField, Button } from '../common'
 
 type FilterType = 'all' | 'income' | 'expense'
 
+interface SelectOption {
+  value: string
+  label: string
+}
+
 interface TransactionFiltersProps {
   filterDate: string
   filterCategory: string
   filterType: FilterType
+  categoryOptions?: SelectOption[]
   onDateChange: (date: string) => void
   onCategoryChange: (category: string) => void
   onTypeChange: (type: FilterType) => void
@@ -21,11 +27,21 @@ const TransactionFilters: FC<TransactionFiltersProps> = ({
   filterDate,
   filterCategory,
   filterType,
+  categoryOptions,
   onDateChange,
   onCategoryChange,
   onTypeChange,
   onApply
 }) => {
+  const categories = categoryOptions ?? [
+    { value: 'all', label: 'All Categories' },
+    { value: 'income', label: 'Income' },
+    { value: 'food', label: 'Food' },
+    { value: 'utilities', label: 'Utilities' },
+    { value: 'entertainment', label: 'Entertainment' },
+    { value: 'transport', label: 'Transport' },
+    { value: 'shopping', label: 'Shopping' },
+  ]
   return (
     <div className="filter-bar">
       <FormField
@@ -39,15 +55,7 @@ const TransactionFilters: FC<TransactionFiltersProps> = ({
         type="select"
         value={filterCategory}
         onChange={onCategoryChange}
-        options={[
-          { value: 'all', label: 'All Categories' },
-          { value: 'income', label: 'Income' },
-          { value: 'food', label: 'Food' },
-          { value: 'utilities', label: 'Utilities' },
-          { value: 'entertainment', label: 'Entertainment' },
-          { value: 'transport', label: 'Transport' },
-          { value: 'shopping', label: 'Shopping' }
-        ]}
+        options={categories}
       />
       <FormField
         label="Type"

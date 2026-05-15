@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { Link } from 'react-router-dom'
 import { Transaction } from '../../types'
 import { IconButton, Badge } from '../common'
 
@@ -26,7 +27,9 @@ const TransactionRow: FC<TransactionRowProps> = ({ transaction, onEdit, onDelete
         {formatDate(transaction.date)}
       </td>
       <td className="transaction-description-cell">
-        {transaction.description}
+        <Link className="admin-link" to={`/transactions/${transaction.id}`}>
+          {transaction.description}
+        </Link>
       </td>
       <td>
         <Badge variant="category" className={`badge-${transaction.category.toLowerCase()}`}>

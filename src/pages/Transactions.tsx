@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, FormEvent } from 'react'
+import { FC, useState, useEffect, FormEvent, useCallback } from 'react'
 import { Transaction } from '../types'
 import {
   PageHeader, Button, Modal,
@@ -8,154 +8,191 @@ import {
   TransactionTable, TransactionFilters,
   Pagination, TransactionsSummary
 } from '../components/transactions'
-import { useFilter, usePagination, useDataFetch } from '../hooks'
+import { useFilter, usePagination } from '../hooks'
+import { transactionAPI } from '../utils/api'
+import { ApiTransaction } from '../types/api'
+import {
+  getApiErrorMessage,
+  mapTransactionFromApi,
+  mapTransactionToApi,
+} from '../utils/mappers'
+import {
+  TRANSACTION_CATEGORIES,
+  categorySelectOptions,
+} from '../constants/categories'
 import '../styles/Transactions.css'
 
 type FilterType = 'all' | 'income' | 'expense'
 const ROWS_PER_PAGE = 5
 
 const Transactions: FC = () => {
-  // Fetch initial data
-  const { data: fetchedTransactions, loading: initialLoading } = useDataFetch<Transaction[]>('/data/transactions-data.json')
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
-  const [nextId, setNextId] = useState(1)
-
-  // Modal state
+  const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingTx, setEditingTx] = useState<Transaction | null>(null)
+  const [saving, setSaving] = useState(false)
 
-  // Form state
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     description: '',
-    category: 'food',
-    amount: ''
+    category: 'Food',
+    amount: '',
   })
 
-  // Initialize transactions when data is fetched
-  useEffect(() => {
-    if (fetchedTransactions && transactions.length == 0) {
-      setTransactions(fetchedTransactions)
-      const maxId = fetchedTransactions.reduce((m, t) => Math.max(m, parseInt(t.id) || 0), 0)
-      setNextId(maxId + 1)
+  const loadTransactions = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await transactionAPI.getUserTransactions()
+      const list = (res.data.transactions as ApiTransaction[]).map(
+        mapTransactionFromApi
+      )
+      setTransactions(list)
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to load transactions'))
+    } finally {
       setLoading(false)
     }
-  }, [fetchedTransactions])
+  }, [])
 
-  // Reset form when modal opens/closes
+  useEffect(() => {
+    loadTransactions()
+  }, [loadTransactions])
+
   useEffect(() => {
     if (showModal && editingTx) {
       setFormData({
         date: editingTx.date,
         description: editingTx.description,
         category: editingTx.category,
-        amount: String(editingTx.amount)
+        amount: String(editingTx.amount),
       })
     } else if (showModal) {
       setFormData({
         date: new Date().toISOString().split('T')[0],
         description: '',
-        category: 'food',
-        amount: ''
+        category: 'Food',
+        amount: '',
       })
     }
   }, [showModal, editingTx])
 
-  /* Uses hook for filter */
   const {
     filteredItems: filtered,
     filters,
     updateFilter,
-    resetFilters
-  } = useFilter<Transaction>(
-    transactions,
-    (transaction, filterValues) => {
-      // Type filter
-      const typeFilter = filterValues.filterType || 'all'
-      if (typeFilter !== 'all' && transaction.type !== typeFilter) {
-        return false
-      }
+  } = useFilter<Transaction>(transactions, (transaction, filterValues) => {
+    const typeFilter = filterValues.filterType || 'all'
+    if (typeFilter !== 'all' && transaction.type !== typeFilter) return false
 
-      // Category filter
-      const categoryFilter = filterValues.filterCategory || 'all'
-      if (categoryFilter !== 'all' && transaction.category.toLowerCase() !== categoryFilter) {
-        return false
-      }
-
-      // Date filter
-      const dateFilter = filterValues.filterDate || ''
-      if (dateFilter) {
-        const txDate = new Date(transaction.date + 'T00:00:00')
-        const filterDate = new Date(dateFilter + 'T00:00:00')
-        if (txDate < filterDate) {
-          return false
-        }
-      }
-
-      return true
+    const categoryFilter = filterValues.filterCategory || 'all'
+    if (
+      categoryFilter !== 'all' &&
+      transaction.category.toLowerCase() !== categoryFilter.toLowerCase()
+    ) {
+      return false
     }
-  )
 
-  // Sort filtered transactions by date
+    const dateFilter = filterValues.filterDate || ''
+    if (dateFilter) {
+      const txDate = new Date(transaction.date + 'T00:00:00')
+      const filterDate = new Date(dateFilter + 'T00:00:00')
+      if (txDate < filterDate) return false
+    }
+
+    return true
+  })
+
   const sortedFiltered = [...filtered].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 
-  /* Uses pagination hook */
   const {
     currentPage,
     totalPages,
     paginatedItems: pageData,
-    setCurrentPage
+    setCurrentPage,
   } = usePagination(sortedFiltered, ROWS_PER_PAGE)
 
-  /* Summary */
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
-  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+  const totalIncome = transactions
+    .filter(t => t.type === 'income')
+    .reduce((s, t) => s + t.amount, 0)
+  const totalExpenses = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((s, t) => s + t.amount, 0)
   const balance = totalIncome - totalExpenses
 
-  /* CRUD */
-  const openAdd = () => { setEditingTx(null); setShowModal(true) }
-  const openEdit = (tx: Transaction) => { setEditingTx(tx); setShowModal(true) }
-  const closeModal = () => { setShowModal(false); setEditingTx(null) }
+  const openAdd = () => {
+    setEditingTx(null)
+    setShowModal(true)
+  }
+  const openEdit = (tx: Transaction) => {
+    setEditingTx(tx)
+    setShowModal(true)
+  }
+  const closeModal = () => {
+    setShowModal(false)
+    setEditingTx(null)
+  }
 
-  const handleSave = (e: FormEvent) => {
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault()
-    if (!formData.description.trim()) { alert('Please enter a description.'); return }
-    const amt = parseFloat(formData.amount)
-    if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return }
-
-    const type: 'income' | 'expense' = formData.category === 'income' ? 'income' : 'expense'
-
-    if (editingTx) {
-      setTransactions(prev => prev.map(t =>
-        t.id === editingTx.id
-          ? { ...t, date: formData.date, description: formData.description, category: formData.category, amount: amt, type }
-          : t
-      ))
-    } else {
-      const newTx: Transaction = {
-        id: String(nextId),
-        date: formData.date,
-        description: formData.description,
-        category: formData.category,
-        amount: amt,
-        type
-      }
-      setTransactions(prev => [...prev, newTx])
-      setNextId(n => n + 1)
+    if (!formData.description.trim()) {
+      alert('Please enter a description.')
+      return
     }
-    closeModal()
+    const amt = parseFloat(formData.amount)
+    if (!amt || amt <= 0) {
+      alert('Please enter a valid amount.')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const payload = mapTransactionToApi({
+        description: formData.description.trim(),
+        amount: amt,
+        category: formData.category,
+        date: formData.date,
+      })
+
+      if (editingTx) {
+        await transactionAPI.updateTransaction(editingTx.id, payload)
+      } else {
+        await transactionAPI.createTransaction(payload)
+      }
+      await loadTransactions()
+      closeModal()
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to save transaction'))
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleDelete = (id: string) => {
-    setTransactions(prev => prev.filter(t => t.id !== id))
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this transaction?')) return
+    try {
+      await transactionAPI.deleteTransaction(id)
+      await loadTransactions()
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to delete transaction'))
+    }
   }
 
-  const handleApplyFilter = () => setCurrentPage(1)
+  const categoryFilterOptions = [
+    { value: 'all', label: 'All Categories' },
+    ...categorySelectOptions(TRANSACTION_CATEGORIES),
+  ]
 
-  if (loading || initialLoading) return <main><div className="loading">Loading transactions...</div></main>
+  if (loading) {
+    return (
+      <main>
+        <div className="loading">Loading transactions...</div>
+      </main>
+    )
+  }
 
   return (
     <main>
@@ -165,25 +202,25 @@ const Transactions: FC = () => {
           subtitle="View and manage all your income and expenses"
         />
 
-        {/* Summary Cards */}
+        {error && <div className="auth-error-message">{error}</div>}
+
         <TransactionsSummary
           totalIncome={totalIncome}
           totalExpenses={totalExpenses}
           balance={balance}
         />
 
-        {/* Filter Bar */}
         <TransactionFilters
           filterDate={(filters.filterDate as string) || ''}
           filterCategory={(filters.filterCategory as string) || 'all'}
           filterType={(filters.filterType as FilterType) || 'all'}
-          onDateChange={(val) => updateFilter('filterDate', val)}
-          onCategoryChange={(val) => updateFilter('filterCategory', val)}
-          onTypeChange={(val) => updateFilter('filterType', val)}
-          onApply={handleApplyFilter}
+          categoryOptions={categoryFilterOptions}
+          onDateChange={val => updateFilter('filterDate', val)}
+          onCategoryChange={val => updateFilter('filterCategory', val)}
+          onTypeChange={val => updateFilter('filterType', val)}
+          onApply={() => setCurrentPage(1)}
         />
 
-        {/* Table */}
         {filtered.length === 0 ? (
           <EmptyState
             icon="📄"
@@ -210,11 +247,15 @@ const Transactions: FC = () => {
           </div>
         )}
 
-        <Button variant="primary" fullWidth onClick={openAdd} className="add-transaction-btn">
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={openAdd}
+          className="add-transaction-btn"
+        >
           + Add New Transaction
         </Button>
 
-        {/* Modal */}
         <Modal
           isOpen={showModal}
           onClose={closeModal}
@@ -225,14 +266,14 @@ const Transactions: FC = () => {
               label="Date"
               type="date"
               value={formData.date}
-              onChange={(val) => setFormData({ ...formData, date: val })}
+              onChange={val => setFormData({ ...formData, date: val })}
               required
             />
             <FormField
               label="Description"
               type="text"
               value={formData.description}
-              onChange={(val) => setFormData({ ...formData, description: val })}
+              onChange={val => setFormData({ ...formData, description: val })}
               placeholder="e.g. Grocery shopping"
               required
             />
@@ -240,29 +281,36 @@ const Transactions: FC = () => {
               label="Category"
               type="select"
               value={formData.category}
-              onChange={(val) => setFormData({ ...formData, category: val })}
-              options={[
-                { value: 'income', label: 'Income' },
-                { value: 'food', label: 'Food' },
-                { value: 'utilities', label: 'Utilities' },
-                { value: 'entertainment', label: 'Entertainment' },
-                { value: 'transport', label: 'Transport' },
-                { value: 'shopping', label: 'Shopping' }
-              ]}
+              onChange={val => setFormData({ ...formData, category: val })}
+              options={categorySelectOptions(TRANSACTION_CATEGORIES)}
             />
             <FormField
               label="Amount ($)"
               type="number"
               value={formData.amount}
-              onChange={(val) => setFormData({ ...formData, amount: val })}
+              onChange={val => setFormData({ ...formData, amount: val })}
               placeholder="0.00"
               min="0.01"
               step="0.01"
               required
             />
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-              <Button type="submit" variant="primary" className="modal-form-submit">Save</Button>
-              <Button type="button" variant="secondary" onClick={closeModal} className="modal-form-cancel">Cancel</Button>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={saving}
+                className="modal-form-submit"
+              >
+                Save
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={closeModal}
+                className="modal-form-cancel"
+              >
+                Cancel
+              </Button>
             </div>
           </form>
         </Modal>

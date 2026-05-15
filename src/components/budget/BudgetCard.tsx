@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { Link } from 'react-router-dom'
 import { Card, IconButton, ProgressBar, Badge } from '../common'
 
 interface BudgetCardProps {
@@ -15,7 +16,7 @@ interface BudgetCardProps {
  * BudgetCard - Displays a single budget category with progress
  * Shows spending progress, remaining amount, and action buttons
  */
-const BudgetCard: FC<BudgetCardProps> = ({ icon, name, limit, spent, onEdit, onDelete }) => {
+const BudgetCard: FC<BudgetCardProps> = ({ id, icon, name, limit, spent, onEdit, onDelete }) => {
   const pct = Math.min((spent / limit) * 100, 100)
   const remain = limit - spent
   
@@ -34,7 +35,9 @@ const BudgetCard: FC<BudgetCardProps> = ({ icon, name, limit, spent, onEdit, onD
       <div className="budget-card-header">
         <div className="budget-card-title">
           <span className="budget-card-icon">{icon}</span>
-          <span className="budget-card-name">{name}</span>
+          <Link className="admin-link budget-card-name" to={`/budgets/${id}`}>
+            {name}
+          </Link>
         </div>
         <div className="budget-card-actions">
           <IconButton icon="✏️" label="Edit" onClick={onEdit} />

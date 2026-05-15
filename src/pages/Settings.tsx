@@ -1,16 +1,26 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useCallback } from 'react'
 import { PageHeader, Button, FormField } from '../components/common'
 import {
   SettingsSection, NotificationToggle,
   PaymentCard, AccountActionCard
 } from '../components/settings'
-import { useDataFetch, usePaymentCards } from '../hooks'
-import { SettingsData, UserSettings, NotificationSettings } from '../types'
+import { settingsAPI, userAPI } from '../utils/api'
+import { useAuth } from '../context/AuthContext'
+import { getApiErrorMessage } from '../utils/mappers'
+import { NotificationSettings, UserSettings } from '../types'
 import '../styles/Settings.css'
 
+interface PaymentCardUi {
+  id: string
+  type: 'visa' | 'mc'
+  lastFour: string
+  expiryDate: string
+}
+
 const Settings: FC = () => {
-  const { data: fetchedData, loading } = useDataFetch<SettingsData>('/data/settings-data.json')
-  
+  const { user, login } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [settings, setSettings] = useState<UserSettings>({
     fullName: '',
     email: '',
@@ -18,31 +28,69 @@ const Settings: FC = () => {
     currency: 'USD',
     threshold: 90,
     dateFormat: 'mdy',
-    budgetCycleStart: '1'
+    budgetCycleStart: '1',
   })
-
   const [notifications, setNotifications] = useState<NotificationSettings>({
     budgetAlerts: true,
     weeklySummary: false,
     transactionAlerts: true,
-    monthlyReport: true
+    monthlyReport: true,
   })
-
+  const [cards, setCards] = useState<PaymentCardUi[]>([])
   const [saved, setSaved] = useState(false)
-  const { cards, removeCard } = usePaymentCards()
+  const [saving, setSaving] = useState(false)
 
-  // Initialize state when data is fetched
-  useEffect(() => {
-    if (fetchedData) {
-      setSettings(fetchedData.userSettings)
-      setNotifications(fetchedData.notifications)
+  const loadSettings = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const [settingsRes, profileRes, cardsRes] = await Promise.all([
+        settingsAPI.getSettings(),
+        userAPI.getProfile(),
+        settingsAPI.getPaymentMethods(),
+      ])
+
+      const apiSettings = settingsRes.data.settings
+      const profile = profileRes.data.user
+
+      setSettings({
+        fullName: [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.username,
+        email: profile.email,
+        phone: '',
+        currency: apiSettings.currency || 'USD',
+        threshold: 90,
+        dateFormat: 'mdy',
+        budgetCycleStart: '1',
+      })
+
+      setNotifications({
+        budgetAlerts: apiSettings.monthlyBudgetReminder ?? true,
+        weeklySummary: apiSettings.emailNotifications ?? false,
+        transactionAlerts: apiSettings.notificationsEnabled ?? true,
+        monthlyReport: apiSettings.savingsGoalReminder ?? true,
+      })
+
+      const methods = cardsRes.data.paymentMethods || []
+      setCards(
+        methods.map((m: { id: string; type: string; lastDigits: string }) => ({
+          id: m.id,
+          type: m.type === 'credit_card' || m.type === 'visa' ? 'visa' : 'mc',
+          lastFour: m.lastDigits,
+          expiryDate: '—',
+        }))
+      )
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to load settings'))
+    } finally {
+      setLoading(false)
     }
-  }, [fetchedData])
+  }, [])
 
-  const updateSetting = <K extends keyof UserSettings>(
-    key: K,
-    value: UserSettings[K]
-  ) => {
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
+
+  const updateSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
     setSettings(prev => ({ ...prev, [key]: value }))
     setSaved(false)
   }
@@ -52,21 +100,96 @@ const Settings: FC = () => {
     setSaved(false)
   }
 
-  const saveSettings = () => {
-    console.log('Saving settings:', { settings, notifications })
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
-  }
+  const saveSettings = async () => {
+    setSaving(true)
+    try {
+      const nameParts = settings.fullName.trim().split(/\s+/)
+      const firstName = nameParts[0] || ''
+      const lastName = nameParts.slice(1).join(' ')
 
-  const resetSettings = () => {
-    if (fetchedData) {
-      setSettings(fetchedData.userSettings)
-      setNotifications(fetchedData.notifications)
-      setSaved(false)
+      await userAPI.updateProfile({
+        firstName,
+        lastName,
+        email: settings.email,
+      })
+
+      await settingsAPI.updateSettings({
+        currency: settings.currency,
+        notificationsEnabled: notifications.transactionAlerts,
+        emailNotifications: notifications.weeklySummary,
+        monthlyBudgetReminder: notifications.budgetAlerts,
+        savingsGoalReminder: notifications.monthlyReport,
+      })
+
+      const token = localStorage.getItem('authToken')
+      if (token && user) {
+        login(token, {
+          ...user,
+          email: settings.email,
+          firstName,
+          lastName,
+        })
+      }
+
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to save settings'))
+    } finally {
+      setSaving(false)
     }
   }
 
-  if (loading) return <main><div className="loading">Loading settings...</div></main>
+  const resetSettings = () => {
+    loadSettings()
+    setSaved(false)
+  }
+
+  const removeCard = async (id: string) => {
+    try {
+      await settingsAPI.deletePaymentMethod(id)
+      setCards(prev => prev.filter(c => c.id !== id))
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to remove card'))
+    }
+  }
+
+  const addCard = async () => {
+    const name = window.prompt('Card nickname (e.g. Chase Visa)')
+    if (!name) return
+    const lastDigits = window.prompt('Last 4 digits')
+    if (!lastDigits || lastDigits.length !== 4) {
+      alert('Enter exactly 4 digits')
+      return
+    }
+    try {
+      const res = await settingsAPI.addPaymentMethod({
+        type: 'credit_card',
+        name,
+        lastDigits,
+      })
+      const method = res.data.paymentMethod
+      setCards(prev => [
+        ...prev,
+        {
+          id: method.id,
+          type: 'visa',
+          lastFour: method.lastDigits,
+          expiryDate: '—',
+        },
+      ])
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to add card'))
+    }
+  }
+
+  if (loading) {
+    return (
+      <main>
+        <div className="loading">Loading settings...</div>
+      </main>
+    )
+  }
 
   return (
     <main>
@@ -76,8 +199,9 @@ const Settings: FC = () => {
           subtitle="Manage your account preferences and personal information"
         />
 
+        {error && <div className="auth-error-message">{error}</div>}
+
         <form onSubmit={e => e.preventDefault()}>
-          {/* Personal Information */}
           <SettingsSection title="Personal Information">
             <div className="settings-grid">
               <div className="settings-full-row">
@@ -85,46 +209,45 @@ const Settings: FC = () => {
                   label="Full Name"
                   type="text"
                   value={settings.fullName}
-                  onChange={(val) => updateSetting('fullName', val)}
+                  onChange={val => updateSetting('fullName', val)}
                 />
               </div>
               <FormField
                 label="Email Address"
                 type="email"
                 value={settings.email}
-                onChange={(val) => updateSetting('email', val)}
+                onChange={val => updateSetting('email', val)}
               />
               <FormField
                 label="Phone Number"
                 type="tel"
                 value={settings.phone}
-                onChange={(val) => updateSetting('phone', val)}
-                placeholder="(212) 555-0199"
+                onChange={val => updateSetting('phone', val)}
+                placeholder="(optional — not stored on server yet)"
               />
             </div>
           </SettingsSection>
 
-          {/* Preferences */}
           <SettingsSection title="Preferences">
             <div className="settings-grid">
               <FormField
                 label="Local Currency"
                 type="select"
                 value={settings.currency}
-                onChange={(val) => updateSetting('currency', val)}
+                onChange={val => updateSetting('currency', val)}
                 options={[
                   { value: 'USD', label: 'USD ($)' },
                   { value: 'EUR', label: 'EUR (€)' },
                   { value: 'GBP', label: 'GBP (£)' },
                   { value: 'JPY', label: 'JPY (¥)' },
-                  { value: 'CAD', label: 'CAD (C$)' }
+                  { value: 'CAD', label: 'CAD (C$)' },
                 ]}
               />
               <FormField
                 label="Spending Alert Threshold (%)"
                 type="number"
                 value={settings.threshold}
-                onChange={(val) => updateSetting('threshold', Number(val))}
+                onChange={val => updateSetting('threshold', Number(val))}
                 min="1"
                 max="100"
               />
@@ -132,28 +255,27 @@ const Settings: FC = () => {
                 label="Date Format"
                 type="select"
                 value={settings.dateFormat}
-                onChange={(val) => updateSetting('dateFormat', val)}
+                onChange={val => updateSetting('dateFormat', val)}
                 options={[
                   { value: 'mdy', label: 'MM/DD/YYYY' },
                   { value: 'dmy', label: 'DD/MM/YYYY' },
-                  { value: 'ymd', label: 'YYYY-MM-DD' }
+                  { value: 'ymd', label: 'YYYY-MM-DD' },
                 ]}
               />
               <FormField
                 label="Budget Cycle Start"
                 type="select"
                 value={settings.budgetCycleStart}
-                onChange={(val) => updateSetting('budgetCycleStart', val)}
+                onChange={val => updateSetting('budgetCycleStart', val)}
                 options={[
                   { value: '1', label: '1st of month' },
                   { value: '15', label: '15th of month' },
-                  { value: 'last', label: 'Last day of month' }
+                  { value: 'last', label: 'Last day of month' },
                 ]}
               />
             </div>
           </SettingsSection>
 
-          {/* Notifications */}
           <SettingsSection title="Notifications">
             <div className="notification-options">
               <NotificationToggle
@@ -183,7 +305,6 @@ const Settings: FC = () => {
             </div>
           </SettingsSection>
 
-          {/* Payment Methods */}
           <SettingsSection title="Payment Methods">
             <div className="card-list">
               {cards.map(card => (
@@ -196,12 +317,11 @@ const Settings: FC = () => {
                 />
               ))}
             </div>
-            <Button variant="primary" className="btn-add-card">
+            <Button variant="primary" className="btn-add-card" onClick={addCard}>
               + Add Payment Method
             </Button>
           </SettingsSection>
 
-          {/* Account Management */}
           <SettingsSection title="Account Management">
             <div className="account-actions">
               <AccountActionCard
@@ -210,7 +330,7 @@ const Settings: FC = () => {
                 actionLabel="Export"
                 buttonVariant="primary"
                 buttonClassName="btn-action-export"
-                onAction={() => alert('Exporting data...')}
+                onAction={() => alert('Export coming soon')}
               />
               <AccountActionCard
                 title="Pause Account"
@@ -218,7 +338,7 @@ const Settings: FC = () => {
                 actionLabel="Pause"
                 buttonVariant="secondary"
                 buttonClassName="btn-action-pause"
-                onAction={() => alert('Pausing account...')}
+                onAction={() => alert('Pause coming soon')}
               />
               <AccountActionCard
                 title="Delete Account"
@@ -227,17 +347,20 @@ const Settings: FC = () => {
                 variant="danger"
                 buttonVariant="danger"
                 onAction={() => {
-                  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-                    alert('Account deleted')
+                  if (
+                    window.confirm(
+                      'Are you sure you want to delete your account? This cannot be undone.'
+                    )
+                  ) {
+                    alert('Contact admin to delete account')
                   }
                 }}
               />
             </div>
           </SettingsSection>
 
-          {/* Save / Discard Bar */}
           <div className="save-bar">
-            <Button variant="primary" onClick={saveSettings} size="large">
+            <Button variant="primary" onClick={saveSettings} size="large" loading={saving}>
               Save Changes
             </Button>
             <Button variant="secondary" onClick={resetSettings} size="large">

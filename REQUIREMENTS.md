@@ -28,23 +28,3 @@
 ```bash
 npm install
 ```
-
-## Commands
-
-```bash
-npm run dev       # Start development server (http://localhost:5173)
-npm run build     # Build for production
-npm run preview   # Preview production build
-```
-
-## Project Stack
-
-- **Frontend**: React 18 + TypeScript
-- **Routing**: React Router v6
-- **Charts**: Chart.js
-- **Build Tool**: Vite
-- **Styling**: CSS
-
-## Required Data
-
-Place `/data/dashboard-data.json` with dashboard data (monthlyData, categoryBreakdown, currentMonth)

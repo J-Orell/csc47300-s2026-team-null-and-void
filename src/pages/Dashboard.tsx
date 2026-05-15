@@ -1,5 +1,4 @@
-import { FC } from 'react'
-import { useDataFetch } from '../hooks/useDataFetch'
+import { FC, useCallback, useEffect, useState } from 'react'
 import { DashboardData } from '../types'
 import { getCurrentDate } from '../utils/helpers'
 import { PageHeader } from '../components/common'
@@ -7,29 +6,69 @@ import {
   ChartCard, CategoryDetail, DashboardSummary,
   MonthlyChart, CategoryChart
 } from '../components/dashboard'
+import { transactionAPI } from '../utils/api'
+import { ApiTransaction } from '../types/api'
+import { buildDashboardFromTransactions, getApiErrorMessage } from '../utils/mappers'
 import '../styles/Dashboard.css'
 
 const Dashboard: FC = () => {
-  const { data, loading, error } = useDataFetch<DashboardData>('/data/dashboard-data.json')
+  const [data, setData] = useState<DashboardData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  if (loading) return <main><div className="loading">Loading dashboard...</div></main>
-  if (error) return <main><div className="error">Error loading dashboard: {error.message}</div></main>
-  if (!data) return <main><div className="error">No data available</div></main>
+  const loadDashboard = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await transactionAPI.getUserTransactions()
+      const transactions = res.data.transactions as ApiTransaction[]
+      setData(buildDashboardFromTransactions(transactions))
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to load dashboard'))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  // Calculate category breakdown data
+  useEffect(() => {
+    loadDashboard()
+  }, [loadDashboard])
+
+  if (loading) {
+    return (
+      <main>
+        <div className="loading">Loading dashboard...</div>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main>
+        <div className="error">Error loading dashboard: {error}</div>
+      </main>
+    )
+  }
+
+  if (!data) {
+    return (
+      <main>
+        <div className="error">No data available</div>
+      </main>
+    )
+  }
+
   const categoryEntries = Object.entries(data.categoryBreakdown)
   const total = categoryEntries.reduce((sum, [, amount]) => sum + amount, 0)
 
   return (
     <main className="dashboard-container">
-      {/* Page Header */}
       <PageHeader
         title="Financial Overview"
         subtitle="Monitor your income, expenses, and savings at a glance"
         extra={getCurrentDate()}
       />
 
-      {/* Dashboard Summary */}
       <DashboardSummary
         totalIncome={data.currentMonth.totalIncome}
         totalExpenses={data.currentMonth.totalExpenses}
@@ -37,12 +76,8 @@ const Dashboard: FC = () => {
         savingsRate={data.currentMonth.savingsRate}
       />
 
-      {/* Charts Section */}
       <div className="charts-section">
-        <ChartCard
-          title="Monthly Income vs Expenses"
-          subtitle="6-month comparison"
-        >
+        <ChartCard title="Monthly Income vs Expenses" subtitle="6-month comparison">
           <MonthlyChart data={data.monthlyData} />
         </ChartCard>
 
@@ -55,22 +90,25 @@ const Dashboard: FC = () => {
         </ChartCard>
       </div>
 
-      {/* Expense Categories */}
       <div className="category-details">
         <h3 className="section-title">Expense Categories</h3>
-        <div className="category-list">
-          {categoryEntries.map(([name, amount]) => {
-            const percentage = ((amount / total) * 100).toFixed(1)
-            return (
-              <CategoryDetail
-                key={name}
-                name={name}
-                amount={amount}
-                percentage={parseFloat(percentage)}
-              />
-            )
-          })}
-        </div>
+        {categoryEntries.length === 0 ? (
+          <p>No expenses recorded this month yet.</p>
+        ) : (
+          <div className="category-list">
+            {categoryEntries.map(([name, amount]) => {
+              const percentage = total > 0 ? ((amount / total) * 100).toFixed(1) : '0'
+              return (
+                <CategoryDetail
+                  key={name}
+                  name={name}
+                  amount={amount}
+                  percentage={parseFloat(percentage)}
+                />
+              )
+            })}
+          </div>
+        )}
       </div>
     </main>
   )

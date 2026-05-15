@@ -1,41 +1,55 @@
-import { FC, useState, useEffect, FormEvent } from 'react'
-import { Budget as BudgetType } from '../types'
+import { FC, useState, useEffect, FormEvent, useCallback } from 'react'
 import {
   PageHeader, Modal, FormField,
   EmptyState, CreateFormSection, Button
 } from '../components/common'
 import { BudgetCard, BudgetSummary } from '../components/budget'
-import { useDataFetch } from '../hooks'
+import { budgetAPI } from '../utils/api'
+import { ApiBudget } from '../types/api'
+import {
+  BudgetCardData,
+  getApiErrorMessage,
+  mapBudgetFromApi,
+} from '../utils/mappers'
+import { BUDGET_CATEGORIES, categorySelectOptions } from '../constants/categories'
 import '../styles/Budget.css'
 
-interface BudgetCategory extends BudgetType {
-  id: string
-  icon: string
-}
-
 const Budget: FC = () => {
-  // Uses hook for data fetching
-  const { data: fetchedBudgets, loading } = useDataFetch<Array<{ icon: string; name: string; limit: number; spent: number }>>('/data/budget-data.json')
-  const [budgets, setBudgets] = useState<BudgetCategory[]>([])
-  const [editingBudget, setEditingBudget] = useState<BudgetCategory | null>(null)
+  const [budgets, setBudgets] = useState<BudgetCardData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [editingBudget, setEditingBudget] = useState<BudgetCardData | null>(null)
+  const [saving, setSaving] = useState(false)
   const [newCat, setNewCat] = useState({
-    icon: '🛒',
+    category: 'Food',
     name: '',
     limit: '',
-    spent: ''
+    spent: '',
+    month: new Date().toISOString().slice(0, 7) + '-01',
   })
 
-  // Update local state when data is fetched
-  useEffect(() => {
-    if (fetchedBudgets && budgets.length === 0) {
-      setBudgets(fetchedBudgets.map((b, i) => ({ ...b, id: String(i + 1) })))
+  const loadBudgets = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await budgetAPI.getUserBudgets()
+      const list = (res.data.budgets as ApiBudget[]).map(mapBudgetFromApi)
+      setBudgets(list)
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to load budgets'))
+    } finally {
+      setLoading(false)
     }
-  }, [fetchedBudgets])
+  }, [])
 
-  const handleAdd = (e: FormEvent) => {
+  useEffect(() => {
+    loadBudgets()
+  }, [loadBudgets])
+
+  const handleAdd = async (e: FormEvent) => {
     e.preventDefault()
     if (!newCat.name.trim()) {
-      alert('Please enter a category name.')
+      alert('Please enter a budget name.')
       return
     }
     const limit = parseFloat(newCat.limit)
@@ -45,34 +59,75 @@ const Budget: FC = () => {
     }
     const spent = parseFloat(newCat.spent) || 0
 
-    const nextId = String(Date.now())
-    setBudgets(prev => [...prev, {
-      id: nextId,
-      icon: newCat.icon,
-      name: newCat.name.trim(),
-      limit,
-      spent
-    }])
-    setNewCat({ icon: '🛒', name: '', limit: '', spent: '' })
+    setSaving(true)
+    try {
+      await budgetAPI.createBudget({
+        name: newCat.name.trim(),
+        category: newCat.category,
+        budgetedAmount: limit,
+        month: newCat.month,
+        spentAmount: spent,
+      })
+      await loadBudgets()
+      setNewCat({
+        category: 'Food',
+        name: '',
+        limit: '',
+        spent: '',
+        month: new Date().toISOString().slice(0, 7) + '-01',
+      })
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to create budget'))
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleDelete = (id: string) => {
-    setBudgets(prev => prev.filter(b => b.id !== id))
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this budget?')) return
+    try {
+      await budgetAPI.deleteBudget(id)
+      await loadBudgets()
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to delete budget'))
+    }
   }
 
-  const handleEditSave = (name: string, limit: number, spent: number) => {
+  const handleEditSave = async (
+    name: string,
+    limit: number,
+    spent: number,
+    category: string
+  ) => {
     if (!editingBudget) return
-    setBudgets(prev => prev.map(b =>
-      b.id === editingBudget.id ? { ...b, name, limit, spent } : b
-    ))
-    setEditingBudget(null)
+    setSaving(true)
+    try {
+      await budgetAPI.updateBudget(editingBudget.id, {
+        name,
+        category,
+        budgetedAmount: limit,
+        spentAmount: spent,
+      })
+      await loadBudgets()
+      setEditingBudget(null)
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to update budget'))
+    } finally {
+      setSaving(false)
+    }
   }
 
   const totalBudget = budgets.reduce((s, b) => s + b.limit, 0)
   const totalSpent = budgets.reduce((s, b) => s + b.spent, 0)
   const totalRemain = totalBudget - totalSpent
 
-  if (loading) return <main><div className="loading">Loading budgets...</div></main>
+  if (loading) {
+    return (
+      <main>
+        <div className="loading">Loading budgets...</div>
+      </main>
+    )
+  }
 
   return (
     <main>
@@ -81,6 +136,8 @@ const Budget: FC = () => {
           title="Budget Manager"
           subtitle="Set monthly limits per category and track your spending."
         />
+
+        {error && <div className="auth-error-message">{error}</div>}
 
         <BudgetSummary
           totalBudget={totalBudget}
@@ -91,40 +148,35 @@ const Budget: FC = () => {
         <CreateFormSection
           title="Add New Budget Category"
           onSubmit={handleAdd}
-          submitLabel="Add"
+          submitLabel={saving ? 'Adding...' : 'Add'}
         >
           <FormField
-            label="Icon"
+            label="Category"
             type="select"
-            value={newCat.icon}
-            onChange={(val) => setNewCat({ ...newCat, icon: val })}
-            options={[
-              { value: '🛒', label: '🛒 Groceries' },
-              { value: '🚗', label: '🚗 Transport' },
-              { value: '🎬', label: '🎬 Entertainment' },
-              { value: '💡', label: '💡 Utilities' },
-              { value: '🛍', label: '🛍 Shopping' },
-              { value: '🍽', label: '🍽 Dining' },
-              { value: '💊', label: '💊 Health' },
-              { value: '📚', label: '📚 Education' },
-              { value: '✈️', label: '✈️ Travel' },
-              { value: '🏠', label: '🏠 Housing' },
-              { value: '💰', label: '💰 Other' }
-            ]}
+            value={newCat.category}
+            onChange={val => setNewCat({ ...newCat, category: val })}
+            options={categorySelectOptions(BUDGET_CATEGORIES)}
           />
           <FormField
-            label="Category Name"
+            label="Budget Name"
             type="text"
             value={newCat.name}
-            onChange={(val) => setNewCat({ ...newCat, name: val })}
-            placeholder="e.g. Groceries"
+            onChange={val => setNewCat({ ...newCat, name: val })}
+            placeholder="e.g. Monthly Groceries"
+            required
+          />
+          <FormField
+            label="Month"
+            type="date"
+            value={newCat.month}
+            onChange={val => setNewCat({ ...newCat, month: val })}
             required
           />
           <FormField
             label="Monthly Limit ($)"
             type="number"
             value={newCat.limit}
-            onChange={(val) => setNewCat({ ...newCat, limit: val })}
+            onChange={val => setNewCat({ ...newCat, limit: val })}
             placeholder="500"
             min="1"
             required
@@ -133,7 +185,7 @@ const Budget: FC = () => {
             label="Spent So Far ($)"
             type="number"
             value={newCat.spent}
-            onChange={(val) => setNewCat({ ...newCat, spent: val })}
+            onChange={val => setNewCat({ ...newCat, spent: val })}
             placeholder="0"
             min="0"
           />
@@ -161,7 +213,6 @@ const Budget: FC = () => {
           </div>
         )}
 
-        {/* Edit Modal */}
         {editingBudget && (
           <Modal
             isOpen={!!editingBudget}
@@ -171,7 +222,9 @@ const Budget: FC = () => {
           >
             <EditBudgetForm
               budget={editingBudget}
+              saving={saving}
               onSave={handleEditSave}
+              onCancel={() => setEditingBudget(null)}
             />
           </Modal>
         )}
@@ -180,19 +233,21 @@ const Budget: FC = () => {
   )
 }
 
-// Edit Budget Form Component
 const EditBudgetForm: FC<{
-  budget: BudgetCategory
-  onSave: (name: string, limit: number, spent: number) => void
-}> = ({ budget, onSave }) => {
+  budget: BudgetCardData
+  saving: boolean
+  onSave: (name: string, limit: number, spent: number, category: string) => void
+  onCancel: () => void
+}> = ({ budget, saving, onSave, onCancel }) => {
   const [name, setName] = useState(budget.name)
+  const [category, setCategory] = useState(budget.category)
   const [limit, setLimit] = useState(String(budget.limit))
   const [spent, setSpent] = useState(String(budget.spent))
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     if (!name.trim()) {
-      alert('Please enter a category name.')
+      alert('Please enter a budget name.')
       return
     }
     const l = parseFloat(limit)
@@ -200,18 +255,19 @@ const EditBudgetForm: FC<{
       alert('Please enter a valid limit.')
       return
     }
-    onSave(name.trim(), l, parseFloat(spent) || 0)
+    onSave(name.trim(), l, parseFloat(spent) || 0, category)
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <FormField
-        label="Category Name"
-        type="text"
-        value={name}
-        onChange={setName}
-        required
+        label="Category"
+        type="select"
+        value={category}
+        onChange={setCategory}
+        options={categorySelectOptions(BUDGET_CATEGORIES)}
       />
+      <FormField label="Budget Name" type="text" value={name} onChange={setName} required />
       <FormField
         label="Monthly Limit ($)"
         type="number"
@@ -228,8 +284,12 @@ const EditBudgetForm: FC<{
         min="0"
       />
       <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-        <Button type="submit" variant="primary" style={{ flex: 2 }}>Save</Button>
-        <Button type="button" variant="secondary" onClick={() => {}} style={{ flex: 1 }}>Cancel</Button>
+        <Button type="submit" variant="primary" loading={saving} style={{ flex: 2 }}>
+          Save
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel} style={{ flex: 1 }}>
+          Cancel
+        </Button>
       </div>
     </form>
   )
