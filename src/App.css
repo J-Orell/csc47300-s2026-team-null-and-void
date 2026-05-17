@@ -126,7 +126,6 @@ nav {
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 100vh;
   overflow-y: auto;
 }
 
