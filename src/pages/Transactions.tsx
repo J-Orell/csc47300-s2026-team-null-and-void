@@ -38,6 +38,7 @@ const Transactions: FC = () => {
     description: '',
     category: 'Food',
     amount: '',
+    type: 'expense' as 'income' | 'expense',
   })
 
   const loadTransactions = useCallback(async () => {
@@ -67,6 +68,7 @@ const Transactions: FC = () => {
         description: editingTx.description,
         category: editingTx.category,
         amount: String(editingTx.amount),
+        type: editingTx.type,
       })
     } else if (showModal) {
       setFormData({
@@ -74,6 +76,7 @@ const Transactions: FC = () => {
         description: '',
         category: 'Food',
         amount: '',
+        type: 'expense',
       })
     }
   }, [showModal, editingTx])
@@ -155,6 +158,7 @@ const Transactions: FC = () => {
         amount: amt,
         category: formData.category,
         date: formData.date,
+        type: formData.type,
       })
 
       if (editingTx) {
@@ -284,6 +288,25 @@ const Transactions: FC = () => {
               onChange={val => setFormData({ ...formData, category: val })}
               options={categorySelectOptions(TRANSACTION_CATEGORIES)}
             />
+            <div className="tx-type-toggle">
+              <label className="tx-type-label">Type</label>
+              <div className="tx-type-buttons">
+                <button
+                  type="button"
+                  className={`tx-type-btn ${formData.type === 'expense' ? 'active expense' : ''}`}
+                  onClick={() => setFormData({ ...formData, type: 'expense' })}
+                >
+                  Expense
+                </button>
+                <button
+                  type="button"
+                  className={`tx-type-btn ${formData.type === 'income' ? 'active income' : ''}`}
+                  onClick={() => setFormData({ ...formData, type: 'income' })}
+                >
+                  Income
+                </button>
+              </div>
+            </div>
             <FormField
               label="Amount ($)"
               type="number"

@@ -72,8 +72,21 @@ const Navigation: FC = () => {
       <div className="nav-user-section">
         {user && (
           <div className="nav-user-info">
-            <span className="nav-user-name">{user.firstName} {user.lastName}</span>
-            <span className="nav-user-email">{user.email}</span>
+            <div className="nav-avatar">
+              {user.profilePicture ? (
+                <img src={user.profilePicture} alt="Profile" className="nav-avatar-img" />
+              ) : (
+                <div className="nav-avatar-initials">
+                  {(user.firstName?.[0] || user.username?.[0] || '?').toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="nav-user-text">
+              <span className="nav-user-name">
+                {user.firstName ? `${user.firstName} ${user.lastName ?? ''}`.trim() : user.username}
+              </span>
+              <span className="nav-user-email">{user.email}</span>
+            </div>
           </div>
         )}
         <button className="nav-logout-btn" onClick={handleLogout}>

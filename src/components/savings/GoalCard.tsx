@@ -81,9 +81,6 @@ const GoalCard: FC<GoalCardProps> = ({
         <Button variant="primary" onClick={onAddMoney}>
           Add Money
         </Button>
-        <Button variant="ghost" onClick={onDelete}>
-          Delete
-        </Button>
       </div>
     </Card>
   )

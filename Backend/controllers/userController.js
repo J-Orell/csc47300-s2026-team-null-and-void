@@ -41,6 +41,8 @@ exports.register = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        profilePicture: user.profilePicture,
+        phone: user.phone,
       },
     });
   } catch (error) {
@@ -86,6 +88,8 @@ exports.login = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        profilePicture: user.profilePicture,
+        phone: user.phone,
       },
     });
   } catch (error) {
@@ -113,9 +117,9 @@ exports.getProfile = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, username, email, profilePicture } = req.body;
+    const { firstName, lastName, username, email, profilePicture, phone } = req.body;
 
-    const updates = { firstName, lastName, username, profilePicture, updatedAt: Date.now() };
+    const updates = { firstName, lastName, username, profilePicture, phone, updatedAt: Date.now() };
     if (email) updates.email = email;
 
     const user = await User.findByIdAndUpdate(
@@ -213,6 +217,32 @@ exports.updateUserByAdmin = async (req, res) => {
       message: 'User updated successfully',
       user,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete own account (self-service)
+exports.deleteOwnAccount = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required to delete account' });
+    }
+
+    const user = await User.findById(req.user.id).select('+password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isValid = await user.comparePassword(password);
+    if (!isValid) {
+      return res.status(401).json({ message: 'Incorrect password' });
+    }
+
+    await User.findByIdAndDelete(req.user.id);
+
+    res.status(200).json({ success: true, message: 'Account deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

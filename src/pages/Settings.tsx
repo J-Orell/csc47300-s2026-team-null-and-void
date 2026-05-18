@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useCallback } from 'react'
-import { PageHeader, Button, FormField } from '../components/common'
+import { PageHeader, Button, FormField, Modal } from '../components/common'
 import {
   SettingsSection, NotificationToggle,
   PaymentCard, AccountActionCard
@@ -8,6 +8,8 @@ import { settingsAPI, userAPI } from '../utils/api'
 import { useAuth } from '../context/AuthContext'
 import { getApiErrorMessage } from '../utils/mappers'
 import { NotificationSettings, UserSettings } from '../types'
+import { transactionAPI } from '../utils/api'
+import { ApiTransaction } from '../types/api'
 import '../styles/Settings.css'
 
 interface PaymentCardUi {
@@ -18,7 +20,7 @@ interface PaymentCardUi {
 }
 
 const Settings: FC = () => {
-  const { user, login } = useAuth()
+  const { user, login, logout } = useAuth()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [settings, setSettings] = useState<UserSettings>({
@@ -37,8 +39,17 @@ const Settings: FC = () => {
     monthlyReport: true,
   })
   const [cards, setCards] = useState<PaymentCardUi[]>([])
+  const [profilePicture, setProfilePicture] = useState('')
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    () => (localStorage.getItem('theme') as 'light' | 'dark') || 'light'
+  )
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleteError, setDeleteError] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   const loadSettings = useCallback(async () => {
     setLoading(true)
@@ -53,15 +64,21 @@ const Settings: FC = () => {
       const apiSettings = settingsRes.data.settings
       const profile = profileRes.data.user
 
+      setProfilePicture(profile.profilePicture || '')
       setSettings({
         fullName: [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.username,
         email: profile.email,
-        phone: '',
+        phone: profile.phone || '',
         currency: apiSettings.currency || 'USD',
         threshold: 90,
         dateFormat: 'mdy',
         budgetCycleStart: '1',
       })
+
+      const savedTheme = (apiSettings.theme as 'light' | 'dark') || 'light'
+      setTheme(savedTheme)
+      localStorage.setItem('theme', savedTheme)
+      document.documentElement.setAttribute('data-theme', savedTheme)
 
       setNotifications({
         budgetAlerts: apiSettings.monthlyBudgetReminder ?? true,
@@ -100,8 +117,17 @@ const Settings: FC = () => {
     setSaved(false)
   }
 
+  const handleThemeToggle = () => {
+    const next = theme === 'light' ? 'dark' : 'light'
+    setTheme(next)
+    localStorage.setItem('theme', next)
+    document.documentElement.setAttribute('data-theme', next)
+    setSaved(false)
+  }
+
   const saveSettings = async () => {
     setSaving(true)
+    setSaveError('')
     try {
       const nameParts = settings.fullName.trim().split(/\s+/)
       const firstName = nameParts[0] || ''
@@ -111,10 +137,13 @@ const Settings: FC = () => {
         firstName,
         lastName,
         email: settings.email,
+        profilePicture: profilePicture || undefined,
+        phone: settings.phone,
       })
 
       await settingsAPI.updateSettings({
         currency: settings.currency,
+        theme,
         notificationsEnabled: notifications.transactionAlerts,
         emailNotifications: notifications.weeklySummary,
         monthlyBudgetReminder: notifications.budgetAlerts,
@@ -128,13 +157,15 @@ const Settings: FC = () => {
           email: settings.email,
           firstName,
           lastName,
+          profilePicture: profilePicture || null,
+          phone: settings.phone,
         })
       }
 
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (err) {
-      alert(getApiErrorMessage(err, 'Failed to save settings'))
+      setSaveError(getApiErrorMessage(err, 'Failed to save settings'))
     } finally {
       setSaving(false)
     }
@@ -143,6 +174,50 @@ const Settings: FC = () => {
   const resetSettings = () => {
     loadSettings()
     setSaved(false)
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      setDeleteError('Please enter your password.')
+      return
+    }
+    setDeleting(true)
+    setDeleteError('')
+    try {
+      await userAPI.deleteOwnAccount(deletePassword)
+      logout()
+    } catch (err) {
+      setDeleteError(getApiErrorMessage(err, 'Failed to delete account'))
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const exportCSV = async () => {
+    try {
+      const res = await transactionAPI.getUserTransactions()
+      const transactions = res.data.transactions as ApiTransaction[]
+      const header = 'Date,Description,Category,Type,Amount'
+      const rows = transactions.map(t =>
+        [
+          new Date(t.date).toLocaleDateString('en-US'),
+          `"${t.description.replace(/"/g, '""')}"`,
+          t.category,
+          t.type,
+          t.type === 'expense' ? `-${t.amount}` : `${t.amount}`,
+        ].join(',')
+      )
+      const csv = [header, ...rows].join('\n')
+      const blob = new Blob([csv], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `budgetbuddy-transactions-${new Date().toISOString().split('T')[0]}.csv`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to export transactions'))
+    }
   }
 
   const removeCard = async (id: string) => {
@@ -203,6 +278,26 @@ const Settings: FC = () => {
 
         <form onSubmit={e => e.preventDefault()}>
           <SettingsSection title="Personal Information">
+            <div className="profile-pic-row">
+              <div className="profile-pic-preview">
+                {profilePicture ? (
+                  <img src={profilePicture} alt="Profile preview" className="profile-pic-img" />
+                ) : (
+                  <div className="profile-pic-placeholder">
+                    {(user?.firstName?.[0] || user?.username?.[0] || '?').toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="profile-pic-field">
+                <FormField
+                  label="Profile Picture URL"
+                  type="text"
+                  value={profilePicture}
+                  onChange={val => { setProfilePicture(val); setSaved(false) }}
+                  placeholder="https://example.com/photo.jpg"
+                />
+              </div>
+            </div>
             <div className="settings-grid">
               <div className="settings-full-row">
                 <FormField
@@ -223,12 +318,26 @@ const Settings: FC = () => {
                 type="tel"
                 value={settings.phone}
                 onChange={val => updateSetting('phone', val)}
-                placeholder="(optional — not stored on server yet)"
+                placeholder="(212) 555-0199"
               />
             </div>
           </SettingsSection>
 
           <SettingsSection title="Preferences">
+            <div className="theme-toggle-row">
+              <div className="toggle-info">
+                <span className="toggle-label">Dark Mode</span>
+                <span className="toggle-desc">Switch between light and dark theme</span>
+              </div>
+              <label className="toggle-switch">
+                <input
+                  type="checkbox"
+                  checked={theme === 'dark'}
+                  onChange={handleThemeToggle}
+                />
+                <span className="toggle-slider"></span>
+              </label>
+            </div>
             <div className="settings-grid">
               <FormField
                 label="Local Currency"
@@ -330,7 +439,7 @@ const Settings: FC = () => {
                 actionLabel="Export"
                 buttonVariant="primary"
                 buttonClassName="btn-action-export"
-                onAction={() => alert('Export coming soon')}
+                onAction={exportCSV}
               />
               <AccountActionCard
                 title="Pause Account"
@@ -347,13 +456,9 @@ const Settings: FC = () => {
                 variant="danger"
                 buttonVariant="danger"
                 onAction={() => {
-                  if (
-                    window.confirm(
-                      'Are you sure you want to delete your account? This cannot be undone.'
-                    )
-                  ) {
-                    alert('Contact admin to delete account')
-                  }
+                  setDeletePassword('')
+                  setDeleteError('')
+                  setShowDeleteModal(true)
                 }}
               />
             </div>
@@ -371,8 +476,48 @@ const Settings: FC = () => {
           {saved && (
             <div className="save-success">✓ Settings saved successfully!</div>
           )}
+          {saveError && (
+            <div className="auth-error-message">{saveError}</div>
+          )}
         </form>
       </div>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Delete Account"
+      >
+        <p className="delete-modal-warning">
+          This will permanently delete your account and all your data. This cannot be undone.
+        </p>
+        <FormField
+          label="Confirm your password"
+          type="password"
+          value={deletePassword}
+          onChange={val => { setDeletePassword(val); setDeleteError('') }}
+          placeholder="Enter your password"
+        />
+        {deleteError && (
+          <div className="auth-error-message" style={{ marginTop: '0.75rem' }}>{deleteError}</div>
+        )}
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+          <Button
+            variant="danger"
+            loading={deleting}
+            onClick={handleDeleteAccount}
+            className="modal-form-submit"
+          >
+            Delete My Account
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowDeleteModal(false)}
+            className="modal-form-cancel"
+          >
+            Cancel
+          </Button>
+        </div>
+      </Modal>
     </main>
   )
 }

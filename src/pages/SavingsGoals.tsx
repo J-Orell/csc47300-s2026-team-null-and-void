@@ -1,7 +1,7 @@
 import { FC, useState, FormEvent, useCallback, useEffect } from 'react'
 import {
   PageHeader, Button, Modal,
-  FormField, EmptyState, CreateFormSection
+  FormField, EmptyState, CreateFormSection,
 } from '../components/common'
 import { GoalCard, SavingsSummary } from '../components/savings'
 import { savingsGoalAPI } from '../utils/api'
@@ -18,6 +18,9 @@ const SavingsGoals: FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState('')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [addMoneyError, setAddMoneyError] = useState('')
   const [formData, setFormData] = useState({
     goalName: '',
     targetAmount: '',
@@ -98,16 +101,17 @@ const SavingsGoals: FC = () => {
 
   const handleAddGoal = async (e: FormEvent) => {
     e.preventDefault()
+    setFormError('')
     if (!formData.goalName.trim()) {
-      alert('Please enter a goal name.')
+      setFormError('Please enter a goal name.')
       return
     }
     if (!formData.targetAmount) {
-      alert('Please enter a target amount.')
+      setFormError('Please enter a target amount.')
       return
     }
     if (!formData.deadline) {
-      alert('Please select a deadline.')
+      setFormError('Please select a deadline.')
       return
     }
 
@@ -121,30 +125,33 @@ const SavingsGoals: FC = () => {
       await loadGoals()
       setFormData({ goalName: '', targetAmount: '', deadline: '' })
     } catch (err) {
-      alert(getApiErrorMessage(err, 'Failed to create goal'))
+      setFormError(getApiErrorMessage(err, 'Failed to create goal'))
     } finally {
       setSaving(false)
     }
   }
 
-  const handleDeleteGoal = async (id: string) => {
-    if (!window.confirm('Delete this savings goal?')) return
+  const handleDeleteGoal = async () => {
+    if (!deletingId) return
     try {
-      await savingsGoalAPI.deleteGoal(id)
+      await savingsGoalAPI.deleteGoal(deletingId)
       await loadGoals()
+      setDeletingId(null)
     } catch (err) {
-      alert(getApiErrorMessage(err, 'Failed to delete goal'))
+      setError(getApiErrorMessage(err, 'Failed to delete goal'))
+      setDeletingId(null)
     }
   }
 
   const handleAddMoney = async (amount: number) => {
     if (!addMoneyGoalId) return
+    setAddMoneyError('')
     try {
       await savingsGoalAPI.addToGoal(addMoneyGoalId, amount)
       await loadGoals()
       setAddMoneyGoalId(null)
     } catch (err) {
-      alert(getApiErrorMessage(err, 'Failed to add money'))
+      setAddMoneyError(getApiErrorMessage(err, 'Failed to add money'))
     }
   }
 
@@ -178,6 +185,8 @@ const SavingsGoals: FC = () => {
           isOnTrack={allGoalsOnTrack}
           projectedCompletion={topGoal ? getProjectedCompletion(topGoal) : 'N/A'}
         />
+
+        {formError && <div className="auth-error-message">{formError}</div>}
 
         <CreateFormSection
           title="Create New Goal"
@@ -230,7 +239,7 @@ const SavingsGoals: FC = () => {
                   isOnTrack={isOnTrack(goal)}
                   projectedCompletion={getProjectedCompletion(goal)}
                   onAddMoney={() => setAddMoneyGoalId(goal.id)}
-                  onDelete={() => handleDeleteGoal(goal.id)}
+                  onDelete={() => setDeletingId(goal.id)}
                 />
               ))}
             </div>
@@ -238,10 +247,30 @@ const SavingsGoals: FC = () => {
         </div>
       </div>
 
+      <Modal
+        isOpen={!!deletingId}
+        onClose={() => setDeletingId(null)}
+        title="Delete Goal"
+        maxWidth="360px"
+      >
+        <p style={{ marginBottom: '1.5rem', color: 'var(--text-medium)' }}>
+          Are you sure you want to delete this savings goal? This cannot be undone.
+        </p>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Button variant="danger" onClick={handleDeleteGoal} style={{ flex: 2 }}>
+            Delete
+          </Button>
+          <Button variant="secondary" onClick={() => setDeletingId(null)} style={{ flex: 1 }}>
+            Cancel
+          </Button>
+        </div>
+      </Modal>
+
       {addMoneyGoal && (
         <AddMoneyModal
           goalName={addMoneyGoal.name}
-          onClose={() => setAddMoneyGoalId(null)}
+          error={addMoneyError}
+          onClose={() => { setAddMoneyGoalId(null); setAddMoneyError('') }}
           onAdd={handleAddMoney}
         />
       )}
@@ -251,18 +280,21 @@ const SavingsGoals: FC = () => {
 
 const AddMoneyModal: FC<{
   goalName: string
+  error: string
   onClose: () => void
   onAdd: (amount: number) => void
-}> = ({ goalName, onClose, onAdd }) => {
+}> = ({ goalName, error, onClose, onAdd }) => {
   const [amount, setAmount] = useState('')
+  const [localError, setLocalError] = useState('')
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     const n = parseFloat(amount)
     if (!n || n <= 0) {
-      alert('Please enter a valid amount.')
+      setLocalError('Please enter a valid amount.')
       return
     }
+    setLocalError('')
     onAdd(n)
   }
 
@@ -282,6 +314,11 @@ const AddMoneyModal: FC<{
           step="0.01"
           required
         />
+        {(localError || error) && (
+          <div className="auth-error-message" style={{ marginTop: '0.75rem' }}>
+            {localError || error}
+          </div>
+        )}
         <div className="add-money-actions">
           <Button type="submit" variant="primary" className="add-money-submit">
             Add Money

@@ -20,6 +20,8 @@ const Budget: FC = () => {
   const [error, setError] = useState('')
   const [editingBudget, setEditingBudget] = useState<BudgetCardData | null>(null)
   const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState('')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [newCat, setNewCat] = useState({
     category: 'Food',
     name: '',
@@ -48,13 +50,14 @@ const Budget: FC = () => {
 
   const handleAdd = async (e: FormEvent) => {
     e.preventDefault()
+    setFormError('')
     if (!newCat.name.trim()) {
-      alert('Please enter a budget name.')
+      setFormError('Please enter a budget name.')
       return
     }
     const limit = parseFloat(newCat.limit)
     if (!limit || limit <= 0) {
-      alert('Please enter a valid budget limit.')
+      setFormError('Please enter a valid budget limit.')
       return
     }
     const spent = parseFloat(newCat.spent) || 0
@@ -77,19 +80,21 @@ const Budget: FC = () => {
         month: new Date().toISOString().slice(0, 7) + '-01',
       })
     } catch (err) {
-      alert(getApiErrorMessage(err, 'Failed to create budget'))
+      setFormError(getApiErrorMessage(err, 'Failed to create budget'))
     } finally {
       setSaving(false)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this budget?')) return
+  const handleDelete = async () => {
+    if (!deletingId) return
     try {
-      await budgetAPI.deleteBudget(id)
+      await budgetAPI.deleteBudget(deletingId)
       await loadBudgets()
+      setDeletingId(null)
     } catch (err) {
-      alert(getApiErrorMessage(err, 'Failed to delete budget'))
+      setError(getApiErrorMessage(err, 'Failed to delete budget'))
+      setDeletingId(null)
     }
   }
 
@@ -97,7 +102,8 @@ const Budget: FC = () => {
     name: string,
     limit: number,
     spent: number,
-    category: string
+    category: string,
+    onError: (msg: string) => void
   ) => {
     if (!editingBudget) return
     setSaving(true)
@@ -111,7 +117,7 @@ const Budget: FC = () => {
       await loadBudgets()
       setEditingBudget(null)
     } catch (err) {
-      alert(getApiErrorMessage(err, 'Failed to update budget'))
+      onError(getApiErrorMessage(err, 'Failed to update budget'))
     } finally {
       setSaving(false)
     }
@@ -144,6 +150,8 @@ const Budget: FC = () => {
           totalSpent={totalSpent}
           totalRemain={totalRemain}
         />
+
+        {formError && <div className="auth-error-message">{formError}</div>}
 
         <CreateFormSection
           title="Add New Budget Category"
@@ -207,7 +215,7 @@ const Budget: FC = () => {
                 limit={b.limit}
                 spent={b.spent}
                 onEdit={() => setEditingBudget(b)}
-                onDelete={() => handleDelete(b.id)}
+                onDelete={() => setDeletingId(b.id)}
               />
             ))}
           </div>
@@ -228,6 +236,25 @@ const Budget: FC = () => {
             />
           </Modal>
         )}
+
+        <Modal
+          isOpen={!!deletingId}
+          onClose={() => setDeletingId(null)}
+          title="Delete Budget"
+          maxWidth="360px"
+        >
+          <p style={{ marginBottom: '1.5rem', color: 'var(--text-medium)' }}>
+            Are you sure you want to delete this budget? This cannot be undone.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <Button variant="danger" onClick={handleDelete} style={{ flex: 2 }}>
+              Delete
+            </Button>
+            <Button variant="secondary" onClick={() => setDeletingId(null)} style={{ flex: 1 }}>
+              Cancel
+            </Button>
+          </div>
+        </Modal>
       </div>
     </main>
   )
@@ -236,26 +263,28 @@ const Budget: FC = () => {
 const EditBudgetForm: FC<{
   budget: BudgetCardData
   saving: boolean
-  onSave: (name: string, limit: number, spent: number, category: string) => void
+  onSave: (name: string, limit: number, spent: number, category: string, onError: (msg: string) => void) => void
   onCancel: () => void
 }> = ({ budget, saving, onSave, onCancel }) => {
   const [name, setName] = useState(budget.name)
   const [category, setCategory] = useState(budget.category)
   const [limit, setLimit] = useState(String(budget.limit))
   const [spent, setSpent] = useState(String(budget.spent))
+  const [formError, setFormError] = useState('')
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
+    setFormError('')
     if (!name.trim()) {
-      alert('Please enter a budget name.')
+      setFormError('Please enter a budget name.')
       return
     }
     const l = parseFloat(limit)
     if (!l || l <= 0) {
-      alert('Please enter a valid limit.')
+      setFormError('Please enter a valid limit.')
       return
     }
-    onSave(name.trim(), l, parseFloat(spent) || 0, category)
+    onSave(name.trim(), l, parseFloat(spent) || 0, category, setFormError)
   }
 
   return (
@@ -283,6 +312,7 @@ const EditBudgetForm: FC<{
         onChange={setSpent}
         min="0"
       />
+      {formError && <div className="auth-error-message" style={{ marginTop: '0.75rem' }}>{formError}</div>}
       <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
         <Button type="submit" variant="primary" loading={saving} style={{ flex: 2 }}>
           Save

@@ -61,7 +61,11 @@ export const userAPI = {
     username?: string;
     email?: string;
     profilePicture?: string;
+    phone?: string;
   }) => apiClient.put('/users/profile', data),
+
+  deleteOwnAccount: (password: string) =>
+    apiClient.delete('/users/me', { data: { password } }),
 
   getAllUsers: () => apiClient.get('/users'),
 

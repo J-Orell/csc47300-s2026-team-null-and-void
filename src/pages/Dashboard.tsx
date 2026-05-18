@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useState } from 'react'
 import { DashboardData } from '../types'
 import { getCurrentDate } from '../utils/helpers'
-import { PageHeader } from '../components/common'
+import { PageHeader, EmptyState } from '../components/common'
 import {
   ChartCard, CategoryDetail, DashboardSummary,
   MonthlyChart, CategoryChart
@@ -60,6 +60,7 @@ const Dashboard: FC = () => {
 
   const categoryEntries = Object.entries(data.categoryBreakdown)
   const total = categoryEntries.reduce((sum, [, amount]) => sum + amount, 0)
+  const hasData = data.monthlyData.income.some(v => v > 0) || data.monthlyData.expenses.some(v => v > 0)
 
   return (
     <main className="dashboard-container">
@@ -69,6 +70,13 @@ const Dashboard: FC = () => {
         extra={getCurrentDate()}
       />
 
+      {!hasData ? (
+        <EmptyState
+          icon="📊"
+          message="No transactions yet. Add some transactions to see your financial overview here."
+        />
+      ) : (
+      <>
       <DashboardSummary
         totalIncome={data.currentMonth.totalIncome}
         totalExpenses={data.currentMonth.totalExpenses}
@@ -110,6 +118,8 @@ const Dashboard: FC = () => {
           </div>
         )}
       </div>
+      </>
+      )}
     </main>
   )
 }

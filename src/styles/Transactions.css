@@ -5,6 +5,52 @@
   icon-btn, btn-filter, animations) come from App.css.
 */
 
+/* ── Transaction Type Toggle ── */
+.tx-type-toggle {
+  margin-bottom: 1rem;
+}
+
+.tx-type-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-medium);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tx-type-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tx-type-btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--border-card);
+  border-radius: 8px;
+  background: var(--bg-light);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.tx-type-btn.active.expense {
+  background: #fff0f0;
+  border-color: var(--red-main);
+  color: var(--red-main);
+}
+
+.tx-type-btn.active.income {
+  background: var(--green-bg);
+  border-color: var(--green-main);
+  color: var(--green-main);
+}
+
 .transactions-container {
   max-width: 1400px;
   margin: 0 auto;

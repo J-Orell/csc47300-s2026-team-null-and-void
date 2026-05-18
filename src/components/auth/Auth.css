@@ -1,7 +1,9 @@
 /* Auth page styling for Login and Signup components */
 
 .auth-page {
-  min-height: 100vh;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,12 +20,12 @@
 .auth-content-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: center;
+  gap: 1.5rem;
+  align-items: stretch;
   background: var(--bg-white);
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: var(--shadow-heavy);
-  overflow: hidden;
+  padding: 1.5rem;
   min-height: 600px;
 }
 
@@ -40,6 +42,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  border-radius: 12px;
 }
 
 .auth-branding::before {
@@ -316,7 +319,8 @@
   .auth-content-wrapper {
     grid-template-columns: 1fr;
     min-height: auto;
-    gap: 0;
+    gap: 1rem;
+    padding: 1rem;
   }
 
   .auth-branding {
@@ -324,6 +328,7 @@
     min-height: 300px;
     display: flex;
     align-items: center;
+    border-radius: 10px;
   }
 
   .auth-branding h1 {

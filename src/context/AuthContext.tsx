@@ -15,6 +15,8 @@ export interface AuthUser {
   firstName?: string
   lastName?: string
   role?: string
+  profilePicture?: string | null
+  phone?: string
 }
 
 interface AuthContextValue {
@@ -53,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     localStorage.removeItem('authToken')
     localStorage.removeItem('user')
+    localStorage.removeItem('theme')
+    document.documentElement.setAttribute('data-theme', 'light')
     setIsLoggedIn(false)
     setUser(null)
   }, [])

@@ -44,6 +44,75 @@ Shared styles (animations, header, empty-state) come from App.css.
   border-bottom: 2px solid var(--green-border);
 }
 
+/* ── Profile Picture ── */
+.profile-pic-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-divider);
+}
+
+.profile-pic-preview {
+  flex-shrink: 0;
+}
+
+.profile-pic-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--green-main);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-pic-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--gradient-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  border: 3px solid var(--green-main);
+}
+
+.profile-pic-field {
+  flex: 1;
+}
+
+/* ── Theme Toggle Row ── */
+.theme-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-divider);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-row:hover {
+  padding-left: 1rem;
+  background: rgba(46, 125, 50, 0.04);
+}
+
+/* ── Delete Modal ── */
+.delete-modal-warning {
+  color: var(--red-main);
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  background: #fff5f5;
+  border-radius: 8px;
+  border-left: 3px solid var(--red-main);
+}
+
 /* ── Form Grid ── */
 .settings-grid {
   display: grid;
