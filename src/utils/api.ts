@@ -1,6 +1,17 @@
 import axios, { AxiosInstance } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050/api';
+const DEFAULT_API_URL = import.meta.env.PROD
+  ? 'https://csc47300-s2026-team-null-and-void.onrender.com/api'
+  : 'http://localhost:5050/api';
+
+const normalizeApiUrl = (url: string) => {
+  const trimmedUrl = url.trim().replace(/\/+$/, '');
+  return trimmedUrl.endsWith('/api') ? trimmedUrl : `${trimmedUrl}/api`;
+};
+
+const API_BASE_URL = normalizeApiUrl(
+  import.meta.env.VITE_API_URL || DEFAULT_API_URL
+);
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
